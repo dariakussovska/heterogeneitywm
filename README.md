@@ -18,3 +18,12 @@ Detailed description of the dataset is included in the original paper by Kyzar e
 # Data extraction
 
 In order to extact data for main analysis, you can use the code 1_data_extraction. Note that this is not needed for you to recreate all analyses and figures, as Excel sheets for main analyses will be provided as part of every code for main/supplementary analysis figure. 
+
+# Important - Install dependencies 
+
+Since some of the analyses were done in Excel, download the following files to make sure that everything runs smootly with your codes:
+
+new_trial_info.xlsx
+new_trial_final.xlsx
+brain_regions_cleaned.xlsx
+Cell_Metrics.xlsx 
