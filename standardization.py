@@ -31,14 +31,33 @@ def standardize_spikes(file_path, spikes_column, period_name):
     if 'start_time_enc1' in df.columns and spikes_column in df.columns:
         def standardize_row_spikes(row):
             spikes = row[spikes_column]
+            
+            # Debug: print the type and first few elements
             if isinstance(spikes, str):
                 try:
                     spikes = ast.literal_eval(spikes)
                 except:
                     spikes = []
             
+            # Handle nested lists by flattening
+            def flatten_spikes(spike_data):
+                flat_list = []
+                for item in spike_data:
+                    if isinstance(item, list):
+                        flat_list.extend(flatten_spikes(item))
+                    else:
+                        flat_list.append(item)
+                return flat_list
+            
+            if isinstance(spikes, list):
+                spikes = flatten_spikes(spikes)
+            
             if isinstance(spikes, list) and not pd.isna(row['start_time_enc1']):
-                return [float(spike) - float(row['start_time_enc1']) for spike in spikes if spike is not None]
+                try:
+                    return [float(spike) - float(row['start_time_enc1']) for spike in spikes if spike is not None]
+                except (TypeError, ValueError) as e:
+                    print(f"Error processing spikes: {spikes}, error: {e}")
+                    return []
             return []
 
         df['Standardized_Spikes'] = df.apply(standardize_row_spikes, axis=1)
@@ -47,8 +66,17 @@ def standardize_spikes(file_path, spikes_column, period_name):
         print(f"Missing required columns in {file_path}. Skipping standardization.")
         return None
 
+# Test with one file first to see the actual data structure
+print("Testing with Encoding1 file...")
+test_df = pd.read_excel(filtered_files['Encoding1'])
+print("Sample spike data:")
+print(test_df['Spikes'].head(3))
+print("Data types:")
+print(test_df['Spikes'].apply(type).value_counts())
+
 standardized_data = {}
 for period_name, file_path in filtered_files.items():
+    print(f"Processing {period_name}...")
     spikes_column = 'Spikes' 
     if period_name == 'Delay':
         spikes_column = 'Spikes_in_Delay'
@@ -135,8 +163,25 @@ def standardize_fixation_period(file_path, spikes_column, start_time_column):
                 except:
                     spikes = []
             
+            # Handle nested lists by flattening
+            def flatten_spikes(spike_data):
+                flat_list = []
+                for item in spike_data:
+                    if isinstance(item, list):
+                        flat_list.extend(flatten_spikes(item))
+                    else:
+                        flat_list.append(item)
+                return flat_list
+            
+            if isinstance(spikes, list):
+                spikes = flatten_spikes(spikes)
+            
             if isinstance(spikes, list) and not pd.isna(row[start_time_column]):
-                return [float(spike) - float(row[start_time_column]) for spike in spikes if spike is not None]
+                try:
+                    return [float(spike) - float(row[start_time_column]) for spike in spikes if spike is not None]
+                except (TypeError, ValueError) as e:
+                    print(f"Error processing spikes: {spikes}, error: {e}")
+                    return []
             return []
 
         df['Standardized_Spikes'] = df.apply(standardize_row_spikes, axis=1)
