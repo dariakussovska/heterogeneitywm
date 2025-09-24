@@ -114,9 +114,18 @@ def plot_raster_and_psth_grouped_by_stimulus(
         print(f"PSTH plot with CI saved to {psth_path}")
     plt.show()
 
-plot_example_concept_cells(
-    df_original=df,
-    df_sig=df_final,
-    save_dir='/home/daria',
-    max_plots=2
+import pandas as pd
+
+df_spikes = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Encoding1.xlsx')
+
+plot_raster_and_psth_grouped_by_stimulus(
+    data=df_spikes,
+    neuron_id_3=14016,
+    subject_id=14,
+    spike_column='Standardized_Spikes',
+    stimulus_column='stimulus_index',
+    time_range=(0, 1),
+    bin_size=0.05,
+    smooth_sigma=1,
+    save_dir='/home/daria/PROJECT'
 )
