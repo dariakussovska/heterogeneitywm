@@ -9,8 +9,8 @@ Install the dataset (from https://www.nature.com/articles/s41597-024-02943-8) an
 One way is to use dandi (install with conda or pip): 
 
 ```
-conda install -c conda forge dandi
-dandi download https://dandiarchive.org/dandiset/000469
+pip install "dandi>=0.60.0"
+dandi download DANDI:000469/0.240123.1806
 ```
 
 Detailed description of the dataset is included in the original paper by Kyzar et al., 2024. 
