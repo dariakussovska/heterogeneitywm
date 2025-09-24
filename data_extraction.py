@@ -294,7 +294,7 @@ class NWBProcessor:
 # Main execution
 if __name__ == "__main__":
     # Update file paths for your server
-    filepaths = [f"/home/daria/PROJECT/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" 
+    filepaths = [f"/home/daria/PROJECT/000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" 
                 for i in range(21)]
     
     # Initialize processor
