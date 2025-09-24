@@ -6,11 +6,11 @@ There are some notebooks for pre-processing steps, but we have also provided ext
 # Downloading the dataset
 Install the dataset (from https://www.nature.com/articles/s41597-024-02943-8) and put it in a folder on your computer. There are multiple ways of installing this dataset, all of them detailed in the github repository of the Kyzar et al., 2024 paper. 
 
-One way is to clone the repository: 
+One way is to use dandi (install with conda or pip): 
 
 ```
-cd $target_directory 
-git clone https://github.com/rutishauserlab/workingmem-release-NWB.git
+conda install -c conda forge dandi
+dandi download https://dandiarchive.org/dandiset/000469
 ```
 
 Detailed description of the dataset is included in the original paper by Kyzar et al., 2024. 
