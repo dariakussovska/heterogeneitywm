@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from ast import literal_eval
 import os 
+import matplotlib.pyplot as plt
 
 def compute_firing_rate(df, start_time=0.2, end_time=1.0):
     """
