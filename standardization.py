@@ -29,13 +29,19 @@ def standardize_spikes(file_path, spikes_column, period_name):
     )
 
     if 'start_time_enc1' in df.columns and spikes_column in df.columns:
-        def standardize_spikes(row):
-            spikes = ast.literal_eval(row[spikes_column]) if isinstance(row[spikes_column], str) else row[spikes_column]
+        def standardize_row_spikes(row):
+            spikes = row[spikes_column]
+            if isinstance(spikes, str):
+                try:
+                    spikes = ast.literal_eval(spikes)
+                except:
+                    spikes = []
+            
             if isinstance(spikes, list) and not pd.isna(row['start_time_enc1']):
-                return [spike - row['start_time_enc1'] for spike in spikes]
+                return [float(spike) - float(row['start_time_enc1']) for spike in spikes if spike is not None]
             return []
 
-        df['Standardized_Spikes'] = df.apply(standardize_spikes, axis=1)
+        df['Standardized_Spikes'] = df.apply(standardize_row_spikes, axis=1)
         return df
     else:
         print(f"Missing required columns in {file_path}. Skipping standardization.")
@@ -58,28 +64,6 @@ for period_name, file_path in filtered_files.items():
         standardized_data[period_name] = standardized_df
 
 print("Standardization completed for all filtered files.")
-
-significant_neurons = pd.read_excel(os.path.join(BASE_DIR, 'Neuron_Check_Significant_All.xlsx'))
-significant_neurons.rename(columns={'Signi': 'Significance'}, inplace=True)
-
-significant_neurons['subject_id'] = significant_neurons['subject_id'].astype(str).str.strip()
-significant_neurons['Neuron_ID'] = significant_neurons['Neuron_ID'].astype(int)
-
-for period_name, df in standardized_data.items():
-    df['subject_id'] = df['subject_id'].astype(str).str.strip()
-    df['Neuron_ID'] = df['Neuron_ID'].astype(int)
-
-    df = pd.merge(
-        df,
-        significant_neurons[['subject_id', 'Neuron_ID', 'Significance']],
-        on=['subject_id', 'Neuron_ID'],
-        how='left'  
-    )
-
-    df['Significance'] = df['Significance'].fillna('N')
-    standardized_data[period_name] = df
-
-print("Significance column added to all standardized DataFrames.")
 
 trial_info_new = pd.read_excel(os.path.join(BASE_DIR, 'new_trial_info.xlsx'))
 trial_info_final = pd.read_excel(os.path.join(BASE_DIR, 'new_trial_final.xlsx'))
@@ -138,19 +122,24 @@ clean_standardized_data()
 print("All standardized data has been cleaned and saved in the clean_data folder.")
 
 fixation_file_path = os.path.join(BASE_DIR, 'all_spike_rate_data_fixation.xlsx')
-trial_info_path = os.path.join(BASE_DIR, 'trial_info.xlsx')
 
 def standardize_fixation_period(file_path, spikes_column, start_time_column):
     df = pd.read_excel(file_path)
 
     if start_time_column in df.columns and spikes_column in df.columns:
-        def standardize_spikes(row):
-            spikes = ast.literal_eval(row[spikes_column]) if isinstance(row[spikes_column], str) else row[spikes_column]
+        def standardize_row_spikes(row):
+            spikes = row[spikes_column]
+            if isinstance(spikes, str):
+                try:
+                    spikes = ast.literal_eval(spikes)
+                except:
+                    spikes = []
+            
             if isinstance(spikes, list) and not pd.isna(row[start_time_column]):
-                return [spike - row[start_time_column] for spike in spikes]
+                return [float(spike) - float(row[start_time_column]) for spike in spikes if spike is not None]
             return []
 
-        df['Standardized_Spikes'] = df.apply(standardize_spikes, axis=1)
+        df['Standardized_Spikes'] = df.apply(standardize_row_spikes, axis=1)
         print("Fixation data standardized successfully.")
         return df
     else:
@@ -162,10 +151,6 @@ standardized_fixation_data = standardize_fixation_period(
     spikes_column='Spikes_in_Fixation',
     start_time_column='Fixation_Start'
 )
-
-trial_info = pd.read_excel(trial_info_path)
-trial_info['subject_id'] = trial_info['subject_id'].astype(str).str.strip()
-trial_info['trial_id'] = trial_info['trial_id'].astype(int)
 
 if standardized_fixation_data is not None:
     standardized_fixation_data['subject_id'] = standardized_fixation_data['subject_id'].astype(str).str.strip()
