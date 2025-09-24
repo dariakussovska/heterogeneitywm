@@ -108,7 +108,7 @@ def run_significance_test(df, iteration=1000):
     return df
 
 df_final = run_significance_test(df_top_2)
-df_final.to_excel('/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Significant_All.xlsx', index=False)
+df_final.to_excel('/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx', index=False)
 print("Final file saved at: Neuron_Check_Significant_All.xlsx")
 
 significant_neurons = df_final[df_final['Signi'] == 'Y']
@@ -135,7 +135,7 @@ for filename in os.listdir(clean_data_dir):
         print(f"Added significance data to: {filename}")
 
 # Add significance results to all graph_data files  
-graph_data_dir = "/Users/darikussovska/Desktop/PROJECT/graph_data"
+graph_data_dir = "/home/daria/PROJECT/graph_data"
 for filename in os.listdir(graph_data_dir):
     if filename.startswith('graph_') and filename.endswith('.xlsx'):
         file_path = os.path.join(graph_data_dir, filename)
