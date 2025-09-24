@@ -143,7 +143,7 @@ all_data_enc2 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding
 all_data_enc3 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding3.xlsx')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
-output_path = '/home/daira//PROJECT/trial_info.xlsx'
+output_path = '/home/daria/PROJECT/trial_info.xlsx'
 trial_info_df.to_excel(output_path, index=False)
 
 print(f"Trial info has been saved to {output_path}")
