@@ -138,9 +138,9 @@ def create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3):
 
     return trial_info_df
 
-all_data_enc1 = pd.read_excel(f'/Users/darikussovska/Desktop/PROJECT/all_spike_rate_data_encoding1.xlsx')
-all_data_enc2 = pd.read_excel(f'/Users/darikussovska/Desktop/PROJECT/all_spike_rate_data_encoding2.xlsx')
-all_data_enc3 = pd.read_excel(f'/Users/darikussovska/Desktop/PROJECT/all_spike_rate_data_encoding3.xlsx')
+all_data_enc1 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding1.xlsx')
+all_data_enc2 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding2.xlsx')
+all_data_enc3 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding3.xlsx')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
 output_path = '/home/daira//PROJECT/trial_info.xlsx'
