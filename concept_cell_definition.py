@@ -28,7 +28,7 @@ df = pd.read_excel(input_path)
 # Compute firing rates
 df = compute_firing_rate(df)
 
-  def extract_top_two_categories(df):
+def extract_top_two_categories(df):
     def get_top_two(subject_id, neuron_id, df):
         cat_1st, cat_2nd = [], []
         mean_1st = mean_2nd = 0
