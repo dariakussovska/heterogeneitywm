@@ -154,3 +154,64 @@ for filename in os.listdir(graph_data_dir):
         print(f"Added significance data to: {filename}")
 
 print("Significance data added to all files successfully!")
+
+def plot_example_concept_cells(df_original, df_sig, save_dir, max_plots=2):
+    """
+    Plot and save bar plots of concept cells based on their firing rates across categories.
+    Only 'Signi' == 'Y' neurons will be plotted, and up to max_plots will be saved.
+    """
+
+    # Filter significant neurons only
+    significant_neurons = df_sig[df_sig['Signi'] == 'Y']
+    saved = 0
+
+    os.makedirs(save_dir, exist_ok=True)
+
+    for idx, row in significant_neurons.iterrows():
+        subject_id = row['subject_id']
+        neuron_id = row['Neuron_ID']
+        max_image_id = row['im_cat_1st']
+
+        # Filter for the neuron's data
+        neuron_data = df_original[
+            (df_original['subject_id'] == subject_id) &
+            (df_original['Neuron_ID'] == neuron_id)
+        ]
+
+        # Group by image ID and compute stats
+        grouped = neuron_data.groupby('stimulus_index')['Spike_Rate_new']
+        mean_rates = grouped.mean()
+        sem_rates = grouped.sem()
+
+        # Plot
+        fig, ax = plt.subplots(figsize=(15, 5))
+        ax.bar(mean_rates.index, mean_rates.values, yerr=sem_rates.values, capsize=5, color='blue', alpha=0.7)
+
+        if max_image_id in mean_rates.index:
+            ax.bar([max_image_id], [mean_rates[max_image_id]], yerr=[sem_rates[max_image_id]],
+                   capsize=5, color='red', alpha=0.9)
+
+        ax.set_title(f'Subject {subject_id} - Neuron {neuron_id} - Category Selectivity')
+        ax.set_xlabel('Image ID')
+        ax.set_ylabel('Firing Rate (Hz)')
+        ax.grid(True)
+        plt.xticks(rotation=90)
+
+        # Save only a few .eps examples
+        if saved < max_plots:
+            filename = os.path.join(save_dir, f'concept_cell_{saved+1}.eps')
+            plt.savefig(filename, format='eps')
+            print(f"Saved: {filename}")
+            saved += 1
+
+        plt.show()
+
+        if saved >= max_plots:
+            break
+
+plot_example_concept_cells(
+    df_original=df,
+    df_sig=df_final,
+    save_dir='/home/daria/PROJECT',
+    max_plots=2
+)
