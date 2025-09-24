@@ -1,0 +1,218 @@
+import pandas as pd
+from pynwb import NWBHDF5IO
+import matplotlib.pyplot as plt 
+
+import re
+
+def extract_subject_id(file_path):
+    """
+    Extracts the subject_id from the file path.
+    """
+    match = re.search(r'sub-(\d+)', file_path)
+    if match:
+        return int(match.group(1))  # Convert to integer for consistency
+    else:
+        raise ValueError(f"Subject ID not found in file path: {file_path}")
+
+def visualize_and_rank_stimulus_images(nwbfile):
+    stim_templates = nwbfile.stimulus_template['StimulusTemplates']
+    image_order = {}
+    
+    sorted_keys = sorted(stim_templates.images.keys())
+    num_images = len(sorted_keys)
+    num_columns = 6  # Display 5 images per row
+    num_rows = (num_images + num_columns - 1) // num_columns 
+    
+    fig, axes = plt.subplots(num_rows, num_columns, figsize=(15, 3 * num_rows))
+    axes = axes.flatten() 
+    
+    for rank, (key, ax) in enumerate(zip(sorted_keys, axes)):
+        image_data = stim_templates.images[key].data[:]
+        ax.imshow(image_data, cmap='gray')
+        ax.set_title(f"ID: {key}\nRank: {rank}")
+        ax.axis('off')  
+        image_order[key] = rank
+        
+    for ax in axes[len(sorted_keys):]:
+        ax.axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return image_order
+
+def map_image_ids_to_encoding_periods(nwbfile, image_order, file_path):
+    """
+    Map image IDs to encoding periods and add subject_id based on file_path.
+    """
+    subject_id = extract_subject_id(file_path)
+
+    stim_pres = nwbfile.stimulus['StimulusPresentation']
+    trial_data = nwbfile.intervals['trials']
+
+    df_enc1 = pd.DataFrame()
+    df_enc2 = pd.DataFrame()
+    df_enc3 = pd.DataFrame()
+
+    for i in range(len(trial_data)):
+        idx_base = i * 4  
+
+        stimulus_index_enc1 = stim_pres.data[idx_base]
+        stimulus_index_enc2 = stim_pres.data[idx_base + 1]
+        stimulus_index_enc3 = stim_pres.data[idx_base + 2]
+        
+        image_id_enc1 = list(image_order.keys())[stimulus_index_enc1]
+        image_id_enc2 = list(image_order.keys())[stimulus_index_enc2]
+        image_id_enc3 = list(image_order.keys())[stimulus_index_enc3]
+
+        start_time_enc1 = trial_data['timestamps_Encoding1'][i]
+        stop_time_enc1 = trial_data['timestamps_Encoding1_end'][i]
+        start_time_enc2 = trial_data['timestamps_Encoding2'][i]
+        stop_time_enc2 = trial_data['timestamps_Encoding2_end'][i]
+        start_time_enc3 = trial_data['timestamps_Encoding3'][i]
+        stop_time_enc3 = trial_data['timestamps_Encoding3_end'][i]
+
+        df_enc1 = pd.concat([df_enc1, pd.DataFrame({
+            'subject_id': [subject_id],  
+            'trial_id': [i + 1],
+            'start_time': [start_time_enc1],
+            'stop_time': [stop_time_enc1],
+            'image_id': [image_id_enc1],
+            'stimulus_index': [stimulus_index_enc1],
+            'image_rank': [image_order[image_id_enc1]]
+        })], ignore_index=True)
+
+        df_enc2 = pd.concat([df_enc2, pd.DataFrame({
+            'subject_id': [subject_id], 
+            'trial_id': [i + 1],
+            'start_time': [start_time_enc2],
+            'stop_time': [stop_time_enc2],
+            'image_id': [image_id_enc2],
+            'stimulus_index': [stimulus_index_enc2],
+            'image_rank': [image_order[image_id_enc2]]
+        })], ignore_index=True)
+
+        df_enc3 = pd.concat([df_enc3, pd.DataFrame({
+            'subject_id': [subject_id], 
+            'trial_id': [i + 1],
+            'start_time': [start_time_enc3],
+            'stop_time': [stop_time_enc3],
+            'image_id': [image_id_enc3],
+            'stimulus_index': [stimulus_index_enc3],
+            'image_rank': [image_order[image_id_enc3]]
+        })], ignore_index=True)
+
+    return df_enc1, df_enc2, df_enc3
+
+
+def get_spike_rate_single_neuron(nwbfile, neuron_id, df_encoding):
+    SNP = nwbfile.units['spike_times'][neuron_id]
+    spikes = []
+    spikes_rate = []
+
+    for i in range(df_encoding.shape[0]):
+        start_time = df_encoding['start_time'][i]
+        stop_time = df_encoding['stop_time'][i]
+
+        # Check if start_time or stop_time is NaN or missing
+        if pd.isna(start_time) or pd.isna(stop_time):
+            spikes.append([])  # No spikes
+            spikes_rate.append(0)  # Spike rate is 0
+            continue
+
+        duration = stop_time - start_time
+        if duration > 0: 
+            temp_arr = [spike for spike in SNP if start_time <= spike < stop_time]
+            spikes.append(temp_arr)
+            spikes_rate.append(len(temp_arr) / duration)
+        else:
+            spikes.append([])
+            spikes_rate.append(0)
+
+    df_encoding['Spikes'] = spikes
+    df_encoding['Spikes_rate'] = spikes_rate
+    df_encoding['Neuron_ID'] = neuron_id
+
+    return df_encoding
+
+def get_spike_rate(nwbfile, df_enc1, df_enc2, df_enc3, subject_id):
+    """
+    Compute spike rates for all neurons across encoding periods.
+    """
+    total_neurons = len(nwbfile.units['spike_times'])
+    df_final_enc1 = pd.DataFrame()
+    df_final_enc2 = pd.DataFrame()
+    df_final_enc3 = pd.DataFrame()
+
+    for neuron_id in range(total_neurons):
+        df_final_enc1 = pd.concat([
+            df_final_enc1,
+            get_spike_rate_single_neuron(nwbfile, neuron_id, df_enc1.copy())
+        ], ignore_index=True)
+        df_final_enc2 = pd.concat([
+            df_final_enc2,
+            get_spike_rate_single_neuron(nwbfile, neuron_id, df_enc2.copy())
+        ], ignore_index=True)
+        df_final_enc3 = pd.concat([
+            df_final_enc3,
+            get_spike_rate_single_neuron(nwbfile, neuron_id, df_enc3.copy())
+        ], ignore_index=True)
+
+    df_final_enc1['subject_id'] = subject_id
+    df_final_enc2['subject_id'] = subject_id
+    df_final_enc3['subject_id'] = subject_id
+
+    return df_final_enc1, df_final_enc2, df_final_enc3
+
+import re
+
+def process_file(filepath):
+    """
+    Process an NWB file and extract subject-specific data.
+    """
+    io = NWBHDF5IO(filepath, mode='r', load_namespaces=True)
+    nwbfile = io.read()
+
+    match = re.search(r'sub-(\d+)', filepath)
+    if match:
+        subject_id = int(match.group(1))
+    else:
+        raise ValueError(f"Subject ID not found in file path: {filepath}")
+    image_order = visualize_and_rank_stimulus_images(nwbfile)
+    df_enc1, df_enc2, df_enc3 = map_image_ids_to_encoding_periods(nwbfile, image_order, filepath)
+
+    # Calculate spike rates for all neurons
+    df_final_enc1, df_final_enc2, df_final_enc3 = get_spike_rate(nwbfile, df_enc1, df_enc2, df_enc3, subject_id)
+    io.close()
+
+    return df_final_enc1, df_final_enc2, df_final_enc3
+
+    import warnings
+warnings.filterwarnings("ignore")
+
+# File paths for all subjects
+filepaths = [f"/Users/darikussovska/Desktop/PROJECT/000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
+
+all_data_enc1 = pd.DataFrame()
+all_data_enc2 = pd.DataFrame()
+all_data_enc3 = pd.DataFrame()
+
+for filepath in filepaths:
+    if os.path.exists(filepath):
+        print(f"Processing: {filepath}")
+        df_enc1, df_enc2, df_enc3 = process_file(filepath)
+        all_data_enc1 = pd.concat([all_data_enc1, df_enc1], ignore_index=True)
+        all_data_enc2 = pd.concat([all_data_enc2, df_enc2], ignore_index=True)
+        all_data_enc3 = pd.concat([all_data_enc3, df_enc3], ignore_index=True)
+    else:
+        print(f"Filepath does not exist: {filepath}")
+
+# Save combined data to Excel files
+output_dir = "/Users/darikussovska/Desktop/PROJECT/"
+os.makedirs(output_dir, exist_ok=True)
+
+all_data_enc1.to_excel(os.path.join(output_dir, "spike_rate_data_Encoding1.xlsx"), index=False)
+all_data_enc2.to_excel(os.path.join(output_dir, "spike_rate_data_Encoding2.xlsx"), index=False)
+all_data_enc3.to_excel(os.path.join(output_dir, "spike_rate_data_Encoding3.xlsx"), index=False)
+
+print("Data processing complete and saved to Excel.")
