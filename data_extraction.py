@@ -74,33 +74,89 @@ class NWBProcessor:
         
         return (pd.DataFrame(results[1]), pd.DataFrame(results[2]), pd.DataFrame(results[3]))
     
-    def get_period_times(self, nwbfile, start_code, end_code, period_name):
-        """Extract period times based on event codes."""
+    def get_fixation_periods(self, nwbfile):
+        """Extract fixation periods (event codes 11 -> 1)."""
         events = nwbfile.acquisition['events']
         timestamps = events.timestamps[:]
         data = events.data[:]
         
-        period_data = []
+        fixation_data = []
         trial_id = 0
         
         for i in range(len(data) - 1):
-            if data[i] == start_code and data[i + 1] == end_code:
+            if data[i] == 11 and data[i + 1] == 1:
                 trial_id += 1
-                period_data.append({
+                fixation_data.append({
                     'start_time': timestamps[i],
                     'end_time': timestamps[i + 1],
                     'trial_id': trial_id
                 })
         
-        return period_data
+        return fixation_data
     
-    def calculate_spike_rates_for_period(self, nwbfile, period_data, subject_id, period_name):
+    def get_delay_periods(self, nwbfile):
+        """Extract delay periods (event codes 6 -> 7)."""
+        events = nwbfile.acquisition['events']
+        timestamps = events.timestamps[:]
+        data = events.data[:]
+        
+        delay_data = []
+        trial_id = 0
+        
+        for i in range(len(data) - 1):
+            if data[i] == 6 and data[i + 1] == 7:
+                trial_id += 1
+                delay_data.append({
+                    'start_time': timestamps[i],
+                    'end_time': timestamps[i + 1],
+                    'trial_id': trial_id
+                })
+        
+        return delay_data
+    
+    def get_probe_periods_with_trials(self, nwbfile):
+        """Your working probe period code."""
+        events = nwbfile.acquisition['events']
+        timestamps = events.timestamps[:]
+        data = events.data[:]
+
+        trials_table = nwbfile.intervals['trials']
+        probe_in_out_data = trials_table['probe_in_out'].data[:]
+        response_accuracy_data = trials_table['response_accuracy'].data[:]
+        loads_probe_pic_ids = trials_table['loadsProbe_PicIDs'].data[:]
+        trial_start_times = trials_table['start_time'].data[:]
+        trial_stop_times = trials_table['stop_time'].data[:]
+
+        probe_data = []
+
+        for trial_id, (start_time, stop_time, probe_pic_id, in_out, accuracy) in enumerate(
+            zip(trial_start_times, trial_stop_times, loads_probe_pic_ids, probe_in_out_data, response_accuracy_data)
+        ):
+            within_trial = (timestamps > start_time) & (timestamps < stop_time)
+            probe_events = np.where((data[:-1] == 7) & (data[1:] == 8) & within_trial[:-1])[0]
+
+            for idx in probe_events:
+                probe_data.append({
+                    'start_time': timestamps[idx],
+                    'end_time': timestamps[idx + 1],
+                    'trial_id': trial_id + 1,
+                    'image_id': probe_pic_id,
+                    'probe_in_out': in_out,
+                    'response_accuracy': accuracy
+                })
+
+        return probe_data
+    
+    def calculate_spike_rates(self, nwbfile, period_data, subject_id, period_name):
         """Calculate spike rates for any period type."""
         if not period_data:
+            print(f"No {period_name} periods found.")
             return pd.DataFrame()
         
         all_results = []
         total_neurons = len(nwbfile.units['spike_times'])
+        
+        print(f"Processing {period_name} periods for {total_neurons} neurons...")
         
         for neuron_id in range(total_neurons):
             spike_times = nwbfile.units['spike_times'][neuron_id]
@@ -126,79 +182,21 @@ class NWBProcessor:
                     f'Spikes_rate_{period_name}': spike_rate
                 }
                 
+                # Add optional fields if they exist
+                for key in ['image_id', 'probe_in_out', 'response_accuracy']:
+                    if key in period:
+                        result[key] = period[key]
+                
                 all_results.append(result)
         
         return pd.DataFrame(all_results)
-    
-    def process_probe_periods(self, nwbfile, subject_id):
-        """Process probe periods with additional trial data."""
-        events = nwbfile.acquisition['events']
-        timestamps = events.timestamps[:]
-        data = events.data[:]
-        
-        trials_table = nwbfile.intervals['trials']
-        probe_data = []
-        
-        for trial_idx, (start_time, stop_time) in enumerate(zip(
-            trials_table['start_time'].data[:],
-            trials_table['stop_time'].data[:]
-        )):
-            within_trial = (timestamps > start_time) & (timestamps < stop_time)
-            probe_events = np.where((data[:-1] == 7) & (data[1:] == 8) & within_trial[:-1])[0]
-            
-            for idx in probe_events:
-                probe_data.append({
-                    'start_time': timestamps[idx],
-                    'end_time': timestamps[idx + 1],
-                    'trial_id': trial_idx + 1,
-                    'image_id': trials_table['loadsProbe_PicIDs'].data[trial_idx],
-                    'probe_in_out': trials_table['probe_in_out'].data[trial_idx],
-                    'response_accuracy': trials_table['response_accuracy'].data[trial_idx]
-                })
-        
-        return self.calculate_spike_rates_for_period(nwbfile, probe_data, subject_id, 'Probe')
-    
-    def process_single_file(self, filepath):
-        """Process a single NWB file and extract all data."""
-        print(f"Processing: {filepath}")
-        
-        with NWBHDF5IO(filepath, 'r', load_namespaces=True) as io:
-            nwbfile = io.read()
-            subject_id = self.extract_subject_id(filepath)
-            
-            # Get image order for encoding periods
-            image_order = self.get_image_order(nwbfile)
-            
-            # Process encoding periods
-            df_enc1, df_enc2, df_enc3 = self.process_encoding_periods(nwbfile, image_order, subject_id)
-            
-            # Add spike rates to encoding periods
-            encoding_dfs = {}
-            for enc_num, df_enc in zip([1, 2, 3], [df_enc1, df_enc2, df_enc3]):
-                encoding_dfs[enc_num] = self.add_spike_rates_to_encoding(nwbfile, df_enc, f'Encoding{enc_num}')
-            
-            # Process other periods
-            fixation_data = self.get_period_times(nwbfile, 11, 1, 'Fixation')
-            df_fixation = self.calculate_spike_rates_for_period(nwbfile, fixation_data, subject_id, 'Fixation')
-            
-            delay_data = self.get_period_times(nwbfile, 6, 7, 'Delay')
-            df_delay = self.calculate_spike_rates_for_period(nwbfile, delay_data, subject_id, 'Delay')
-            
-            df_probe = self.process_probe_periods(nwbfile, subject_id)
-            
-            return {
-                'encoding1': encoding_dfs[1],
-                'encoding2': encoding_dfs[2],
-                'encoding3': encoding_dfs[3],
-                'fixation': df_fixation,
-                'delay': df_delay,
-                'probe': df_probe
-            }
     
     def add_spike_rates_to_encoding(self, nwbfile, df_encoding, period_name):
         """Add spike rates to encoding period dataframes."""
         total_neurons = len(nwbfile.units['spike_times'])
         all_results = []
+        
+        print(f"Adding spike rates to {period_name} for {total_neurons} neurons...")
         
         for neuron_id in range(total_neurons):
             spike_times = nwbfile.units['spike_times'][neuron_id]
@@ -225,6 +223,44 @@ class NWBProcessor:
             all_results.extend(neuron_results)
         
         return pd.DataFrame(all_results)
+    
+    def process_single_file(self, filepath):
+        """Process a single NWB file and extract all data."""
+        print(f"Processing: {filepath}")
+        
+        with NWBHDF5IO(filepath, 'r', load_namespaces=True) as io:
+            nwbfile = io.read()
+            subject_id = self.extract_subject_id(filepath)
+            
+            # Get image order for encoding periods
+            image_order = self.get_image_order(nwbfile)
+            
+            # Process encoding periods
+            df_enc1, df_enc2, df_enc3 = self.process_encoding_periods(nwbfile, image_order, subject_id)
+            
+            # Add spike rates to encoding periods
+            df_enc1_final = self.add_spike_rates_to_encoding(nwbfile, df_enc1, 'Encoding1')
+            df_enc2_final = self.add_spike_rates_to_encoding(nwbfile, df_enc2, 'Encoding2')
+            df_enc3_final = self.add_spike_rates_to_encoding(nwbfile, df_enc3, 'Encoding3')
+            
+            # Process other periods
+            fixation_data = self.get_fixation_periods(nwbfile)
+            df_fixation = self.calculate_spike_rates(nwbfile, fixation_data, subject_id, 'Fixation')
+            
+            delay_data = self.get_delay_periods(nwbfile)
+            df_delay = self.calculate_spike_rates(nwbfile, delay_data, subject_id, 'Delay')
+            
+            probe_data = self.get_probe_periods_with_trials(nwbfile)
+            df_probe = self.calculate_spike_rates(nwbfile, probe_data, subject_id, 'Probe')
+            
+            return {
+                'encoding1': df_enc1_final,
+                'encoding2': df_enc2_final,
+                'encoding3': df_enc3_final,
+                'fixation': df_fixation,
+                'delay': df_delay,
+                'probe': df_probe
+            }
     
     def process_all_files(self, filepaths):
         """Process all NWB files and save results."""
@@ -257,8 +293,8 @@ class NWBProcessor:
 
 # Main execution
 if __name__ == "__main__":
-    # Create file paths
-    filepaths = [f"/home/daria/PROJECT/000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" 
+    # Update file paths for your server
+    filepaths = [f"/home/daria/PROJECT/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" 
                 for i in range(21)]
     
     # Initialize processor
@@ -271,4 +307,3 @@ if __name__ == "__main__":
     print("Generated files:")
     for period in ['encoding1', 'encoding2', 'encoding3', 'fixation', 'delay', 'probe']:
         print(f"  - all_spike_rate_data_{period}.xlsx")
-
