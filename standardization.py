@@ -138,7 +138,7 @@ clean_standardized_data()
 print("All standardized data has been cleaned and saved in the clean_data folder.")
 
 fixation_file_path = os.path.join(BASE_DIR, 'all_spike_rate_data_fixation.xlsx')
-trial_info_path = os.path.join(BASE_DIR, 'trial_info copy.xlsx')
+trial_info_path = os.path.join(BASE_DIR, 'trial_info.xlsx')
 
 def standardize_fixation_period(file_path, spikes_column, start_time_column):
     df = pd.read_excel(file_path)
@@ -196,20 +196,9 @@ if standardized_fixation_data is not None:
 
 print("Fixation period cleaning and saving completed.")
 
-significant_neurons_extended = pd.read_excel(os.path.join(BASE_DIR, 'merged_significant_neurons_with_brain_regions.xlsx'))
-
 def create_graph_data():
     for period_name, df in standardized_data.items():
         df_graph = df.copy()
-        
-        df_graph = pd.merge(
-            df_graph,
-            significant_neurons_extended[['subject_id', 'Neuron_ID', 'im_cat_1st', 'Location']],
-            on=['subject_id', 'Neuron_ID'],
-            how='left'
-        )
-        
-        df_graph.rename(columns={'im_cat_1st': 'preferred_image_id'}, inplace=True)
         
         output_file = os.path.join(graph_data_dir, f'graph_{period_name.lower()}.xlsx')
         df_graph.to_excel(output_file, index=False)
@@ -219,13 +208,6 @@ create_graph_data()
 print("Graph data creation completed.")
 
 fixation_graph_data = pd.read_excel(os.path.join(cleaned_data_dir, 'cleaned_Fixation.xlsx'))
-fixation_graph_data = pd.merge(
-    fixation_graph_data,
-    significant_neurons_extended[['subject_id', 'Neuron_ID', 'Location']],
-    on=['subject_id', 'Neuron_ID'],
-    how='inner'
-)
-
 fixation_graph_output = os.path.join(graph_data_dir, 'graph_fixation.xlsx')
 fixation_graph_data.to_excel(fixation_graph_output, index=False)
 print(f"Fixation graph data saved to: {fixation_graph_output}")
