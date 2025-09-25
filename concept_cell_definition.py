@@ -118,7 +118,7 @@ print("Significant Neurons:")
 print(significant_neurons)
 
 # Load brain regions data
-brain_regions_path = "/Users/darikussovska/Desktop/PROJECT/all_neurons_with_brain_regions_cleaned.xlsx"
+brain_regions_path = "/home/daria/PROJECT/all_neurons_with_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
 
 # Function to add preferred image ID and categorize trials
@@ -165,7 +165,7 @@ def add_brain_region(df, brain_regions_df):
     return df
 
 # Add significance results to all clean_data files with preferred image and category
-clean_data_dir = "/Users/darikussovska/Desktop/PROJECT/clean_data"
+clean_data_dir = "/home/daria/PROJECT/clean_data"
 for filename in os.listdir(clean_data_dir):
     if filename.startswith('clean_') and filename.endswith('.xlsx'):
         file_path = os.path.join(clean_data_dir, filename)
