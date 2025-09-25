@@ -118,7 +118,7 @@ print("Significant Neurons:")
 print(significant_neurons)
 
 # Load brain regions data
-brain_regions_path = "/home/daria/PROJECT/all_neurons_with_brain_regions_cleaned.xlsx"
+brain_regions_path = "/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
 
 # Function to add preferred image ID and categorize trials
