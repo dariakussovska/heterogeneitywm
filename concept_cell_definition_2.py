@@ -55,16 +55,81 @@ def add_preferred_and_category(df, significant_neurons_df):
     df['Category'] = df.apply(get_category, axis=1)
     return df
    
-
-# Function to add brain region information
 def add_brain_region(df, brain_regions_df):
-    df = pd.merge(
-        df,
-        brain_regions_df[['subject_id', 'Neuron_ID', 'Location']],
-        on=['subject_id', 'Neuron_ID'],
-        how='left'
-    )
-    return df
+    df = df.copy()
+    br = brain_regions_df.copy()
+
+    # --- Normalize types in df ---
+    df['subject_id'] = df['subject_id'].astype(str).str.strip()
+    if 'Neuron_ID' in df.columns:
+        df['Neuron_ID'] = pd.to_numeric(df['Neuron_ID'], errors='coerce').astype('Int64')
+    if 'Neuron_ID_3' in df.columns:
+        df['Neuron_ID_3'] = pd.to_numeric(df['Neuron_ID_3'], errors='coerce').astype('Int64')
+
+    # Ensure df has Neuron_ID_3 (unique)
+    if 'Neuron_ID_3' not in df.columns and {'subject_id','Neuron_ID'}.issubset(df.columns):
+        df['Neuron_ID_3'] = (df['subject_id'].astype(str).str.strip() + '0' +
+                             df['Neuron_ID'].astype('Int64').astype(str)).astype(int)
+
+    # --- Normalize types / columns in brain regions ---
+    # Common variants seen: Neuron_ID_3, Neuron_ID_2, Neuron_ID; sometimes subject_id is present
+    br_cols = set(br.columns.str.strip())
+
+    # Standardize subject_id if present
+    if 'subject_id' in br_cols:
+        br['subject_id'] = br['subject_id'].astype(str).str.strip()
+
+    # Detect neuron key in brain regions
+    if 'Neuron_ID_3' in br_cols:
+        neuron_key_br = 'Neuron_ID_3'
+        br[neuron_key_br] = pd.to_numeric(br[neuron_key_br], errors='coerce').astype('Int64')
+    elif 'Neuron_ID_2' in br_cols:
+        neuron_key_br = 'Neuron_ID_2'
+        br[neuron_key_br] = pd.to_numeric(br[neuron_key_br], errors='coerce').astype('Int64')
+    elif 'Neuron_ID' in br_cols:
+        neuron_key_br = 'Neuron_ID'
+        br[neuron_key_br] = pd.to_numeric(br[neuron_key_br], errors='coerce').astype('Int64')
+    else:
+        raise ValueError("brain_regions_df must contain one of: Neuron_ID_3, Neuron_ID_2, or Neuron_ID")
+
+    # If brain regions is NOT already on Neuron_ID_3, try to construct it
+    if neuron_key_br != 'Neuron_ID_3':
+        # Need subject_id to build Neuron_ID_3; if missing, we will merge on (subject_id, Neuron_ID) fallback
+        if 'subject_id' in br_cols and neuron_key_br in {'Neuron_ID','Neuron_ID_2'}:
+            br['Neuron_ID_3'] = (br['subject_id'].astype(str).str.strip() + '0' +
+                                 br[neuron_key_br].astype('Int64').astype(str)).astype(int)
+        # else: keep as-is for fallback merge
+
+    # Decide merge strategy (prefer unique key)
+    if 'Neuron_ID_3' in br.columns and 'Neuron_ID_3' in df.columns:
+        left_keys  = ['Neuron_ID_3']
+        right_keys = ['Neuron_ID_3']
+    elif {'subject_id','Neuron_ID'}.issubset(df.columns) and \
+         'subject_id' in br.columns and neuron_key_br in br.columns and neuron_key_br == 'Neuron_ID':
+        left_keys  = ['subject_id','Neuron_ID']
+        right_keys = ['subject_id','Neuron_ID']
+    else:
+        raise ValueError(
+            "Cannot align keys to merge brain regions.\n"
+            f"df has: {df.columns.tolist()}\n"
+            f"brain_regions_df has: {br.columns.tolist()}\n"
+            "Provide either Neuron_ID_3 in both, or (subject_id, Neuron_ID) in both."
+        )
+
+    # Do the merge; keep Location (or whatever the region column is named)
+    # Try common region column names
+    region_col = next((c for c in ['Location','Region','BrainRegion','brain_region'] if c in br.columns), None)
+    if region_col is None:
+        raise ValueError("brain_regions_df must contain a region column (e.g., 'Location').")
+
+    br_slim = br[left_keys + [region_col]].drop_duplicates()
+    merged = pd.merge(df, br_slim, left_on=left_keys, right_on=left_keys, how='left')
+
+    # Standardize region column name to 'Location'
+    if region_col != 'Location':
+        merged = merged.rename(columns={region_col: 'Location'})
+
+    return merged
 
 # Add significance results to all clean_data files with preferred image and category
 clean_data_dir = "/home/daria/PROJECT/clean_data"
