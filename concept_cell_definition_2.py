@@ -8,38 +8,53 @@ df_final = pd.read_excel(final_data)
 brain_regions_path = "/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
 
+import numpy as np
+import pandas as pd
+
 def add_preferred_and_category(df, significant_neurons_df):
-    # normalize types for a clean merge
+    df = df.copy()
+
+    # normalize dtypes
     df['subject_id'] = df['subject_id'].astype(str).str.strip()
-    df['Neuron_ID'] = df['Neuron_ID'].astype(int)
-    significant_neurons_df = significant_neurons_df.copy()
-    significant_neurons_df['subject_id'] = significant_neurons_df['subject_id'].astype(str).str.strip()
-    significant_neurons_df['Neuron_ID'] = significant_neurons_df['Neuron_ID'].astype(int)
+    df['Neuron_ID']  = df['Neuron_ID'].astype(int)
 
-    # merge preferred image + significance
-    df = pd.merge(
-        df,
-        significant_neurons_df[['subject_id','Neuron_ID','im_cat_1st','Signi']],
-        on=['subject_id','Neuron_ID'],
-        how='left'
-    ).rename(columns={'im_cat_1st':'preferred_image_id'})
+    sig = significant_neurons_df[['subject_id','Neuron_ID','im_cat_1st','Signi']].copy()
+    sig['subject_id'] = sig['subject_id'].astype(str).str.strip()
+    sig['Neuron_ID']  = sig['Neuron_ID'].astype(int)
 
-    # find the best available stimulus column for this file
+    # 1) Merge into a TEMPORARY column to avoid duplicates
+    sig = sig.rename(columns={'im_cat_1st': 'preferred_image_id_from_sig'})
+    df = pd.merge(df, sig, on=['subject_id','Neuron_ID'], how='left')
+
+    # 2) Coalesce: if df already had preferred_image_id, keep it; otherwise use from_sig
+    if 'preferred_image_id' not in df.columns:
+        df['preferred_image_id'] = np.nan
+    df['preferred_image_id'] = df['preferred_image_id'].where(
+        df['preferred_image_id'].notna(), df['preferred_image_id_from_sig']
+    )
+
+    # 3) Clean up the temp column
+    df = df.drop(columns=['preferred_image_id_from_sig'])
+
+    # 4) Pick the best stimulus column available in this file
     stim_cols = [
-        'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3',
-        'stimulus_index', 'image_id_enc1', 'Image_ID', 'image_id'
+        'stimulus_index_enc1','stimulus_index_enc2','stimulus_index_enc3',
+        'stimulus_index','image_id_enc1','Image_ID','image_id'
     ]
     present_stim_col = next((c for c in stim_cols if c in df.columns), None)
 
+    # 5) Compute Category safely (no ambiguous Series)
     def get_category(row):
-        if pd.isna(row.get('preferred_image_id', np.nan)):
-            return 'Unknown'  # neuron not significant / no preferred image
-        if present_stim_col is None or pd.isna(row.get(present_stim_col, np.nan)):
-            return 'No-Image'  # e.g., Delay (no presented image)
-        return 'Preferred' if row['preferred_image_id'] == row[present_stim_col] else 'Non-Preferred'
+        pref = row['preferred_image_id']
+        if pd.isna(pref):
+            return 'Unknown'          # neuron not significant / no preferred image
+        if present_stim_col is None or pd.isna(row[present_stim_col]):
+            return 'No-Image'         # e.g., Delay/Fixation with no stimulus label
+        return 'Preferred' if pref == row[present_stim_col] else 'Non-Preferred'
 
     df['Category'] = df.apply(get_category, axis=1)
     return df
+   
 
 # Function to add brain region information
 def add_brain_region(df, brain_regions_df):
