@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np 
 
 # Load brain regions data
+final_data = "/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx"
+df_final = pd.read_excel(final_data)
 brain_regions_path = "/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
 
