@@ -8,48 +8,63 @@ df_final = pd.read_excel(final_data)
 brain_regions_path = "/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
 
-import numpy as np
-import pandas as pd
-
 def add_preferred_and_category(df, significant_neurons_df):
     df = df.copy()
 
-    # normalize dtypes
+    # Normalize dtypes for keys
     df['subject_id'] = df['subject_id'].astype(str).str.strip()
-    df['Neuron_ID']  = df['Neuron_ID'].astype(int)
+    df['Neuron_ID']  = pd.to_numeric(df['Neuron_ID'], errors='coerce').astype('Int64')
 
     sig = significant_neurons_df[['subject_id','Neuron_ID','im_cat_1st','Signi']].copy()
     sig['subject_id'] = sig['subject_id'].astype(str).str.strip()
-    sig['Neuron_ID']  = sig['Neuron_ID'].astype(int)
+    sig['Neuron_ID']  = pd.to_numeric(sig['Neuron_ID'], errors='coerce').astype('Int64')
 
-    # 1) Merge into a TEMPORARY column to avoid duplicates
-    sig = sig.rename(columns={'im_cat_1st': 'preferred_image_id_from_sig'})
-    df = pd.merge(df, sig, on=['subject_id','Neuron_ID'], how='left')
+    # --- 1) Drop stale/conflicting columns from previous runs ---
+    for col in [
+        'Signi', 'Signi_x', 'Signi_y',
+        'im_cat_1st', 'im_cat_1st_x', 'im_cat_1st_y',
+        'preferred_image_id_from_sig', 'preferred_image_id_sig'
+    ]:
+        if col in df.columns:
+            df = df.drop(columns=[col])
 
-    # 2) Coalesce: if df already had preferred_image_id, keep it; otherwise use from_sig
+    # --- 2) Merge with controlled suffixes (sig columns get "_sig") ---
+    df = pd.merge(df, sig, on=['subject_id','Neuron_ID'], how='left', suffixes=('', '_sig'))
+
+    # --- 3) Rename sig columns to safe names and coalesce ---
+    if 'im_cat_1st_sig' in df.columns:
+        df = df.rename(columns={'im_cat_1st_sig': 'preferred_image_id_from_sig'})
+    # If df had a 'preferred_image_id' already, keep it; else take from sig
     if 'preferred_image_id' not in df.columns:
         df['preferred_image_id'] = np.nan
-    df['preferred_image_id'] = df['preferred_image_id'].where(
-        df['preferred_image_id'].notna(), df['preferred_image_id_from_sig']
-    )
+    if 'preferred_image_id_from_sig' in df.columns:
+        df['preferred_image_id'] = df['preferred_image_id'].where(
+            df['preferred_image_id'].notna(), df['preferred_image_id_from_sig']
+        )
+        df = df.drop(columns=['preferred_image_id_from_sig'])
 
-    # 3) Clean up the temp column
-    df = df.drop(columns=['preferred_image_id_from_sig'])
+    # If the merge created Signi_sig, standardize its name; if not present, ensure the column exists
+    if 'Signi_sig' in df.columns:
+        if 'Signi' in df.columns:  # unlikely due to dropping above, but safe
+            df = df.drop(columns=['Signi'])
+        df = df.rename(columns={'Signi_sig': 'Signi'})
+    elif 'Signi' not in df.columns:
+        df['Signi'] = np.nan
 
-    # 4) Pick the best stimulus column available in this file
+    # --- 4) Pick the best stimulus column available ---
     stim_cols = [
         'stimulus_index_enc1','stimulus_index_enc2','stimulus_index_enc3',
         'stimulus_index','image_id_enc1','Image_ID','image_id'
     ]
     present_stim_col = next((c for c in stim_cols if c in df.columns), None)
 
-    # 5) Compute Category safely (no ambiguous Series)
+    # --- 5) Compute Category safely (no ambiguous Series) ---
     def get_category(row):
         pref = row['preferred_image_id']
         if pd.isna(pref):
-            return 'Unknown'          # neuron not significant / no preferred image
+            return 'Unknown'       # neuron not significant / no preferred image
         if present_stim_col is None or pd.isna(row[present_stim_col]):
-            return 'No-Image'         # e.g., Delay/Fixation with no stimulus label
+            return 'No-Image'      # e.g., Delay/Fixation
         return 'Preferred' if pref == row[present_stim_col] else 'Non-Preferred'
 
     df['Category'] = df.apply(get_category, axis=1)
