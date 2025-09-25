@@ -15,15 +15,50 @@ dandi download DANDI:000469/0.240123.1806
 
 Detailed description of the dataset is included in the original paper by Kyzar et al., 2024. 
 
-# Data extraction
+# Data extraction and organization
 
-In order to extact data for main analysis, you can use the code 1_data_extraction. Note that this is not needed for you to recreate all analyses and figures, as Excel sheets for main analyses will be provided as part of every code for main/supplementary analysis figure. 
+After you have downloaded the dataset from the original paper by Kyzar et al., 2024, you can use clone this repository on your local computer or server by running this line of code in your terminal: 
+
+```
+git clone https://github.com/dariakussovska/heterogeneity_wm/
+```
+This will create a folder "heterogeneity_wm" which will have all the necessary files and python codes to generate all the figures in the Kussovska et al., 2026 paper. 
+
+I highly recommend that you also have a separate directory for all your newly generated files. In my case, I use a folder called "PROJECT" as you will see on all of the codes. That is where the raw NWB files are stored, and that is where I move all the dependencies installed from this repository. 
+
+To extact data for main analysis, you can use the code 1_data_extraction.py by going into the heterogeneity_wm folder on your terminal and running
+
+```
+python 1_data_extraction.py
+```
+1_data_extraction.py extracts spike times for encoding 1, 2, and 3 periods, as well as the maintenance, and probe periods, and other relevant information, such as start and end time of each trial, subject id, neurond id, and stimulus presented. 
+
+If you run 2_data_extraction.py then you can extract cell_metrics (calculation for firing rate, cv2, ISI, etc. and trial_info excel sheet, where each subject and trial id has its corresponding stimulus identity (or identities). 
 
 # Important - Install dependencies 
 
-Since some of the analyses were done in Excel, download the following files to make sure that everything runs smootly with your codes:
+For ease of use, some of the dependent files are given here, under the folder "data". new_trial_info.xlsx and trial_info_final.xlsx are files which make sure that stimulus ids are balanced based on load, and on number of image identities, respectively. all_neuron_brain_regions_cleaned.xlsx is a file where each neuron id has its correspodning brain region in a cleaned and organized way (because the extraction from the NWB file was not as straightforward). 
 
-new_trial_info.xlsx
-new_trial_final.xlsx
-brain_regions_cleaned.xlsx
-Cell_Metrics.xlsx 
+Under cell_analysis, there are matlab structs and functions to run the cell classification method from scratch, suing the software Cell Explorer. 
+
+Under electrodes_plotting, there is a function to plot all the electrode coordinates from the Kyzar et al, 2024 paper in MNI space. 
+
+Detailed explanation of each of these and how to run them is found under "Documentation". 
+
+# After data extraction 
+
+After data extraction, you need just two more steps before you have all necessary files to run all analyses and get all figures. First, standardize the spikes. Run the code standardization.py 
+
+```
+python standardization.py
+```
+
+In order to standardize the spikes in two different ways: for PSTH graphs (standardizing by start of each corresponding period); and for cross-temporal decoding (standardizing the spikes from the encoding period). This outputs two folders with standardized spikes column, as well as adds new neuron identities (subject id + 0 + neuron id) for ease of use. 
+
+Then, identify concept cells by running the python code concept_cell_definition.py. 
+
+```
+python concept_cell_definition.py
+
+```
+This includes our method for concept cell identification and adds the corresponding identity of each neuron to each of our standardized files (Signi == Y if concept cell and Signi == N if not). 
