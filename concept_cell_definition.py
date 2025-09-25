@@ -118,7 +118,7 @@ print("Significant Neurons:")
 print(significant_neurons)
 
 # Load brain regions data
-brain_regions_path = "/Users/darikussovska/Desktop/PROJECT/merged_significant_neurons_with_brain_regions.xlsx"
+brain_regions_path = "/Users/darikussovska/Desktop/PROJECT/all_neurons_with_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
 
 # Function to add preferred image ID and categorize trials
@@ -134,11 +134,23 @@ def add_preferred_and_category(df, significant_neurons_df):
     # Rename columns
     df.rename(columns={'im_cat_1st': 'preferred_image_id'}, inplace=True)
     
-    # Add category column (Preferred/Non-Preferred)
-    df['Category'] = df.apply(
-        lambda row: 'Preferred' if row['preferred_image_id'] == row['stimulus_index'] else 'Non-Preferred', 
-        axis=1
-    )
+    # Add category column (Preferred/Non-Preferred) - handle both column names
+    def get_category(row):
+        # Try both possible column names for the stimulus index
+        if 'stimulus_index_enc1' in row and pd.notna(row['stimulus_index_enc1']):
+            if row['preferred_image_id'] == row['stimulus_index_enc1']:
+                return 'Preferred'
+            else:
+                return 'Non-Preferred'
+        elif 'stimulus_index' in row and pd.notna(row['stimulus_index']):
+            if row['preferred_image_id'] == row['stimulus_index']:
+                return 'Preferred'
+            else:
+                return 'Non-Preferred'
+        else:
+            return 'Unknown'
+    
+    df['Category'] = df.apply(get_category, axis=1)
     
     return df
 
@@ -155,7 +167,7 @@ def add_brain_region(df, brain_regions_df):
 # Add significance results to all clean_data files with preferred image and category
 clean_data_dir = "/Users/darikussovska/Desktop/PROJECT/clean_data"
 for filename in os.listdir(clean_data_dir):
-    if filename.startswith('cleaned_') and filename.endswith('.xlsx'):
+    if filename.startswith('clean_') and filename.endswith('.xlsx'):
         file_path = os.path.join(clean_data_dir, filename)
         df_clean = pd.read_excel(file_path)
         
