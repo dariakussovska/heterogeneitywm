@@ -61,4 +61,4 @@ Then, identify concept cells by running the python code concept_cell_definition.
 python concept_cell_definition.py
 
 ```
-This includes our method for concept cell identification and adds the corresponding identity of each neuron to each of our standardized files (Signi == Y if concept cell and Signi == N if not). 
+This includes our method for concept cell identification and adds the corresponding identity of each neuron to each of our standardized files (Signi == Y if concept cell and Signi == N if not). Also, based on the top image (the image that elicits the highest response in all the cells), we add Preferred vs Non-preferred image identity in all of our graph_data files. THese are going to be used later when we plot PSTH graphs and look at the response of concept cells during Preferred trials vs during Non-preferred trials. 
