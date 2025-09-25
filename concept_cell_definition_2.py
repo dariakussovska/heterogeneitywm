@@ -1,3 +1,7 @@
+import os 
+import pandas as pd
+import numpy as np 
+
 # Load brain regions data
 brain_regions_path = "/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx"
 brain_regions_df = pd.read_excel(brain_regions_path)
