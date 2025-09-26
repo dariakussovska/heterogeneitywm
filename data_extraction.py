@@ -339,7 +339,7 @@ def process_probe_periods(nwbfile, subject_id: int) -> pd.DataFrame:
             'trial_id': trial_nums,
             'Probe_Start_Time': probe_starts,
             'Probe_End_Time': probe_ends,
-            'Probe_Image_ID': image_ids,
+            'Probe_Image_ID': [img_id - 1 for img_id in image_ids],
             'Spikes_in_Probe': spikes_list,
             'Spikes_rate_Probe': rates_list,
             'probe_in_out': in_out,
