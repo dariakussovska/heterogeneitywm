@@ -357,10 +357,10 @@ delay_pref = delay_df[delay_df["Category"] == "Preferred"]
 delay_nonpref = delay_df[delay_df["Category"] == "Non-Preferred"]
 
 # Probe: only Nonencoded
-probe_pe = probe_df[probe_df["Trial_Type"] == "Preferred Encoded"]
-probe_pn = probe_df[probe_df["Trial_Type"] == "Preferred Nonencoded"]
-probe_ne = probe_df[probe_df["Trial_Type"] == "Nonpreferred Encoded"]
-probe_np = probe_df[probe_df["Trial_Type"] == "Nonpreferred Nonencoded"]
+probe_pe = probe_df[probe_df["Probe_Category"] == "Preferred Encoded"]
+probe_pn = probe_df[probe_df["Probe_Category"] == "Preferred Nonencoded"]
+probe_ne = probe_df[probe_df["Probe_Category"] == "Nonpreferred Encoded"]
+probe_np = probe_df[probe_df["Probe_Category"] == "Nonpreferred Nonencoded"]
 
 fig, axs = plt.subplots(1, 3, figsize=(20, 6))
 fig.suptitle(f"Raster Plots — Subject {subject_id}, Neuron {neuron_id}", fontsize=18)
