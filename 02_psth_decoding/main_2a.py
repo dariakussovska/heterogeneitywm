@@ -53,16 +53,16 @@ def construct_z_encoding(enc_data, fixation_data, time_bins):
     baseline_mean, baseline_std = calculate_baseline_stats(fixation_data, "Spikes_rate_Fixation")
     pref = enc_data[enc_data["Category"] == "Preferred"]
     nonpref = enc_data[enc_data["Category"] == "Non-Preferred"]
-    fr_pref = calculate_firing_rates_matrix(pref, "Standardized_Spikes_New", time_bins)
-    fr_nonpref = calculate_firing_rates_matrix(nonpref, "Standardized_Spikes_New", time_bins)
+    fr_pref = calculate_firing_rates_matrix(pref, "Standardized_Spikes", time_bins)
+    fr_nonpref = calculate_firing_rates_matrix(nonpref, "Standardized_Spikes", time_bins)
     return calculate_z_scores(fr_pref, baseline_mean, baseline_std), calculate_z_scores(fr_nonpref, baseline_mean, baseline_std)
 
 def construct_z_delay(delay_data, fixation_data, time_bins):
     baseline_mean, baseline_std = calculate_baseline_stats(fixation_data, "Spikes_rate_Fixation")
     pref = delay_data[delay_data["Category"] == "Preferred"]
     nonpref = delay_data[delay_data["Category"] == "Non-Preferred"]
-    fr_pref = calculate_firing_rates_matrix(pref, "Standardized_Spikes_in_Delay", time_bins)
-    fr_nonpref = calculate_firing_rates_matrix(nonpref, "Standardized_Spikes_in_Delay", time_bins)
+    fr_pref = calculate_firing_rates_matrix(pref, "Standardized_Spikes", time_bins)
+    fr_nonpref = calculate_firing_rates_matrix(nonpref, "Standardized_Spikes", time_bins)
     return calculate_z_scores(fr_pref, baseline_mean, baseline_std), calculate_z_scores(fr_nonpref, baseline_mean, baseline_std)
 
 def construct_z_probe_all_categories(probe_data, fixation_data, time_bins):
@@ -76,7 +76,7 @@ def construct_z_probe_all_categories(probe_data, fixation_data, time_bins):
     z_scores_by_type = {}
     for trial_type in trial_types:
         trials = probe_data[probe_data["Probe_Category"] == trial_type]
-        fr = calculate_firing_rates_matrix(trials, "Standardized_Spikes_in_Probe", time_bins)
+        fr = calculate_firing_rates_matrix(trials, "Standardized_Spikes", time_bins)
         z_scores_by_type[trial_type] = calculate_z_scores(fr, baseline_mean, baseline_std)
     return z_scores_by_type
 
@@ -368,7 +368,7 @@ fig.suptitle(f"Raster Plots — Subject {subject_id}, Neuron {neuron_id}", fonts
 # Encoding Raster
 plot_ordered_raster(
     axs[0], enc_pref, enc_nonpref,
-    spike_column="Standardized_Spikes_New",
+    spike_column="Standardized_Spikes",
     color_top="darkgreen", color_bottom="purple",
     title="Encoding 1"
 )
@@ -376,7 +376,7 @@ axs[0].set_xlim(0, 1)
 # Delay Raster 
 plot_ordered_raster(
     axs[1], delay_pref, delay_nonpref,
-    spike_column="Standardized_Spikes_in_Delay",
+    spike_column="Standardized_Spikes",
     color_top="darkgreen", color_bottom="purple",
     title="Delay"
 )
@@ -384,7 +384,7 @@ axs[1].set_xlim(0, 2.5)
 plot_probe_raster(
     axs[2],
     groups=[probe_pe, probe_pn, probe_ne, probe_np],
-    spike_column="Standardized_Spikes_in_Probe",
+    spike_column="Standardized_Spikes",
     colors=["red", "orange", "green", "blue"],
     labels=["Pref at probe and in memory", "Pref not at probe and in memory", "Pref at probe and not in memory", "Pref not at probe and not in memory"],
     title="Probe (All Trials)"
