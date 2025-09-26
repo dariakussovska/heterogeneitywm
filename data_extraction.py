@@ -113,39 +113,54 @@ class NWBProcessor:
                 })
         
         return delay_data
-    
-    def get_probe_periods_with_trials(self, nwbfile):
-        """Your working probe period code."""
-        events = nwbfile.acquisition['events']
-        timestamps = events.timestamps[:]
-        data = events.data[:]
 
-        trials_table = nwbfile.intervals['trials']
-        probe_in_out_data = trials_table['probe_in_out'].data[:]
-        response_accuracy_data = trials_table['response_accuracy'].data[:]
-        loads_probe_pic_ids = trials_table['loadsProbe_PicIDs'].data[:]
-        trial_start_times = trials_table['start_time'].data[:]
-        trial_stop_times = trials_table['stop_time'].data[:]
+def get_probe_periods_with_trials(self, nwbfile):
+    """Extract probe periods and per-trial metadata."""
+    import numpy as np
 
-        probe_data = []
+    events = nwbfile.acquisition['events']
+    timestamps = events.timestamps[:]
+    data = events.data[:]
 
-        for trial_id, (start_time, stop_time, probe_pic_id, in_out, accuracy) in enumerate(
-            zip(trial_start_times, trial_stop_times, loads_probe_pic_ids, probe_in_out_data, response_accuracy_data)
-        ):
-            within_trial = (timestamps > start_time) & (timestamps < stop_time)
-            probe_events = np.where((data[:-1] == 7) & (data[1:] == 8) & within_trial[:-1])[0]
+    trials_table = nwbfile.intervals['trials']
+    probe_in_out_data = trials_table['probe_in_out'].data[:]
+    response_accuracy_data = trials_table['response_accuracy'].data[:]
+    loads_probe_pic_ids = trials_table['loadsProbe_PicIDs'].data[:]  # per-trial probe image id(s)
+    trial_start_times = trials_table['start_time'].data[:]
+    trial_stop_times = trials_table['stop_time'].data[:]
 
-            for idx in probe_events:
-                probe_data.append({
-                    'start_time': timestamps[idx],
-                    'end_time': timestamps[idx + 1],
-                    'trial_id': trial_id + 1,
-                    'image_id': probe_pic_id,
-                    'probe_in_out': in_out,
-                    'response_accuracy': accuracy
-                })
+    def to_scalar(x):
+        # Some NWB fields can be 0-d arrays or 1-length arrays; normalize to a scalar
+        if isinstance(x, (list, tuple, np.ndarray)):
+            return x[0] if len(x) else np.nan
+        return x
 
-        return probe_data
+    probe_data = []
+
+    for trial_id, (start_time, stop_time, probe_pic_id, in_out, accuracy) in enumerate(
+        zip(trial_start_times, trial_stop_times, loads_probe_pic_ids, probe_in_out_data, response_accuracy_data)
+    ):
+        probe_image_id = to_scalar(probe_pic_id)
+
+        # Find probe events (7 -> 8) that occur within this trial
+        within_trial = (timestamps > start_time) & (timestamps < stop_time)
+        # Note: align the within_trial mask with the 7->8 pair check
+        idxs = np.where((data[:-1] == 7) & (data[1:] == 8) & within_trial[:-1])[0]
+
+        for idx in idxs:
+            probe_data.append({
+                'start_time': timestamps[idx],
+                'end_time': timestamps[idx + 1],
+                'trial_id': trial_id + 1,
+                # Keep both names for compatibility: your code sometimes uses `image_id`,
+                # and for probe-specific logic you use `Probe_Image_ID`
+                'image_id': probe_image_id,
+                'Probe_Image_ID': probe_image_id,
+                'probe_in_out': to_scalar(in_out),
+                'response_accuracy': to_scalar(accuracy)
+            })
+
+    return probe_data
     
     def calculate_spike_rates(self, nwbfile, period_data, subject_id, period_name):
         """Calculate spike rates for any period type."""
@@ -183,7 +198,7 @@ class NWBProcessor:
                 }
                 
                 # Add optional fields if they exist
-                for key in ['image_id', 'probe_in_out', 'response_accuracy']:
+                for key in ['image_id', 'Probe_Image_ID', 'probe_in_out', 'response_accuracy']:
                     if key in period:
                         result[key] = period[key]
                 
