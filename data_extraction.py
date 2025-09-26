@@ -1,189 +1,416 @@
-import re, os
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path
 from pynwb import NWBHDF5IO
+import matplotlib.pyplot as plt 
+import re
+import numpy as np
+import os
+from typing import Tuple, Dict, List
 
-class NWBProcessor:
-    def __init__(self, output_dir="/home/daria/PROJECT"):
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+def extract_subject_id(file_path: str) -> int:
+    """Extracts the subject_id from the file path."""
+    match = re.search(r'sub-(\d+)', file_path)
+    if match:
+        return int(match.group(1))
+    else:
+        raise ValueError(f"Subject ID not found in file path: {file_path}")
 
-    def extract_subject_id(self, file_path):
-        m = re.search(r'sub-(\d+)', str(file_path))
-        return int(m.group(1)) if m else None
+def read_nwb_file(filepath: str):
+    """Read NWB file with proper error handling."""
+    io = NWBHDF5IO(filepath, mode='r', load_namespaces=True)
+    nwbfile = io.read()
+    return nwbfile, io
 
-    def get_image_order(self, nwbfile):
-        stim_templates = nwbfile.stimulus_template['StimulusTemplates']
-        sorted_keys = sorted(stim_templates.images.keys())
-        # (optional) plotting omitted for brevity
-        return {key: rank for rank, key in enumerate(sorted_keys)}
+def visualize_and_rank_stimulus_images(nwbfile) -> Dict:
+    """Visualize and rank stimulus images."""
+    stim_templates = nwbfile.stimulus_template['StimulusTemplates']
+    sorted_keys = sorted(stim_templates.images.keys())
+    num_images = len(sorted_keys)
+    
+    # Create visualization
+    num_columns = 6
+    num_rows = (num_images + num_columns - 1) // num_columns 
+    fig, axes = plt.subplots(num_rows, num_columns, figsize=(15, 3 * num_rows))
+    axes = axes.flatten() 
+    
+    image_order = {}
+    for rank, key in enumerate(sorted_keys):
+        image_data = stim_templates.images[key].data[:]
+        axes[rank].imshow(image_data, cmap='gray')
+        axes[rank].set_title(f"ID: {key}\nRank: {rank}")
+        axes[rank].axis('off')  
+        image_order[key] = rank
+        
+    # Hide unused axes
+    for ax in axes[len(sorted_keys):]:
+        ax.axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return image_order
 
-    def process_encoding_periods(self, nwbfile, image_order, subject_id):
-        stim_pres = nwbfile.stimulus['StimulusPresentation']
-        trial_data = nwbfile.intervals['trials']
-        results = {1: [], 2: [], 3: []}
+def map_image_ids_to_encoding_periods(nwbfile, image_order: Dict, file_path: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Map image IDs to encoding periods."""
+    subject_id = extract_subject_id(file_path)
+    stim_pres = nwbfile.stimulus['StimulusPresentation']
+    trial_data = nwbfile.intervals['trials']
+    
+    n_trials = len(trial_data)
+    image_keys = list(image_order.keys())
+    
+    # Pre-allocate data lists for better performance
+    enc1_data, enc2_data, enc3_data = [], [], []
+    
+    for i in range(n_trials):
+        idx_base = i * 4
+        stimulus_indices = [
+            stim_pres.data[idx_base],
+            stim_pres.data[idx_base + 1], 
+            stim_pres.data[idx_base + 2]
+        ]
+        
+        image_ids = [image_keys[idx] for idx in stimulus_indices]
+        
+        trial_record = {
+            'subject_id': subject_id,
+            'trial_id': i + 1,
+        }
+        
+        # Encoding 1
+        enc1_data.append({
+            **trial_record,
+            'start_time': trial_data['timestamps_Encoding1'][i],
+            'stop_time': trial_data['timestamps_Encoding1_end'][i],
+            'image_id': image_ids[0],
+            'stimulus_index': stimulus_indices[0],
+            'image_rank': image_order[image_ids[0]]
+        })
+        
+        # Encoding 2
+        enc2_data.append({
+            **trial_record,
+            'start_time': trial_data['timestamps_Encoding2'][i],
+            'stop_time': trial_data['timestamps_Encoding2_end'][i],
+            'image_id': image_ids[1],
+            'stimulus_index': stimulus_indices[1],
+            'image_rank': image_order[image_ids[1]]
+        })
+        
+        # Encoding 3
+        enc3_data.append({
+            **trial_record,
+            'start_time': trial_data['timestamps_Encoding3'][i],
+            'stop_time': trial_data['timestamps_Encoding3_end'][i],
+            'image_id': image_ids[2],
+            'stimulus_index': stimulus_indices[2],
+            'image_rank': image_order[image_ids[2]]
+        })
+    
+    return pd.DataFrame(enc1_data), pd.DataFrame(enc2_data), pd.DataFrame(enc3_data)
 
-        for i in range(len(trial_data)):
-            idx_base = i * 4
-            for enc_num in [1, 2, 3]:
-                stim_idx = stim_pres.data[idx_base + enc_num - 1]
-                image_id = list(image_order.keys())[stim_idx]
-                start_time = trial_data[f'timestamps_Encoding{enc_num}'][i]
-                stop_time  = trial_data[f'timestamps_Encoding{enc_num}_end'][i]
-                results[enc_num].append({
-                    'subject_id': subject_id,
-                    'trial_id': i + 1,
-                    'start_time': start_time,
-                    'stop_time':  stop_time,
-                    'image_id': image_id,
-                    'stimulus_index': stim_idx,
-                    'image_rank': image_order[image_id],
-                })
+def calculate_spike_rate(spike_times: np.ndarray, start_time: float, stop_time: float) -> Tuple[List, float]:
+    """Calculate spikes and spike rate for a given time window."""
+    if pd.isna(start_time) or pd.isna(stop_time) or (stop_time - start_time) <= 0:
+        return [], 0.0
+    
+    spikes_in_window = [spike for spike in spike_times if start_time <= spike < stop_time]
+    duration = stop_time - start_time
+    spike_rate = len(spikes_in_window) / duration if duration > 0 else 0.0
+    
+    return spikes_in_window, spike_rate
 
-        return (pd.DataFrame(results[1]), pd.DataFrame(results[2]), pd.DataFrame(results[3]))
+def get_spike_rate_single_neuron(nwbfile, neuron_id: int, df_encoding: pd.DataFrame) -> pd.DataFrame:
+    """Calculate spike rates for a single neuron across encoding periods."""
+    spike_times = nwbfile.units['spike_times'][neuron_id]
+    
+    spikes = []
+    spikes_rate = []
+    
+    for _, row in df_encoding.iterrows():
+        spike_list, rate = calculate_spike_rate(spike_times, row['start_time'], row['stop_time'])
+        spikes.append(spike_list)
+        spikes_rate.append(rate)
+    
+    df_result = df_encoding.copy()
+    df_result['Spikes'] = spikes
+    df_result['Spikes_rate'] = spikes_rate
+    df_result['Neuron_ID'] = neuron_id
+    
+    return df_result
 
-    def get_fixation_periods(self, nwbfile):
-        events = nwbfile.acquisition['events']
-        t, d = events.timestamps[:], events.data[:]
-        out, trial_id = [], 0
-        for i in range(len(d) - 1):
-            if d[i] == 11 and d[i+1] == 1:
-                trial_id += 1
-                out.append({'start_time': t[i], 'end_time': t[i+1], 'trial_id': trial_id})
-        return out
+def get_spike_rate_all_neurons(nwbfile, df_enc1: pd.DataFrame, df_enc2: pd.DataFrame, df_enc3: pd.DataFrame, subject_id: int) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Compute spike rates for all neurons across encoding periods."""
+    total_neurons = len(nwbfile.units['spike_times'])
+    
+    # Use list comprehension for better performance
+    enc1_results = []
+    enc2_results = [] 
+    enc3_results = []
+    
+    for neuron_id in range(total_neurons):
+        enc1_results.append(get_spike_rate_single_neuron(nwbfile, neuron_id, df_enc1.copy()))
+        enc2_results.append(get_spike_rate_single_neuron(nwbfile, neuron_id, df_enc2.copy()))
+        enc3_results.append(get_spike_rate_single_neuron(nwbfile, neuron_id, df_enc3.copy()))
+    
+    # Concatenate all results at once
+    df_final_enc1 = pd.concat(enc1_results, ignore_index=True)
+    df_final_enc2 = pd.concat(enc2_results, ignore_index=True)
+    df_final_enc3 = pd.concat(enc3_results, ignore_index=True)
+    
+    # Add subject_id (already present from mapping function)
+    return df_final_enc1, df_final_enc2, df_final_enc3
 
-    def get_delay_periods(self, nwbfile):
-        events = nwbfile.acquisition['events']
-        t, d = events.timestamps[:], events.data[:]
-        out, trial_id = [], 0
-        for i in range(len(d) - 1):
-            if d[i] == 6 and d[i+1] == 7:
-                trial_id += 1
-                out.append({'start_time': t[i], 'end_time': t[i+1], 'trial_id': trial_id})
-        return out
+def process_encoding_file(filepath: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Process an NWB file and extract encoding period data."""
+    nwbfile, io = read_nwb_file(filepath)
+    subject_id = extract_subject_id(filepath)
+    
+    try:
+        image_order = visualize_and_rank_stimulus_images(nwbfile)
+        df_enc1, df_enc2, df_enc3 = map_image_ids_to_encoding_periods(nwbfile, image_order, filepath)
+        df_final_enc1, df_final_enc2, df_final_enc3 = get_spike_rate_all_neurons(nwbfile, df_enc1, df_enc2, df_enc3, subject_id)
+    finally:
+        io.close()
+    
+    return df_final_enc1, df_final_enc2, df_final_enc3
 
-    def get_probe_periods_with_trials(self, nwbfile):
-        """Add Probe_Image_ID (and keep image_id for consistency)."""
-        events = nwbfile.acquisition['events']
-        t, d = events.timestamps[:], events.data[:]
+# Fixation period functions
+def get_fixation_periods(nwbfile) -> Tuple[List, List, List]:
+    """Extracts fixation periods from events."""
+    events = nwbfile.acquisition['events']
+    timestamps = events.timestamps[:]
+    data = events.data[:]
+    
+    fixation_starts = []
+    fixation_ends = []
+    trial_ids = []
+    
+    for i in range(len(data) - 1):
+        if data[i] == 11 and data[i + 1] == 1:  # Fixation onset to picture shown
+            trial_id = len(fixation_starts) + 1
+            fixation_starts.append(timestamps[i])
+            fixation_ends.append(timestamps[i + 1])
+            trial_ids.append(trial_id)
+    
+    return fixation_starts, fixation_ends, trial_ids
 
-        trials = nwbfile.intervals['trials']
-        probe_in_out = trials['probe_in_out'].data[:]
-        resp_acc     = trials['response_accuracy'].data[:]
-        probe_ids    = trials['loadsProbe_PicIDs'].data[:]
-        t_start      = trials['start_time'].data[:]
-        t_stop       = trials['stop_time'].data[:]
+def process_fixation_periods(nwbfile, subject_id: int) -> pd.DataFrame:
+    """Process fixation periods for all neurons."""
+    fixation_starts, fixation_ends, trial_ids = get_fixation_periods(nwbfile)
+    
+    if not fixation_starts:
+        return pd.DataFrame()
+    
+    total_neurons = len(nwbfile.units['spike_times'])
+    all_results = []
+    
+    for neuron_id in range(total_neurons):
+        spike_times = nwbfile.units['spike_times'][neuron_id]
+        spikes_list = []
+        rates_list = []
+        
+        for start, end in zip(fixation_starts, fixation_ends):
+            spikes, rate = calculate_spike_rate(spike_times, start, end)
+            spikes_list.append(spikes)
+            rates_list.append(rate)
+        
+        all_results.append(pd.DataFrame({
+            'subject_id': subject_id,
+            'Neuron_ID': neuron_id,
+            'trial_id': trial_ids,
+            'Fixation_Start': fixation_starts,
+            'Fixation_End': fixation_ends,
+            'Spikes_in_Fixation': spikes_list,
+            'Spikes_rate_Fixation': rates_list,
+        }))
+    
+    return pd.concat(all_results, ignore_index=True) if all_results else pd.DataFrame()
 
-        def to_scalar(x):
-            if isinstance(x, (list, tuple, np.ndarray)): return x[0] if len(x) else np.nan
-            return x
+# Delay period functions  
+def get_delay_periods(nwbfile) -> Tuple[List, List, List]:
+    """Extracts delay periods from events."""
+    events = nwbfile.acquisition['events']
+    timestamps = events.timestamps[:]
+    data = events.data[:]
+    
+    delay_starts = []
+    delay_ends = []
+    trial_ids = []
+    
+    for i in range(len(data) - 1):
+        if data[i] == 6 and data[i + 1] == 7:
+            trial_id = len(delay_starts) + 1
+            delay_starts.append(timestamps[i])
+            delay_ends.append(timestamps[i + 1])
+            trial_ids.append(trial_id)
+    
+    return delay_starts, delay_ends, trial_ids
 
-        out = []
-        for trial_id, (s, e, pid, pin, acc) in enumerate(zip(t_start, t_stop, probe_ids, probe_in_out, resp_acc)):
-            pid = to_scalar(pid); pin = to_scalar(pin); acc = to_scalar(acc)
-            within = (t > s) & (t < e)
-            idxs = np.where((d[:-1] == 7) & (d[1:] == 8) & within[:-1])[0]
-            for idx in idxs:
-                out.append({
-                    'start_time': t[idx],
-                    'end_time':   t[idx+1],
-                    'trial_id':   trial_id + 1,
-                    'image_id':   pid,
-                    'Probe_Image_ID': pid,
-                    'probe_in_out': pin,
-                    'response_accuracy': acc
-                })
-        return out
+def process_delay_periods(nwbfile, subject_id: int) -> pd.DataFrame:
+    """Process delay periods for all neurons."""
+    delay_starts, delay_ends, trial_ids = get_delay_periods(nwbfile)
+    
+    if not delay_starts:
+        return pd.DataFrame()
+    
+    total_neurons = len(nwbfile.units['spike_times'])
+    all_results = []
+    
+    for neuron_id in range(total_neurons):
+        spike_times = nwbfile.units['spike_times'][neuron_id]
+        spikes_list = []
+        rates_list = []
+        
+        for start, end in zip(delay_starts, delay_ends):
+            spikes, rate = calculate_spike_rate(spike_times, start, end)
+            spikes_list.append(spikes)
+            rates_list.append(rate)
+        
+        all_results.append(pd.DataFrame({
+            'subject_id': subject_id,
+            'Neuron_ID': neuron_id,
+            'trial_id': trial_ids,
+            'Delay_Start': delay_starts,
+            'Delay_End': delay_ends,
+            'Spikes_in_Delay': spikes_list,
+            'Spikes_rate_Delay': rates_list,
+        }))
+    
+    return pd.concat(all_results, ignore_index=True) if all_results else pd.DataFrame()
 
-    def calculate_spike_rates(self, nwbfile, period_data, subject_id, period_name):
-        if not period_data:
-            print(f"No {period_name} periods found.")
-            return pd.DataFrame()
+# Probe period functions
+def get_probe_periods_with_trials(nwbfile) -> Tuple[List, List, List, List, List, List]:
+    """Extracts probe periods with trial information."""
+    trials_table = nwbfile.intervals['trials']
+    
+    probe_starts = []
+    probe_ends = []
+    image_ids = []
+    trial_nums = []
+    in_out = []
+    accuracy = []
+    
+    events = nwbfile.acquisition['events']
+    event_times = events.timestamps[:]
+    event_data = events.data[:]
+    
+    for trial_idx in range(len(trials_table)):
+        trial_start = trials_table['start_time'][trial_idx]
+        trial_end = trials_table['stop_time'][trial_idx]
+        
+        # Find probe events within this trial
+        mask = (event_times > trial_start) & (event_times < trial_end)
+        probe_indices = np.where((event_data[:-1] == 7) & (event_data[1:] == 8) & mask[:-1])[0]
+        
+        for idx in probe_indices:
+            probe_starts.append(event_times[idx])
+            probe_ends.append(event_times[idx + 1])
+            image_ids.append(trials_table['loadsProbe_PicIDs'][trial_idx])
+            trial_nums.append(trial_idx + 1)
+            in_out.append(trials_table['probe_in_out'][trial_idx])
+            accuracy.append(trials_table['response_accuracy'][trial_idx])
+    
+    return probe_starts, probe_ends, image_ids, trial_nums, in_out, accuracy
 
-        all_rows = []
-        n_units = len(nwbfile.units['spike_times'])
-        for neuron_id in range(n_units):
-            spikes_all = nwbfile.units['spike_times'][neuron_id]
-            for p in period_data:
-                s, e = p['start_time'], p['end_time']
-                dur = e - s
-                if dur > 0:
-                    spikes = [sp for sp in spikes_all if s < sp < e]
-                    rate = len(spikes) / dur
-                else:
-                    spikes, rate = [], 0.0
-                row = {
-                    'subject_id': subject_id,
-                    'Neuron_ID': neuron_id,
-                    'trial_id': p['trial_id'],
-                    f'{period_name}_Start': s,
-                    f'{period_name}_End':   e,
-                    f'Spikes_in_{period_name}': [spikes],
-                    f'Spikes_rate_{period_name}': rate,
-                }
-                for key in ['image_id', 'Probe_Image_ID', 'probe_in_out', 'response_accuracy']:
-                    if key in p: row[key] = p[key]
-                all_rows.append(row)
-        return pd.DataFrame(all_rows)
+def process_probe_periods(nwbfile, subject_id: int) -> pd.DataFrame:
+    """Process probe periods for all neurons."""
+    probe_data = get_probe_periods_with_trials(nwbfile)
+    probe_starts, probe_ends, image_ids, trial_nums, in_out, accuracy = probe_data
+    
+    if not probe_starts:
+        return pd.DataFrame()
+    
+    total_neurons = len(nwbfile.units['spike_times'])
+    all_results = []
+    
+    for neuron_id in range(total_neurons):
+        spike_times = nwbfile.units['spike_times'][neuron_id]
+        spikes_list = []
+        rates_list = []
+        
+        for start, end in zip(probe_starts, probe_ends):
+            spikes, rate = calculate_spike_rate(spike_times, start, end)
+            spikes_list.append(spikes)
+            rates_list.append(rate)
+        
+        all_results.append(pd.DataFrame({
+            'subject_id': subject_id,
+            'Neuron_ID': neuron_id,
+            'trial_id': trial_nums,
+            'Probe_Start_Time': probe_starts,
+            'Probe_End_Time': probe_ends,
+            'Probe_Image_ID': image_ids,
+            'Spikes_in_Probe': spikes_list,
+            'Spikes_rate_Probe': rates_list,
+            'probe_in_out': in_out,
+            'response_accuracy': accuracy
+        }))
+    
+    return pd.concat(all_results, ignore_index=True) if all_results else pd.DataFrame()
 
-    def add_spike_rates_to_encoding(self, nwbfile, df_encoding, period_name):
-        n_units = len(nwbfile.units['spike_times'])
-        rows = []
-        for neuron_id in range(n_units):
-            spikes_all = nwbfile.units['spike_times'][neuron_id]
-            for _, r in df_encoding.iterrows():
-                s, e = r['start_time'], r['stop_time']
-                if pd.isna(s) or pd.isna(e) or (e - s) <= 0:
-                    spikes, rate = [], 0.0
-                else:
-                    spikes = [sp for sp in spikes_all if s <= sp < e]
-                    rate = len(spikes) / (e - s)
-                row = r.to_dict()
-                row.update({'Neuron_ID': neuron_id, 'Spikes': [spikes], f'Spikes_rate_{period_name}': rate})
-                rows.append(row)
-        return pd.DataFrame(rows)
-
-    def process_single_file(self, filepath):
+# Main processing pipeline
+def process_all_files(filepaths: List[str]) -> None:
+    """Process all NWB files for all periods."""
+    output_dir = "/home/daria/PROJECT/"
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Initialize data containers
+    all_enc1, all_enc2, all_enc3 = [], [], []
+    all_fixation, all_delay, all_probe = [], [], []
+    
+    for filepath in filepaths:
+        if not os.path.exists(filepath):
+            print(f"File not found: {filepath}")
+            continue
+            
         print(f"Processing: {filepath}")
-        with NWBHDF5IO(filepath, 'r', load_namespaces=True) as io:
-            nwb = io.read()
-            subj = self.extract_subject_id(filepath)
-            image_order = self.get_image_order(nwb)
+        subject_id = extract_subject_id(filepath)
+        
+        try:
+            nwbfile, io = read_nwb_file(filepath)
+            
+            # Process all periods for this file
+            enc1, enc2, enc3 = process_encoding_file(filepath)
+            all_enc1.append(enc1)
+            all_enc2.append(enc2) 
+            all_enc3.append(enc3)
+            
+            fixation_data = process_fixation_periods(nwbfile, subject_id)
+            all_fixation.append(fixation_data)
+            
+            delay_data = process_delay_periods(nwbfile, subject_id)
+            all_delay.append(delay_data)
+            
+            probe_data = process_probe_periods(nwbfile, subject_id)
+            all_probe.append(probe_data)
+            
+            io.close()
+            
+        except Exception as e:
+            print(f"Error processing {filepath}: {e}")
+    
+    # Concatenate and save all data
+    def save_data(data_list, filename):
+        if data_list:
+            combined = pd.concat([d for d in data_list if not d.empty], ignore_index=True)
+            combined.to_excel(os.path.join(output_dir, filename), index=False)
+            print(f"Saved {filename} with {len(combined)} rows")
+        else:
+            print(f"No data for {filename}")
+    
+    save_data(all_enc1, "all_spike_rate_data_encoding1.xlsx")
+    save_data(all_enc2, "all_spike_rate_data_encoding2.xlsx") 
+    save_data(all_enc3, "all_spike_rate_data_encoding3.xlsx")
+    save_data(all_fixation, "all_spike_rate_data_fixation.xlsx")
+    save_data(all_delay, "all_spike_rate_data_delay.xlsx")
+    save_data(all_probe, "all_spike_rate_data_probe.xlsx")
+    
+    print("All data processing complete!")
 
-            df1, df2, df3 = self.process_encoding_periods(nwb, image_order, subj)
-            df1 = self.add_spike_rates_to_encoding(nwb, df1, 'Encoding1')
-            df2 = self.add_spike_rates_to_encoding(nwb, df2, 'Encoding2')
-            df3 = self.add_spike_rates_to_encoding(nwb, df3, 'Encoding3')
-
-            fix = self.calculate_spike_rates(nwb, self.get_fixation_periods(nwb), subj, 'Fixation')
-            dly = self.calculate_spike_rates(nwb, self.get_delay_periods(nwb), subj, 'Delay')
-            prb = self.calculate_spike_rates(nwb, self.get_probe_periods_with_trials(nwb), subj, 'Probe')
-
-            return {'encoding1': df1, 'encoding2': df2, 'encoding3': df3,
-                    'fixation': fix, 'delay': dly, 'probe': prb}
-
-    def process_all_files(self, filepaths):
-        buckets = {k: [] for k in ['encoding1','encoding2','encoding3','fixation','delay','probe']}
-        for fp in filepaths:
-            fp = Path(fp)
-            if not fp.exists():
-                print(f"✗ File not found: {fp}")
-                continue
-            try:
-                res = self.process_single_file(fp)
-                for k, df in res.items():
-                    if not df.empty:
-                        buckets[k].append(df)
-                print(f"✓ Successfully processed {fp.name}")
-            except Exception as e:
-                print(f"✗ Error processing {fp.name}: {e}")
-
-        for k, lst in buckets.items():
-            if lst:
-                out = pd.concat(lst, ignore_index=True)
-                out_path = self.output_dir / f"all_spike_rate_data_{k}.xlsx"
-                out.to_excel(out_path, index=False)
-                print(f"✓ Saved {k} data: {out_path}")
-
+# Run the processing
+if __name__ == "__main__":
+    import warnings
+    warnings.filterwarnings("ignore")
+    
+    filepaths = [f"/home/daria/PROJECT/000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
+    process_all_files(filepaths)
