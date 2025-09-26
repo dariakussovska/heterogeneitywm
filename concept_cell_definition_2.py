@@ -3,6 +3,7 @@ import pandas as pd
 
 # Load the data (replace these paths with the actual paths to your data files)
 enc1_data = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Encoding1.xlsx')
+significant_neurons_df = pd.read_excel('/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx')
 
 # Display the standardized spike times for Enc1
 print(enc1_data[['Neuron_ID_3', 'trial_id', 'start_time', 'Spikes', 'Standardized_Spikes']].head())
@@ -31,7 +32,7 @@ enc1_data_filtered = pd.merge(enc1_data_with_preferred, trial_info, on=['subject
 print(enc1_data_filtered[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'num_images_presented', 'Standardized_Spikes']].head())
 
 # Define the file path where the filtered Enc1 data will be saved
-filtered_enc1_file_path = '/home/daria/PROJECT/graph_datagraph_encoding1.xlsx'
+filtered_enc1_file_path = '/home/daria/PROJECT/graph_data/graph_Encoding1.xlsx'
 
 # Save the filtered Enc1 data to an Excel file
 enc1_data_filtered.to_excel(filtered_enc1_file_path, index=False)
@@ -55,7 +56,7 @@ enc1_data_categorized.to_excel(filtered_enc1_file_path, index=False)
 # Confirm the data has been saved
 print(f"Categorized Enc1 data saved to {filtered_enc1_file_path}")
 
-categorized_enc1_file_path = '/home/daria/PROJECT/graph_datagraph_encoding1.xlsx'
+categorized_enc1_file_path = '/home/daria/PROJECT/graph_data/graph_encoding1.xlsx'
 
 enc1_data_categorized = pd.read_excel(categorized_enc1_file_path)
 
