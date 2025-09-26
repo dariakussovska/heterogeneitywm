@@ -75,7 +75,7 @@ def construct_z_probe_all_categories(probe_data, fixation_data, time_bins):
     ]
     z_scores_by_type = {}
     for trial_type in trial_types:
-        trials = probe_data[probe_data["Category_Probe"] == trial_type]
+        trials = probe_data[probe_data["Probe_Category"] == trial_type]
         fr = calculate_firing_rates_matrix(trials, "Standardized_Spikes_in_Probe", time_bins)
         z_scores_by_type[trial_type] = calculate_z_scores(fr, baseline_mean, baseline_std)
     return z_scores_by_type
