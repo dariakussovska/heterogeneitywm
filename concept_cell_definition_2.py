@@ -2,7 +2,7 @@
 import pandas as pd
 
 # Load the data (replace these paths with the actual paths to your data files)
-enc1_data = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_encoding1.xlsx')
+enc1_data = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Encoding1.xlsx')
 
 # Display the standardized spike times for Enc1
 print(enc1_data[['Neuron_ID_3', 'trial_id', 'start_time', 'Spikes', 'Standardized_Spikes']].head())
