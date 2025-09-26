@@ -1,9 +1,12 @@
-## import numpy as np
+import numpy as np
 import pandas as pd
 
 # Load the data (replace these paths with the actual paths to your data files)
 enc1_data = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Encoding1.xlsx')
 significant_neurons_df = pd.read_excel('/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx')
+
+# Filter significant neurons to only include Y or N (exclude NaN or other values)
+significant_neurons_filtered = significant_neurons_df[significant_neurons_df['Signi'].isin(['Y', 'N'])]
 
 # Display the standardized spike times for Enc1
 print(enc1_data[['Neuron_ID_3', 'trial_id', 'start_time', 'Spikes', 'Standardized_Spikes']].head())
@@ -11,16 +14,16 @@ print(enc1_data[['Neuron_ID_3', 'trial_id', 'start_time', 'Spikes', 'Standardize
 # Add a column for the preferred image ID to the Enc1 data
 def add_preferred_image_id(enc1_df, significant_neurons_df):
     # Merge Enc1 data with significant neurons data on 'subject_id' and 'Neuron_ID'
-    merged_df = pd.merge(enc1_df, significant_neurons_df[['subject_id', 'Neuron_ID', 'im_cat_1st']], on=['subject_id', 'Neuron_ID'], how='inner')
+    merged_df = pd.merge(enc1_df, significant_neurons_df[['subject_id', 'Neuron_ID', 'im_cat_1st', 'Signi']], on=['subject_id', 'Neuron_ID'], how='inner')
     # Rename the 'im_cat_1st' column to 'preferred_image_id'
     merged_df.rename(columns={'im_cat_1st': 'preferred_image_id'}, inplace=True)
     return merged_df
 
-# Apply the function to the Enc1 data
-enc1_data_with_preferred = add_preferred_image_id(enc1_data, significant_neurons)
+# Apply the function to the Enc1 data using filtered significant neurons
+enc1_data_with_preferred = add_preferred_image_id(enc1_data, significant_neurons_filtered)
 
 # Display the Enc1 data with the preferred image ID
-print(enc1_data_with_preferred[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'Standardized_Spikes']].head())
+print(enc1_data_with_preferred[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'Standardized_Spikes', 'Signi']].head())
 
 # Load the trial information data
 trial_info = pd.read_excel('/home/daria/PROJECT/trial_info.xlsx')
@@ -29,7 +32,7 @@ trial_info = pd.read_excel('/home/daria/PROJECT/trial_info.xlsx')
 enc1_data_filtered = pd.merge(enc1_data_with_preferred, trial_info, on=['subject_id', 'trial_id'], how='inner')
 
 # Display the filtered Enc1 data
-print(enc1_data_filtered[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'num_images_presented', 'Standardized_Spikes']].head())
+print(enc1_data_filtered[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'num_images_presented', 'Standardized_Spikes', 'Signi']].head())
 
 # Define the file path where the filtered Enc1 data will be saved
 filtered_enc1_file_path = '/home/daria/PROJECT/graph_data/graph_Encoding1.xlsx'
@@ -49,7 +52,7 @@ def categorize_trials_by_preference(df):
 enc1_data_categorized = categorize_trials_by_preference(enc1_data_filtered)
 
 # Display the categorized Enc1 data
-print(enc1_data_categorized[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'stimulus_index', 'Category']].head())
+print(enc1_data_categorized[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'stimulus_index', 'Category', 'Signi']].head())
 
 enc1_data_categorized.to_excel(filtered_enc1_file_path, index=False)
 
@@ -73,7 +76,7 @@ def add_brain_region_info(enc1_df, significant_neurons_df):
 enc1_data_with_brain_region = add_brain_region_info(enc1_data_categorized, significant_neurons)
 
 # Display the Enc1 data with the brain region information
-print(enc1_data_with_brain_region[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'stimulus_index', 'Category', 'Location']].head())
+print(enc1_data_with_brain_region[['subject_id', 'Neuron_ID', 'trial_id', 'preferred_image_id', 'stimulus_index', 'Category', 'Location', 'Signi']].head())
 
 # Define the file path where the updated Enc1 data will be saved
 updated_enc1_file_path = '/home/daria/PROJECT/graph_data/graph_encoding1.xlsx'
@@ -105,7 +108,7 @@ columns_to_keep_from_enc1 = [
     'subject_id', 'Neuron_ID', 'trial_id', 'Significance', 'new_trial_id',
     'Neuron_ID_3', 'preferred_image_id', 'image_id_enc1', 'stimulus_index_enc1',
     'image_id_enc2', 'stimulus_index_enc2', 'image_id_enc3', 'stimulus_index_enc3',
-    'num_images_presented', 'Category', 'Location'
+    'num_images_presented', 'Category', 'Location', 'Signi'  # Added Signi column
 ]
 
 enc1_data_filtered = enc1_data_with_brain_region[columns_to_keep_from_enc1]
@@ -142,7 +145,7 @@ columns_to_keep_from_enc1 = [
     'subject_id', 'Neuron_ID', 'trial_id', 'Significance', 'new_trial_id',
     'Neuron_ID_3', 'preferred_image_id', 'image_id_enc1', 'stimulus_index_enc1',
     'image_id_enc2', 'stimulus_index_enc2', 'image_id_enc3', 'stimulus_index_enc3',
-    'num_images_presented', 'Category', 'Location'
+    'num_images_presented', 'Category', 'Location', 'Signi'  # Added Signi column
 ]
 
 enc1_data_filtered = enc1_data_with_brain_region[columns_to_keep_from_enc1]
@@ -208,7 +211,7 @@ filtered_fixation_data = pd.merge(filtered_fixation_data, trial_info, on=['subje
 print(filtered_fixation_data.head())
 
 # Save the filtered fixation data to a new Excel file
-filtered_fixation_data.to_excel('/home/daria/PROJECT/graph_datagraph_fixation.xlsx', index=False)
+filtered_fixation_data.to_excel('/home/daria/PROJECT/graph_data/graph_fixation.xlsx', index=False)
 
 import pandas as pd
 import numpy as np
@@ -257,3 +260,5 @@ def categorize_probe(row):
 
 merged_data_probe['Category_Probe'] = merged_data_probe.apply(categorize_probe, axis=1)
 merged_data_probe.to_excel('/home/daria/PROJECT/graph_data/graph_probe.xlsx', index=False)
+
+print("All processing complete! Significant neurons (Signi = Y or N) have been included in all datasets.")
