@@ -30,6 +30,9 @@ enc3_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.xlsx')
 def add_basic_columns(df, sig_neurons_df, brain_regions_df, trial_info_df):
     """Add Signi, preferred_image_id, Location, and trial info to dataframe"""
     
+    # Remove duplicates first
+    df = df.drop_duplicates()
+    
     # Add Signi and preferred_image_id from significant neurons
     if 'subject_id' in df.columns and 'Neuron_ID' in df.columns:
         sig_cols = ['subject_id', 'Neuron_ID', 'Signi', 'im_cat_1st']
@@ -59,18 +62,28 @@ enc3_data = add_basic_columns(enc3_data, significant_neurons_filtered, brain_reg
 print("Adding Category to encoding data...")
 def add_category_to_encoding(df):
     """Add Category column to encoding data: Preferred if preferred_image_id == stimulus_index"""
+    # Remove duplicates to avoid the Series comparison error
+    df = df.drop_duplicates()
+    
     if 'preferred_image_id' in df.columns and 'stimulus_index' in df.columns:
-        df['Category'] = df.apply(
-            lambda row: 'Preferred' if row['preferred_image_id'] == row['stimulus_index'] 
-            else 'Non-Preferred' if pd.notna(row['stimulus_index']) 
-            else 'Unknown', 
-            axis=1
-        )
+        # Use vectorized operations instead of apply to avoid the error
+        conditions = [
+            df['preferred_image_id'] == df['stimulus_index'],
+            df['stimulus_index'].notna()
+        ]
+        choices = ['Preferred', 'Non-Preferred']
+        
+        df['Category'] = np.select(conditions, choices, default='Unknown')
+    
     return df
 
 enc1_data = add_category_to_encoding(enc1_data)
 enc2_data = add_category_to_encoding(enc2_data)
 enc3_data = add_category_to_encoding(enc3_data)
+
+print(f"Enc1 Category distribution: {enc1_data['Category'].value_counts().to_dict()}")
+print(f"Enc2 Category distribution: {enc2_data['Category'].value_counts().to_dict()}")
+print(f"Enc3 Category distribution: {enc3_data['Category'].value_counts().to_dict()}")
 
 # Save the updated encoding data
 enc1_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.xlsx'), index=False)
