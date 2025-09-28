@@ -104,6 +104,7 @@ These files contain standardized spikes (relative to the start time of encoding 
 - It plots the concept cells firing rate with mean and standard error of the mean, throughout the five different image identities they react to. 
 - It merges all_neuron_brain_regions_cleaned.xlsx (brain regions for each of the neurons) to the concept cell definition (specified from the Neuron_Check_Significant_All.xlsx file as Signi == Y for concept cell and Signi == N for a non-concept cell)
 - Based on the preferred image identities, the code also adds preferred vs non-preferred stimulus columns to see how concept cells might react differently for their selective stimulus vs the rest.
+- 05_merge_data.py then merges the significance of the neurons to all dataframes, adds brain region locations, as well as trial info. 
 
 Run the code to calculate the total number of concept cells and the number in each region and plot a pie chart with the percentages. 
 Here, we will use the spike data gathered from Encoding period 1, in order to classify neurons as concept cells or non-concept cells. We will also look at the brain regions of all the cells in the dataset. 
@@ -128,25 +129,39 @@ region_distribution.eps: an EPS file showing a pie chart the distribution of cel
 
 concept_cell_distribution.eps: an EPS file showing a pie chart of the percentage of concept cells per brain region. 
 
+## FIRING RATE GRAPHS 
 
+Here, we are preparing the existing files for plotting the firing rates across concept and non-concept cells for preferred image identities versus non-preferred image identities. 
 
+- First, we need to run the code 06_add_category to add the corresponding trial type ("Category" column) to say whether the trial was preferred or non-preferred for that particular neuron and subject id combination. 
+- Under the 02_psth_decoding >> main_2a,b, we choose a neuron to plot. We run the code to load the data and filter by the number of images presented (to show only load 1 trials). We count spikes and convert to firing rates in the corresponding time bins, and subsequently smooth the data. We calculate calculate z-scores (subtracting the mean firing rate in the baseline and dividing by the standard deviation), and the confidence intervals for plotting later. Finally, we plot the z-scores and confidence intervals for the encoding, delay and probe periods.
+- The script also includes the generation of a raster with the spike times of this particular neuron over the task epochs. 
 
+**Inputs:**
 
-DECODING 
+- graph_encoding1.xlsx : an Excel file with standardized spikes from Encoding 1 per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron. 
+- graph_delay.xlsx : an Excel file with standardized spikes from the Delay (relative to start of the corresponding trial in the Delay) per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron (relative to Encoding 1 period). 
+- graph_probe.xlsx: an Excel file with standardized spikes from the Probe (relative to start of the corresponding trial in the Probe) per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron (relative to Encoding 1 period), with information about preferred vs non-preferred image identity in the probe itself. 
+- graph_fixation.xlsx:  an Excel file with standardized spikes from the Fixation period (relative to the start of the corresponding trial in the Fixation) per subject, trial, and neuron. 
+- trial_info.xlsx: an Excel file, containing the image identity presented in each trial in each subject, as well as the numbers of images presented during the specified trial. 
+
+**Outputs (Figures):** 
+
+- single_PSTH_4052_load1.eps: A peri-stimulus time histogram of a concept cell during load 1 trials where the preferred image was presented vs not-presented in the encoding, maintenance, and probe task epochs. 
+- raster_plots_4052.eps: a raster plot of the same concept cell with trials ordered by preferred vs non-preferred in the encoding, maintenance, and probe task epochs. 
+
+## DECODING 
 
 Here, we are trying to decoding stimulus identity from the maintenance period to see how information gets maintained. In addition, we are doing cross-temporal decoding to see how memoranda evolve through time, and we are doing within-subject decoding on brain regions. 
 
-Open the .ipynb notebook DECODING.ipynb
-Construct the y matrix from individual subject trial labels in the new_trial_final.xlsx file as shown in the code. 
-Run the code to create a design matrix for decoding analysis. Data is binned, normalized by z-scoring with individual neuron’s activity during baseline (fixation). You can choose which neurons to include in the data. The code also creates a corresponding y matrix with labels, performs a leave-one-out cross-validation, and a permutation test for significance testing. By varying the neurons that participate in the decoding analysis, as well as the loads, this code generates the .eps files that are used in Fig. 2f, Fig. 6i,j as well as Fig. S1 and Fig S5i,j. 
-The following chunks of code perform a similar design matrix creation and permutation testing, but this time with all task phases. This is for the purpose of achieving cross-temporal decoding maps. Thresholds for clustering are performed as well. By varying the neurons that participate in the decoding analysis, as well as the loads, this code generates the .eps files that are used in Fig. 2d as well as Fig. S1d, e.
-The final chunk of code performs an analysis across participants. It filters participants with 3 or more concept cells identified and runs decoding with concept cells from different brain regions to see how stable the decoding accuracy is across participants. This uses the initial trial info excel sheet to ensure as many trials in each participant included as possible. This code generates the .eps files used in Fig. 2e and Fig. S1f.
+- We construct the y matrix from individual subject trial labels in the new_trial_final.xlsx file as shown in the code.
+- Run 02_psth_decoding >> main_2d.py to create a design matrix for decoding analysis. Data is binned, normalized by z-scoring with individual neuron’s activity during baseline (fixation). You can choose which neurons to include in the data. The code also creates a corresponding y matrix with labels, performs a leave-one-out cross-validation, and a permutation test for significance testing. By varying the neurons that participate in the decoding analysis, as well as the loads, this code generates the .eps files that are used in Fig. 2f, Fig. 6i,j as well as Fig. S1 and Fig S5i,j.
+- The script 02_psth_decoding >> main_2e.py performs a similar design matrix creation and permutation testing, but this time with all task phases. This is for the purpose of achieving cross-temporal decoding maps. Thresholds for clustering are performed as well. By varying the neurons that participate in the decoding analysis, as well as the loads, this code generates the .eps files that are used in Fig. 2d as well as Fig. S1d, e.
+- The script 02_psth_decoding >> main_2f.py performs an analysis across participants. It filters participants with 3 or more concept cells identified and runs decoding with concept cells from different brain regions to see how stable the decoding accuracy is across participants. This uses the initial trial info excel sheet to ensure as many trials in each participant included as possible. This code generates the .eps files used in Fig. 2e and Fig. S1f.
 
-
-Inputs: 
-trial_info.xlsx: an Excel file, containing the image identity presented in each trial in each subject, as well as the numbers of images presented during the specified trial. 
-
-new_trial_final.xlsx: new trial identities, ensuring easy pooling across neurons for the decoder. Generated as mentioned above.
+**Inputs:**
+- trial_info.xlsx: an Excel file, containing the image identity presented in each trial in each subject, as well as the numbers of images presented during the specified trial. 
+- new_trial_final.xlsx: new trial identities, ensuring easy pooling across neurons for the decoder. Generated as mentioned above.
 
 Folder clean_data containing: 
 
@@ -161,13 +176,11 @@ These files contain standardized spikes (relative to the start time of encoding 
 
 graph_delay.xlsx : an Excel file with standardized spikes from the Delay (relative to start of the corresponding trial in the Delay) per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron (relative to Encoding 1 period). This is used for decoding from the maintenance period only.
 
-Outputs (Figures): 
+**Outputs (Figures):** 
 
-decoding_timebins.eps, decoding_timebins_py, decoding_timebins_in: .eps files that include decoding accuracy during the maintenance period, using neural activity from all concept cells, or just PY and just IN concept cells, and varying the time window used for decoding. 
-
-cross-temporal_decoding.eps, cross_temporal_decoding_py.eps, cross_temporal_decoding_in.eps: .eps files that include cross temporal decoding accuracy across task periods, using neural activity from all concept cells, or just PY and just IN concept cells. 
-
-brain_regions_decoding.eps: an .eps file that includes decoding accuracy during the maintenance period, using concept cells in different regions (MTL and AMY) and across participants
+- decoding_timebins.eps, decoding_timebins_py, decoding_timebins_in: .eps files that include decoding accuracy during the maintenance period, using neural activity from all concept cells, or just PY and just IN concept cells, and varying the time window used for decoding.
+- cross-temporal_decoding.eps, cross_temporal_decoding_py.eps, cross_temporal_decoding_in.eps: .eps files that include cross temporal decoding accuracy across task periods, using neural activity from all concept cells, or just PY and just IN concept cells. 
+- brain_regions_decoding.eps: an .eps file that includes decoding accuracy during the maintenance period, using concept cells in different regions (MTL and AMY) and across participants
 
 
 POISSON ENCODING MODEL
@@ -195,36 +208,6 @@ Clustering_3D.xlsx: an Excel file with labels for putative cell-type classificat
 Outputs (Figures): 
 
 RT_all.eps, RT_concept.eps, load_all.eps, load_concept.eps: .eps files that (depending on the neurons used), portray plots, showing the significantly modulated neurons (by brain region or neuronal type) by task parameters such as load and reaction time. 
-
-FIRING RATE GRAPHS + should add many neurons graphs?
-
-Here, we are preparing the existing files for plotting the firing rates across concept and non-concept cells for preferred image identities versus non-preferred image identities. 
-
-Open the .ipynb notebook FIRING_RATE_GRAPHS.ipynb
-Choose a neuron to plot. Run the code to load the data and filter by the number of images presented (to show only load 1 trials). 
-Run the code to count spikes and convert to firing rates in the corresponding time bins, and subsequently smooth the data. 
-Run the code to calculate z-scores (subtracting the mean firing rate in the baseline and dividing by the standard deviation), and calculate the confidence intervals for plotting later. 
-Run the code to plot z scores and confidence intervals for the encoding, delay and probe periods. 
-Run the code to generate a raster with the spike times of this particular neuron over the task epochs. There is a notebook for plotting all loads as well. 
-
-Inputs: 
-
-graph_encoding1.xlsx : an Excel file with standardized spikes from Encoding 1 per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron. 
-
-graph_delay.xlsx : an Excel file with standardized spikes from the Delay (relative to start of the corresponding trial in the Delay) per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron (relative to Encoding 1 period). 
-
-graph_probe.xlsx: an Excel file with standardized spikes from the Probe (relative to start of the corresponding trial in the Probe) per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron (relative to Encoding 1 period), with information about preferred vs non-preferred image identity in the probe itself. 
-
-graph_fixation.xlsx:  an Excel file with standardized spikes from the Fixation period (relative to the start of the corresponding trial in the Fixation) per subject, trial, and neuron. 
-
-trial_info.xlsx: an Excel file, containing the image identity presented in each trial in each subject, as well as the numbers of images presented during the specified trial. 
-
-Outputs (Figures): 
-
-single_PSTH_4052_load1.eps: A peri-stimulus time histogram of a concept cell during load 1 trials where the preferred image was presented vs not-presented in the encoding, maintenance, and probe task epochs. 
-
-Raster_plots_4052.eps: a raster plot of the same concept cell with trials ordered by preferred vs non-preferred in the encoding, maintenance, and probe task epochs. 
-
 
 DIMENSIONALITY REDUCTION
 
