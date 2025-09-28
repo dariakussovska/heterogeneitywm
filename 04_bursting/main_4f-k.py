@@ -31,14 +31,14 @@ OVERLAP  = 1     # set to 2 if you want ~2 neurons overlapping low & high
 # =========================
 # Load data
 # =========================
-df_metadata  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/Clustering_3D.xlsx')
-df_metadata2 = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/merged_significant_neurons_with_brain_regions.xlsx')
+df_metadata  = pd.read_excel('/home/daria/PROJECT/Clustering_3D.xlsx')
+df_metadata2 = pd.read_excel('/home/daria/PROJECT/merged_significant_neurons_with_brain_regions.xlsx')
 
-df_enc1  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_encoding1.xlsx')
-df_enc2  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_encoding2.xlsx')
-df_enc3  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_encoding3.xlsx')
-df_delay = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_delay.xlsx')
-df_probe = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_probe.xlsx')
+df_enc1  = pd.read_excel('/home/daria/PROJECT/graph_encoding1.xlsx')
+df_enc2  = pd.read_excel('/home/daria/PROJECT/graph_encoding2.xlsx')
+df_enc3  = pd.read_excel('/home/daria/PROJECT/graph_encoding3.xlsx')
+df_delay = pd.read_excel('/home/daria/PROJECT/graph_delay.xlsx')
+df_probe = pd.read_excel('/home/daria/PROJECT/graph_probe.xlsx')
 
 # Convenience filtered/meta frames
 df_metadata_decay_acg = df_metadata[df_metadata['R2'] > 0.3].copy()
