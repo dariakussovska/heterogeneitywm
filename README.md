@@ -29,11 +29,10 @@ I highly recommend that you also have a separate directory for all your newly ge
 To extact data for main analysis, you can use the code 1_data_extraction.py by going into the heterogeneity_wm folder on your terminal and running
 
 ```
-python 1_data_extraction.py
+python 01_data_extraction.py
+python 02_trial_info.py
 ```
-1_data_extraction.py extracts spike times for encoding 1, 2, and 3 periods, as well as the maintenance, and probe periods, and other relevant information, such as start and end time of each trial, subject id, neurond id, and stimulus presented. 
-
-If you run 2_data_extraction.py then you can extract cell_metrics (calculation for firing rate, cv2, ISI, etc. and trial_info excel sheet, where each subject and trial id has its corresponding stimulus identity (or identities). 
+01_data_extraction.py extracts spike times for encoding 1, 2, and 3 periods, as well as the maintenance, and probe periods, and other relevant information, such as start and end time of each trial, subject id, neurond id, and stimulus presented. With 02_trial_info.py you can extract cell_metrics (calculation for firing rate, cv2, ISI, etc. and trial_info excel sheet, where each subject and trial id has its corresponding stimulus identity (or identities). 
 
 # Important - Install dependencies 
 
