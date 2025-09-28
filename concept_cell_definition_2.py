@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import os
 
@@ -9,7 +8,7 @@ GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 # STEP 1: Load all source data
 print("Loading source data...")
 significant_neurons_df = pd.read_excel('/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx')
-trial_info = pd.read_excel('/home/daria/PROJECT/trial_info.xlsx')
+trial_info_df = pd.read_excel('/home/daria/PROJECT/trial_info.xlsx')
 brain_regions_df = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
 
 # Filter significant neurons to only include Y or N
@@ -17,222 +16,150 @@ significant_neurons_filtered = significant_neurons_df[significant_neurons_df['Si
 
 print("Source data loaded:")
 print(f"Significant neurons: {len(significant_neurons_filtered)} rows")
-print(f"Trial info: {len(trial_info)} rows") 
+print(f"Trial info: {len(trial_info_df)} rows") 
 print(f"Brain regions: {len(brain_regions_df)} rows")
 
-# STEP 2: Load encoding data and add basic columns first
-print("\nLoading encoding data...")
-enc1_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.xlsx'))
-enc2_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding2.xlsx')) 
-enc3_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.xlsx'))
-
-# Function to add basic columns (Signi, preferred_image_id, brain region, trial info)
-def add_basic_columns(df, sig_neurons_df, brain_regions_df, trial_info_df):
-    """Add Signi, preferred_image_id, Location, and trial info to dataframe"""
+# STEP 2: Function to add all required columns to a single file
+def add_all_columns_to_file(file_path, sig_neurons_df, trial_info_df, brain_regions_df):
+    """Add Signi, im_cat_1st, num_images_presented, and Location to a single file"""
+    print(f"\nProcessing: {os.path.basename(file_path)}")
     
-    # Remove duplicates first
-    df = df.drop_duplicates()
+    # Load the file
+    df = pd.read_excel(file_path)
+    print(f"Original columns: {df.columns.tolist()}")
+    print(f"Original row count: {len(df)}")
     
-    # Add Signi and preferred_image_id from significant neurons
+    # STEP 2A: Add Signi and im_cat_1st from significant neurons
     if 'subject_id' in df.columns and 'Neuron_ID' in df.columns:
+        print("Adding Signi and im_cat_1st...")
+        
+        # Select only the columns we need from significant neurons
         sig_cols = ['subject_id', 'Neuron_ID', 'Signi', 'im_cat_1st']
-        df = pd.merge(df, sig_neurons_df[sig_cols], on=['subject_id', 'Neuron_ID'], how='left')
-        df.rename(columns={'im_cat_1st': 'preferred_image_id'}, inplace=True)
+        sig_subset = sig_neurons_df[sig_cols].copy()
+        
+        # Merge the data
+        df = pd.merge(df, sig_subset, on=['subject_id', 'Neuron_ID'], how='left')
+        
+        print(f"After Signi merge row count: {len(df)}")
+        
+        # Check if merge was successful
+        if 'Signi' in df.columns:
+            signi_counts = df['Signi'].value_counts(dropna=False)
+            print(f"Signi distribution: {signi_counts.to_dict()}")
+        
+        if 'im_cat_1st' in df.columns:
+            print(f"im_cat_1st sample values: {df['im_cat_1st'].dropna().unique()[:5]}")
     
-    # Add brain region
-    if 'Neuron_ID_3' in df.columns and 'Neuron_ID_3' in brain_regions_df.columns:
-        df = pd.merge(df, brain_regions_df[['Neuron_ID_3', 'Location']], on='Neuron_ID_3', how='left')
-    elif 'subject_id' in df.columns and 'Neuron_ID' in df.columns:
-        df = pd.merge(df, brain_regions_df[['subject_id', 'Neuron_ID', 'Location']], on=['subject_id', 'Neuron_ID'], how='left')
-    
-    # Add trial info (num_images_presented and stimulus indices)
+    # STEP 2B: Add num_images_presented from trial_info
     if 'subject_id' in df.columns and 'trial_id' in df.columns:
-        trial_cols = [col for col in trial_info_df.columns if col not in ['subject_id', 'trial_id']]
-        df = pd.merge(df, trial_info_df[['subject_id', 'trial_id'] + trial_cols], on=['subject_id', 'trial_id'], how='left')
+        print("Adding num_images_presented...")
+        
+        # Select only the columns we need from trial_info
+        trial_cols = ['subject_id', 'trial_id', 'num_images_presented']
+        trial_subset = trial_info_df[trial_cols].copy()
+        
+        # Merge the data
+        df = pd.merge(df, trial_subset, on=['subject_id', 'trial_id'], how='left')
+        
+        print(f"After trial info merge row count: {len(df)}")
+        
+        # Check if merge was successful
+        if 'num_images_presented' in df.columns:
+            num_images_counts = df['num_images_presented'].value_counts(dropna=False)
+            print(f"num_images_presented distribution: {num_images_counts.to_dict()}")
     
+    # STEP 2C: Add Location from brain regions
+    if 'subject_id' in df.columns and 'Neuron_ID' in df.columns:
+        print("Adding Location...")
+        
+        # Select only the columns we need from brain regions
+        brain_cols = ['subject_id', 'Neuron_ID', 'Location']
+        brain_subset = brain_regions_df[brain_cols].copy()
+        
+        # Merge the data
+        df = pd.merge(df, brain_subset, on=['subject_id', 'Neuron_ID'], how='left')
+        
+        print(f"After brain regions merge row count: {len(df)}")
+        
+        # Check if merge was successful
+        if 'Location' in df.columns:
+            location_counts = df['Location'].value_counts(dropna=False)
+            print(f"Location distribution: {location_counts.to_dict()}")
+    
+    # Alternative: Try merging by Neuron_ID_3 if available
+    elif 'Neuron_ID_3' in df.columns and 'Neuron_ID_3' in brain_regions_df.columns:
+        print("Adding Location using Neuron_ID_3...")
+        
+        # Select only the columns we need from brain regions
+        brain_cols = ['Neuron_ID_3', 'Location']
+        brain_subset = brain_regions_df[brain_cols].copy()
+        
+        # Merge the data
+        df = pd.merge(df, brain_subset, on='Neuron_ID_3', how='left')
+        
+        print(f"After brain regions merge row count: {len(df)}")
+        
+        # Check if merge was successful
+        if 'Location' in df.columns:
+            location_counts = df['Location'].value_counts(dropna=False)
+            print(f"Location distribution: {location_counts.to_dict()}")
+    
+    print(f"Final columns: {df.columns.tolist()}")
     return df
 
-# Add basic columns to encoding data
-print("Adding basic columns to encoding data...")
-enc1_data = add_basic_columns(enc1_data, significant_neurons_filtered, brain_regions_df, trial_info)
-enc2_data = add_basic_columns(enc2_data, significant_neurons_filtered, brain_regions_df, trial_info)
-enc3_data = add_basic_columns(enc3_data, significant_neurons_filtered, brain_regions_df, trial_info)
+# STEP 3: Process all clean_data files
+print("\n" + "="*50)
+print("PROCESSING CLEAN_DATA FILES")
+print("="*50)
 
-# STEP 3: Add Category to encoding data based on preferred_image_id vs stimulus_index
-print("Adding Category to encoding data...")
-def add_category_to_encoding(df):
-    """Add Category column to encoding data: Preferred if preferred_image_id == stimulus_index"""
-    # Remove duplicates to avoid the Series comparison error
-    df = df.drop_duplicates()
+clean_files = [f for f in os.listdir(CLEAN_DATA_DIR) if f.startswith('cleaned_') and f.endswith('.xlsx')]
+
+for filename in clean_files:
+    file_path = os.path.join(CLEAN_DATA_DIR, filename)
     
-    if 'preferred_image_id' in df.columns and 'stimulus_index' in df.columns:
-        # Use vectorized operations instead of apply to avoid the error
-        conditions = [
-            df['preferred_image_id'] == df['stimulus_index'],
-            df['stimulus_index'].notna()
-        ]
-        choices = ['Preferred', 'Non-Preferred']
-        
-        df['Category'] = np.select(conditions, choices, default='Unknown')
+    # Add all columns
+    df_updated = add_all_columns_to_file(file_path, significant_neurons_filtered, trial_info_df, brain_regions_df)
     
-    return df
+    # Save back to the same file
+    df_updated.to_excel(file_path, index=False)
+    print(f"Saved: {filename}\n")
 
-enc1_data = add_category_to_encoding(enc1_data)
-enc2_data = add_category_to_encoding(enc2_data)
-enc3_data = add_category_to_encoding(enc3_data)
+# STEP 4: Process all graph_data files
+print("\n" + "="*50)
+print("PROCESSING GRAPH_DATA FILES")
+print("="*50)
 
-print(f"Enc1 Category distribution: {enc1_data['Category'].value_counts().to_dict()}")
-print(f"Enc2 Category distribution: {enc2_data['Category'].value_counts().to_dict()}")
-print(f"Enc3 Category distribution: {enc3_data['Category'].value_counts().to_dict()}")
+graph_files = [f for f in os.listdir(GRAPH_DATA_DIR) if f.startswith('graph_') and f.endswith('.xlsx')]
 
-# Save the updated encoding data
-enc1_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.xlsx'), index=False)
-enc2_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding2.xlsx'), index=False)
-enc3_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.xlsx'), index=False)
-print("Encoding data updated with Category")
-
-# STEP 4: Function to determine Category for non-encoding files (delay, fixation, probe)
-def get_category_from_encoding(row, enc1_df, enc2_df, enc3_df):
-    """Get Category from the correct encoding period based on num_images_presented"""
-    subject_id = row['subject_id']
-    trial_id = row['trial_id']
-    num_images = row.get('num_images_presented')
+for filename in graph_files:
+    file_path = os.path.join(GRAPH_DATA_DIR, filename)
     
-    if pd.isna(num_images):
-        return 'Unknown'
+    # Add all columns
+    df_updated = add_all_columns_to_file(file_path, significant_neurons_filtered, trial_info_df, brain_regions_df)
     
-    try:
-        num_images = int(num_images)
-    except (ValueError, TypeError):
-        return 'Unknown'
+    # Save back to the same file
+    df_updated.to_excel(file_path, index=False)
+    print(f" Saved: {filename}\n")
+
+# Check one file from each directory to verify
+def verify_file_columns(file_path, expected_columns):
+    """Verify that a file has all expected columns"""
+    df = pd.read_excel(file_path)
+    missing_columns = [col for col in expected_columns if col not in df.columns]
     
-    if num_images == 1:
-        # Get Category from Encoding1
-        match = enc1_df[(enc1_df['subject_id'] == subject_id) & (enc1_df['trial_id'] == trial_id)]
-        if not match.empty and 'Category' in match.columns:
-            return match.iloc[0]['Category']
-    
-    elif num_images == 2:
-        # Get Category from Encoding2
-        match = enc2_df[(enc2_df['subject_id'] == subject_id) & (enc2_df['trial_id'] == trial_id)]
-        if not match.empty and 'Category' in match.columns:
-            return match.iloc[0]['Category']
-    
-    elif num_images == 3:
-        # Get Category from Encoding3
-        match = enc3_df[(enc3_df['subject_id'] == subject_id) & (enc3_df['trial_id'] == trial_id)]
-        if not match.empty and 'Category' in match.columns:
-            return match.iloc[0]['Category']
-    
-    return 'Unknown'
+    if missing_columns:
+        print(f"{os.path.basename(file_path)}: Missing {missing_columns}")
+    else:
+        print(f"{os.path.basename(file_path)}: All columns present")
 
-# YOUR EXACT CATEGORIZE_PROBE FUNCTION
-def categorize_probe(row):
-    preferred = row['preferred_image_id']
-    probe = row['Probe_Image_ID']
-    num_images = row['num_images_presented']
-    
-    enc1 = row.get('stimulus_index_enc1')
-    enc2 = row.get('stimulus_index_enc2')
-    enc3 = row.get('stimulus_index_enc3')
+expected_columns = ['Signi', 'im_cat_1st', 'num_images_presented', 'Location']
 
-    # Build encoding image list, excluding '5' (means no image shown)
-    encoded_images = [enc for enc in [enc1, enc2, enc3] if pd.notna(enc) and enc != 5]
+# Check a sample from clean_data
+if clean_files:
+    sample_clean_file = os.path.join(CLEAN_DATA_DIR, clean_files[0])
+    verify_file_columns(sample_clean_file, expected_columns)
 
-    in_encoding = preferred in encoded_images
-    in_probe = probe == preferred
-
-    if num_images == 1:
-        if enc1 == 5:
-            return 'Unknown'
-        if row['Category'] == 'Preferred' and probe == preferred and enc1 == preferred:
-            return 'Preferred Encoded'
-        elif row['Category'] == 'Preferred' and probe != preferred:
-            return 'Preferred Nonencoded'
-        elif row['Category'] == 'Non-Preferred' and probe == preferred:
-            return 'Nonpreferred Encoded'
-        else:
-            return 'Nonpreferred Nonencoded'
-
-    elif num_images in [2, 3]:
-        if in_encoding and in_probe:
-            return 'Preferred Encoded'
-        elif in_encoding and not in_probe:
-            return 'Preferred Nonencoded'
-        elif not in_encoding and in_probe:
-            return 'Nonpreferred Encoded'
-        else:
-            return 'Nonpreferred Nonencoded'
-    
-    return 'Unknown'
-
-# STEP 5: Process delay, fixation, and probe files
-def process_non_encoding_files():
-    """Process delay, fixation, and probe files"""
-    file_types = ['Delay', 'Fixation', 'Probe']
-    
-    for file_type in file_types:
-        clean_file = os.path.join(CLEAN_DATA_DIR, f'cleaned_{file_type}.xlsx')
-        graph_file = os.path.join(GRAPH_DATA_DIR, f'graph_{file_type.lower()}.xlsx')
-        
-        # Process clean data file
-        if os.path.exists(clean_file):
-            print(f"\nProcessing {file_type} clean data...")
-            df = pd.read_excel(clean_file)
-            print(f"Original columns: {df.columns.tolist()}")
-            
-            # Add basic columns
-            df = add_basic_columns(df, significant_neurons_filtered, brain_regions_df, trial_info)
-            
-            # Add Category from encoding data
-            df['Category'] = df.apply(
-                lambda row: get_category_from_encoding(row, enc1_data, enc2_data, enc3_data), 
-                axis=1
-            )
-            
-            # For probe files, add Probe_Category
-            if file_type == 'Probe':
-                df['Probe_Category'] = df.apply(categorize_probe, axis=1)
-            
-            # Save clean data
-            df.to_excel(clean_file, index=False)
-            print(f"Updated {file_type} clean data")
-            print(f"Category distribution: {df['Category'].value_counts().to_dict()}")
-            if 'Probe_Category' in df.columns:
-                print(f"Probe_Category distribution: {df['Probe_Category'].value_counts().to_dict()}")
-        
-        # Process graph data file
-        if os.path.exists(graph_file):
-            print(f"\nProcessing {file_type} graph data...")
-            df = pd.read_excel(graph_file)
-            print(f"Original columns: {df.columns.tolist()}")
-            
-            # Add basic columns
-            df = add_basic_columns(df, significant_neurons_filtered, brain_regions_df, trial_info)
-            
-            # Add Category from encoding data
-            df['Category'] = df.apply(
-                lambda row: get_category_from_encoding(row, enc1_data, enc2_data, enc3_data), 
-                axis=1
-            )
-            
-            # For probe files, add Probe_Category
-            if file_type == 'Probe':
-                df['Probe_Category'] = df.apply(categorize_probe, axis=1)
-            
-            # Save graph data
-            df.to_excel(graph_file, index=False)
-            print(f"Updated {file_type} graph data")
-            print(f"Category distribution: {df['Category'].value_counts().to_dict()}")
-            if 'Probe_Category' in df.columns:
-                print(f"Probe_Category distribution: {df['Probe_Category'].value_counts().to_dict()}")
-
-# STEP 6: Execute the processing
-print("\n=== PROCESSING NON-ENCODING FILES ===")
-process_non_encoding_files()
-
-print("\n=== PROCESSING COMPLETE ===")
-print("All files have been updated in the correct order:")
-print("1. Encoding files: Category based on preferred_image_id vs stimulus_index")
-print("2. Delay/Fixation files: Category inherited from correct encoding period based on num_images_presented")
-print("3. Probe files: Category inherited + Probe_Category using your exact logic")
+# Check a sample from graph_data  
+if graph_files:
+    sample_graph_file = os.path.join(GRAPH_DATA_DIR, graph_files[0])
+    verify_file_columns(sample_graph_file, expected_columns)
