@@ -137,10 +137,6 @@ zp2_smooth = smooth_z_scores(zp2, sigma=1.0)
 zp3_smooth = smooth_z_scores(zp3, sigma=1.0)
 zp4_smooth = smooth_z_scores(zp4, sigma=1.0)
 
-# Display a smoothed Z-score table 
-print("Smoothed Enc1 Preferred:")
-display(z1_smooth)
-
 from joblib import Parallel, delayed
 from statsmodels.stats.multitest import fdrcorrection
 
