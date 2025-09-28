@@ -5,13 +5,13 @@ BASE_DIR = '/home/daria/PROJECT'
 CLEAN_DATA_DIR = os.path.join(BASE_DIR, 'clean_data')
 GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 
-# STEP 1: Load the encoding data first to use as reference
+# Load the encoding data first to use as reference
 print("Loading encoding data for reference...")
 enc1_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.xlsx'))
 enc2_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding2.xlsx'))
 enc3_data = pd.read_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.xlsx'))
 
-# STEP 2: Add Category to encoding files (both clean and graph)
+# Add Category to encoding files (both clean and graph)
 print("\n" + "="*50)
 print("ADDING CATEGORY TO ENCODING FILES")
 print("="*50)
@@ -59,7 +59,7 @@ enc3_graph.to_excel(os.path.join(GRAPH_DATA_DIR, 'graph_encoding3.xlsx'), index=
 
 print("All encoding files updated with Category")
 
-# STEP 3: Function to add Category to non-encoding files (Delay, Fixation, Probe)
+# Add Category to non-encoding files (Delay, Fixation, Probe)
 def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_type):
     """Add Category to non-encoding files by matching with the correct encoding period"""
     print(f"Adding Category to {file_type}...")
@@ -116,7 +116,7 @@ def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_typ
     print(f"Category distribution for {file_type}: {category_counts.to_dict()}")
     return target_df
 
-# STEP 4: Function to add Probe_Category for probe files
+# Add Probe_Category for probe files
 def add_probe_category(df):
     """Add Probe_Category column for probe files using your exact logic"""
     print("Adding Probe_Category...")
@@ -143,7 +143,7 @@ def add_probe_category(df):
     print(f"Probe_Category distribution: {probe_category_counts.to_dict()}")
     return df
 
-# STEP 5: Process Delay and Probe files (both clean and graph)
+# Process Delay and Probe files (both clean and graph)
 print("\n" + "="*50)
 print("PROCESSING NON-ENCODING FILES")
 print("="*50)
