@@ -279,10 +279,10 @@ def create_graph_data():
             start_time_col = 'start_time'  # Adjust based on actual column name
         elif period_name == 'Delay':
             spikes_col = 'Spikes_in_Delay'
-            start_time_col = 'start_time'  # Adjust based on actual column name
+            start_time_col = 'Delay_Start'  # Adjust based on actual column name
         elif period_name == 'Probe':
             spikes_col = 'Spikes_in_Probe'
-            start_time_col = 'start_time'  # Adjust based on actual column name
+            start_time_col = 'Probe_Start_Time'  # Adjust based on actual column name
         
         # Standardize from this period's own start time (DIFFERENT from cleaned data)
         if start_time_col in df_graph.columns and spikes_col in df_graph.columns:
