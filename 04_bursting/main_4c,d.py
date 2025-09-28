@@ -25,9 +25,9 @@ min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 # =========================
 # Paths (edit as needed)
 # =========================
-path_decay_acg  = '/Users/darikussovska/Desktop/PROJECT/Clustering_3D.xlsx'
-path_all_meta   = '/Users/darikussovska/Desktop/PROJECT/merged_significant_neurons_with_brain_regions.xlsx'
-path_trials     = '/Users/darikussovska/Desktop/PROJECT/clean_data/graph_encoding1.xlsx'
+path_decay_acg  = '/home/daria/PROJECT/Clustering_3D.xlsx'
+path_all_meta   = '/home/daria/PROJECT/merged_significant_neurons_with_brain_regions.xlsx'
+path_trials     = '/home/daria/PROJECT/clean_data/graph_encoding1.xlsx'
 
 # =========================
 # Load data
@@ -57,8 +57,8 @@ OVERLAP  = 1    # set to 2 if you want ~2 neurons overlapping between low & high
 # =========================
 categories = [
     "All_cells",
-    "10_lowest_ACG", "10_highest_ACG",
-    "10_lowest_decay", "10_highest_decay",
+    "Lowest_ACG", "Highest_ACG",
+    "Lowest_decay", "Highest_decay",
     "Concept_cells",
     "Pyramidal", "Interneurons"
 ]
@@ -139,13 +139,13 @@ def subject_metadata_for_category(category, subject_id):
 
 def choose_neurons(category, df_subject_metadata):
     """Return Neuron_ID_3 list for this subject & category, using the new per-subject split for ACG/Decay."""
-    if category in ("10_lowest_ACG", "10_highest_ACG"):
+    if category in ("Lowest_ACG", "Highest_ACG"):
         low_ids, high_ids = _split_low_high_for_subject(df_subject_metadata, feature="ACG_Norm")
-        return low_ids if category == "10_lowest_ACG" else high_ids
+        return low_ids if category == "Lowest_ACG" else high_ids
 
-    elif category in ("10_lowest_decay", "10_highest_decay"):
+    elif category in ("Lowest_decay", "Highest_decay"):
         low_ids, high_ids = _split_low_high_for_subject(df_subject_metadata, feature="Decay")
-        return low_ids if category == "10_lowest_decay" else high_ids
+        return low_ids if category == "Lowest_decay" else high_ids
 
     elif category == "All_cells":
         return df_subject_metadata["Neuron_ID_3"].dropna().tolist()
@@ -167,12 +167,12 @@ def subjects_for_category(category):
     - For ACG/Decay categories: require >= PER_SUBJ neurons with a valid feature value (after R² filter applied upstream).
     - Other categories keep your previous logic (thresholds unchanged unless noted).
     """
-    if category in ("10_lowest_ACG", "10_highest_ACG"):
+    if category in ("Lowest_ACG", "Highest_ACG"):
         eligible = df_metadata_decay_acg.dropna(subset=["ACG_Norm"])
         counts = eligible.groupby("subject_id")["Neuron_ID_3"].count()
         return counts[counts >= PER_SUBJ].index.tolist()
 
-    if category in ("10_lowest_decay", "10_highest_decay"):
+    if category in ("Lowest_decay", "Highest_decay"):
         eligible = df_metadata_decay_acg.dropna(subset=["Decay"])
         counts = eligible.groupby("subject_id")["Neuron_ID_3"].count()
         return counts[counts >= PER_SUBJ].index.tolist()
@@ -344,7 +344,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import wilcoxon, mannwhitneyu, friedmanchisquare
 from statsmodels.stats.multitest import multipletests
 
-out_dir = "/Users/darikussovska/Desktop/PROJECT/Figures/Bursting"
+out_dir = "/home/daria/PROJECT/Figures/Bursting"
 os.makedirs(out_dir, exist_ok=True)
 
 def symbol_from_p(p):
