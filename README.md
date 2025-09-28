@@ -50,15 +50,27 @@ Detailed explanation of each of these and how to run them is found under "Docume
 After data extraction, you need just two more steps before you have all necessary files to run all analyses and get all figures. First, standardize the spikes. Run the code standardization.py 
 
 ```
-python standardization.py
+python 01_standardization.py
 ```
 
 In order to standardize the spikes in two different ways: for PSTH graphs (standardizing by start of each corresponding period); and for cross-temporal decoding (standardizing the spikes from the encoding period). This outputs two folders with standardized spikes column, as well as adds new neuron identities (subject id + 0 + neuron id) for ease of use. 
 
-Then, identify concept cells by running the python code concept_cell_definition.py. 
+Then, identify concept cells by running the python code 04_concept_cells.py. Add concept cell or not to the existing dataframes (Signi == Y if concept cell and Signi == N if not), as well as number of images, presented in each trial, and the brain region locations with 05_merge_data. 
 
 ```
-python concept_cell_definition.py
+python 04_concept_cells.py
+python 05_merge_data.py
+```
+Now, based on the the image that elicits the highest response in all the cells, we add Preferred vs Non-preferred image identity in all of our files. We use them to add a column with "Category" for each trial -- Preferred vs Non-preferred trials. We will use those to plot PSTHs. 
 
 ```
-This includes our method for concept cell identification and adds the corresponding identity of each neuron to each of our standardized files (Signi == Y if concept cell and Signi == N if not). Also, based on the top image (the image that elicits the highest response in all the cells), we add Preferred vs Non-preferred image identity in all of our graph_data files. THese are going to be used later when we plot PSTH graphs and look at the response of concept cells during Preferred trials vs during Non-preferred trials. 
+python 06_add_category.py
+```
+# Assigning cell types
+
+The last step needed to recreate all figures with ease is to perform the cell-classification analysis. For preprocessing and how we get the cell metrics needed to classify neurons into pyramidal cells and interneurons, you can read the corresponding section in the DOCUMENTATION.md file. This analysis is done in Matlab with the help of the software CellExplorer, and functions required for it are listed in the "data" folder. However, here, we have provided the outputs of the CellExplorer function under data >> Cell_analysis.xlsx. With the code 07_cell_types.py, we will just run the spectral clustering on those metrics and assign neurons as pyramidal (PY) or interneurons (IN) for subsequent analysis. 
+
+```
+python 07_cell_types.py
+```
+Now that we've ran all of the initial files for data extraction, standardization, and concept cell definition we can proceed with the main analyses used in each of our figures. Each main figure and the panels associated with it have a folder (ex. 01_task, 02_psth_decoding). They include all scripts, needed to recreate the main figures in the manuscript. Note that some figures just require running the same code twice, but with a different set of neurons. If that is the case, then this will be specified as a comment in the specific code. Run each .py file to get the corresponding panel from a main figure.  
