@@ -10,6 +10,11 @@ from scipy.spatial.distance import pdist
 import scipy.stats as sps
 import scikit_posthocs as sp
 
+trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
+trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+
+trialX = trialE
+
 ###ENC AND MAINTENANCE
 
 #dPCA distance-resampling  (Encoding vs Maintenance)
