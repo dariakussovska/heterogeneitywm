@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
-trialX = Xtrial
-trialD = Dtrial
+trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
+trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+
+trialX = trialE
 
 # Trial-averaged data 
 R_train = np.mean(trialX, axis=0)  # (58, 5, 199)
