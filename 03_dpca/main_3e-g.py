@@ -4,8 +4,10 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from dPCA.dPCA import dPCA 
 
-trialX = Xtrial
-trialD = Dtrial
+trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
+trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+
+trialX = trialE
 
 # 1. Split trialD into early and late maintenance
 trialD_early = trialD[:, :, :, :624]   # shape: (6, 58, 5, 624)
