@@ -11,6 +11,10 @@ import scipy.stats as sps
 import scikit_posthocs as sp
 
 # Same but for Early vs Late maintenance
+trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
+trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+
+trialX = trialE
 
 def run_dpca_distance_resampling_stratified(
     trialD,
