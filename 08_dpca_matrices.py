@@ -232,3 +232,14 @@ trialE = Xtrial
 trialD = Dtrial 
 print(trialE.shape)
 print(trialD.shape)
+
+import numpy as np
+
+# Define your directory path
+save_directory = "/home/daria/PROJECT/"  # Replace with your desired path
+
+# Save individual files
+np.save(f"{save_directory}trialE.npy", trialE)
+np.save(f"{save_directory}trialD.npy", trialD)
+
+print(f"Matrices saved to {save_directory}")
