@@ -63,6 +63,6 @@ ax.view_init(elev=20, azim=40)
 ax.grid(True)
 
 # Save or show
-#plt.savefig("/home/daria/maintenance_onto_maintenance.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("/home/daria/maintenance_onto_maintenance.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
 
