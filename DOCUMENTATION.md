@@ -224,7 +224,6 @@ cleaned_Fixation.xlsx:  an Excel file with standardized spikes from the Fixation
 - enc_maint_var.eps, early_var.eps, late_var.eps: .eps files that include the explained variance from fitting the training data in the dPCA algorithm in each of the training conditions: encoding, maintenance, early maintenance, late maintenance
 - encoding_on_encoding, encoding_on_maintenance, maintenance_on_maintenance.eps…etc. : .eps files with example projections of stimulus trajectories in state space in each of the conditions of training/testing the data.  
 
-
 ## BURSTING
 
 Here, we are performing a bursting analysis in all cells and across subjects to look for alternative methods of carrying memoranda. We are grouping cells into different groups of neurons and determining statistical significance between them. 
@@ -253,22 +252,19 @@ Here, we are extracting waveforms and spike times and using Cell Explorer functi
 
 - We run the script to extract the spike times of each neuron from the original .nwb files. Save with UIDs to make it easier for subsequent analysis. We extract the brain regions for every UID.
 
-ON MATLAB: 
-- Now we need to organise a struct to feed into CellExplorer. First, create the struct. It needs to have these exact names so it runs smoothly with CellExplorer. We need to reorganize the waveforms from 256x902 to 1x902 cell with 1x32 doubles. Open the one_reshape_waveforms.m file and follow the instructions to reshape the data. Create a struct within the struct you created, called waveforms. In waveforms, we have to have raw, filt and time cells. In our case, raw and filt are going to be the same, as the waveforms are already filtered. Parse the reshaped data into the raw and filt cells. Create a time 1x902 cell with 1x32 doubles with timesteps from -0.75 to + 0.75. Add the UIDs and the spike times (with the name neuron_spikes) into the general struct. We are giving you the entire struct, but this documentation outlines exactly how we extracted and processed the data. 
-We also have to create cells with general information, sampling rate (32 000 Hz), subject id, animal for each neuron. We also have some required by CellExplorer matrices like deepSuperficial_num, SWR_modulation index, etc, but we fill those with NaN or 0, as first, it is not required for our type of analysis, and second, we don’t have access to all of that info from the dataset. All of this is already into the struct. 
-- CV2, Firing rate, Peak and Mean SNR, as well as projection and isolation distance matrices have already been calculated. 
-- We can use the calc_ACG_metrics.m function (by CellExplorer) to calculate narrow and wide ACG values, as well as Theta modulation and burst indices (Royer and Doublets). 
-- We can use the calc_waveform_metrics.m function (by CellExplorer) to calculate waveform metrics (peak to Trough, AB ratio, etc.) 
-- We can use use the fit_ACG.m function (by CellExplorer) to fit a function to calculate ACG values to use for further analysis. 
-- We can use = the three_Mean_ACG.m file and copy paste in MATLAB to calculate mean ACG values
-- Then, run CellExplorer >> CellExplorer('metrics', project);
+IN MATLAB: 
+- In order for Cell Explorer to run smoothly, we need to organize a struct, which include the neurons' full spike trains, as well as the number of spikes for each neuron throughout the entire session. This is already provided under data >> project.mat. The struct also includes a UID (Neuron_ID_3) and some other important parameters that will be useful for subsequent analyses.
+- As we already have the full spike trains and spike times, we can run the function calc_ACG_metrics.m, provided by CellExplorer. This function calculates narrow and wide ACG values, as well as the burst indices (Royer and Doublets) used in subsequent cell-type related analyses.
+- After calculating the wide and narrow ACGs, we can calculate the mean normalized ACG values with the function Mean_ACG.m.
+- Subsequently, we can use the fit_ACG.m function (by CellExplorer) to fit a triple-exponential function to calculate certain ACG parameters, such as ACG tau decay, tau rise, and variance explained (R squared) of the function fit, which are all needed for our cell-type classification. 
+- cv2 and firing rate were already calculated in the second script in the repository (02_trial_info.py).
+- After extracting these values, they can be neatly put in one Excel file. We have provided this under data >> Cell_analysis.xlsx
 
-ON PYTHON 
-- Now we can continue with our .ipynb file. Run the next block of code to visualize the ACG. You can use that to inspect the cells visually.
-- We can create an Excel sheet for easier analysis of cell metrics. We provided one in the waveforms folder (Cell_analysis.xlsx). You can use that to try out different combinations of cell metrics, plot histograms, and explore how different metrics relate to each other. 
-- First, however, we use the Cell_analysis.xlsx file. We filter cells with an R squared value below 0.3 (less than 30% explained variance) and we run a spectral clustering method on the following metrics – Mean ACG, firing_rate, Tau_rise. We want to see how the cells get separated. We save the spectral clustering labels (0,1) in a new excel file (Clustering_3D.xlsx). The script assigns cell types to the labeled clusters. The cluster that includes cells with higher firing rates is labeled the interneuron cluster, and the other one is labeled the pyramidal cluster. It adds a new column “Cell_Type_New”, with the new identity of each cell, based on the spectral clustering. Then print the number of IN/PY classified neurons and we visualise the UMAP. 
-- The script can then run descriptive statistics on the already classified cells → histograms, distributions and comparison across cell types. 
-- Finally, this script compares bursting (CV2) metrics for IN and PY concept cells in their preferred vs non-preferred trials for Encoding and then for Maintenance. We do it in the following way: we concatenate the spike times for the preferred vs for the non-preferred trials, separately for Encoding and Maintenance for each of the neurons. Then, we calculate a CV2 value for each neuron in each of the four conditions (pref enc, nonpref enc, pref maintenance, nonpref maintenance), and we plot those on a figure. We compare within and across conditions for IN and PY. 
+IN PYTHON: 
+- To visualise the autocorrelograms, we can use the script main_5a,b. This returns all autocorrelograms (one for each neuron).  
+- For our cell classification, we will use the Cell_analysis.xlsx file. We filter cells with an R squared value below 0.3 (less than 30% explained variance) and we run a spectral clustering method on the following metrics – Mean ACG, firing_rate, Tau_rise. We want to see how the cells get separated. We save the spectral clustering labels (0,1) in a new excel file (Clustering_3D.xlsx). The script assigns cell types to the labeled clusters. The cluster that includes cells with higher firing rates is labeled the interneuron cluster, and the other one is labeled the pyramidal cluster. It adds a new column “Cell_Type_New”, with the new identity of each cell, based on the spectral clustering. Then print the number of IN/PY classified neurons and we visualise the UMAP. 
+- The main_5e-g.py script runs descriptive statistics on the already classified cells and performs comparison across cell types (tau rise, firing rate, cv2, burst index, mean ACG). 
+- Finally, the main_6g-h.py script compares bursting (CV2) metrics for IN and PY concept cells in their preferred vs non-preferred trials for Encoding and then for Maintenance. We do it in the following way: we concatenate the spike times for the preferred vs for the non-preferred trials, separately for Encoding and Maintenance for each of the neurons. Then, we calculate a CV2 value for each neuron in each of the four conditions (pref enc, nonpref enc, pref maintenance, nonpref maintenance), and we plot those on a figure. We compare within and across conditions for IN and PY. 
 
 **Inputs:**
 
