@@ -65,7 +65,7 @@ Now, based on the the image that elicits the highest response in all the cells, 
 ```
 python 06_add_category.py
 ```
-# Assigning cell types
+# Inferring cell types
 
 The last step needed to recreate all figures with ease is to perform the cell-classification analysis. For preprocessing and how we get the cell metrics needed to classify neurons into pyramidal cells and interneurons, you can read the corresponding section in the DOCUMENTATION.md file. This analysis is done in Matlab with the help of the software CellExplorer, and functions required for it are listed in the "data" folder. However, here, we have provided the outputs of the CellExplorer function under data >> Cell_analysis.xlsx. With the code 07_cell_types.py, we will just run the spectral clustering on those metrics and assign neurons as pyramidal (PY) or interneurons (IN) for subsequent analysis. 
 
