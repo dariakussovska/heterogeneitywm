@@ -33,23 +33,6 @@ df_filtered["UMAP_1"] = embedding[:, 0]
 df_filtered["UMAP_2"] = embedding[:, 1]
 df_filtered["UMAP_3"] = embedding[:, 2]
 
-# Single 2D UMAP plot (no subplots needed for one method)
-plt.figure(figsize=(8, 6))
-sns.scatterplot(
-    data=df_filtered,
-    x="UMAP_1",
-    y="UMAP_2",
-    hue="Spectral",
-    palette=hex_palette["Spectral"],
-    legend=False,
-    s=30
-)
-plt.title("Spectral Clustering")
-plt.xlabel("UMAP 1")
-plt.ylabel("UMAP 2")
-plt.tight_layout()
-plt.show()
-
 # Assign cell types based on Spectral clustering
 def map_spectral_to_type(spectral_label):
     if pd.isna(spectral_label):
