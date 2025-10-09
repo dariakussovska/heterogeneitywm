@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import DBSCAN, SpectralClustering, KMeans
+from sklearn.cluster import SpectralClustering
 from mpl_toolkits.mplot3d import Axes3D
 import umap.umap_ as umap
 import warnings
