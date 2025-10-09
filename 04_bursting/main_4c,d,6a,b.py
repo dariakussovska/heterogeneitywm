@@ -10,7 +10,7 @@ from scipy.signal.windows import gaussian
 # Parameters
 # =========================
 bin_size = 0.07                     # seconds
-TRIAL_WIN = 1                       # seconds per trial window (delay epoch length)
+TRIAL_WIN = 1                       # seconds per trial window; change to 2.8 for Delay
 GLOBAL_SEED = 5
 sigma_sec = 0.04                    # Gaussian kernel SD in seconds
 prominence_threshold_percentile = 90 # percentile on smoothed rate
@@ -26,8 +26,8 @@ min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 # Paths (edit as needed)
 # =========================
 path_decay_acg  = '/home/daria/PROJECT/Clustering_3D.xlsx'
-path_all_meta   = '/home/daria/PROJECT/merged_significant_neurons_with_brain_regions.xlsx'
-path_trials     = '/home/daria/PROJECT/clean_data/graph_encoding1.xlsx'
+path_all_meta   = '/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx'
+path_trials     = '/home/daria/PROJECT/graph_data/graph_encoding1.xlsx'
 
 # =========================
 # Load data
@@ -50,11 +50,8 @@ df_metadata_in_py     = df_metadata_decay_acg.copy()
 # New knobs for per-subject low/high splits
 # =========================
 PER_SUBJ = 10   # minimum number of eligible neurons per subject to include for ACG/Decay categories
-OVERLAP  = 1    # set to 2 if you want ~2 neurons overlapping between low & high
+OVERLAP  = 1    
 
-# =========================
-# Categories (unchanged; names kept for compatibility with your stats/plots)
-# =========================
 categories = [
     "All_cells",
     "Lowest_ACG", "Highest_ACG",
@@ -63,9 +60,6 @@ categories = [
     "Pyramidal", "Interneurons"
 ]
 
-# =========================
-# Helpers
-# =========================
 def parse_spike_entry(val):
     """Safely parse a spike string/list and keep spikes within [0, TRIAL_WIN]."""
     if val is None:
@@ -192,9 +186,6 @@ def subjects_for_category(category):
 
     return []
 
-# =========================
-# Output container (unchanged)
-# =========================
 results_delay = {
     cat: {
         "real_bursts": [], "poisson_bursts": [],
@@ -202,9 +193,6 @@ results_delay = {
     } for cat in categories
 }
 
-# =========================
-# Main loop (unchanged logic; now uses the new selection)
-# =========================
 for category in categories:
     subj_ids = subjects_for_category(category)
     if PRINT_DEBUG:
@@ -232,12 +220,12 @@ for category in categories:
         if n_trials == 0:
             continue
 
-        # ---------- REAL BURSTS ----------
+        # REAL BURSTS 
         all_spikes = []
         for trial_idx, trial_id in enumerate(trial_ids):
             df_trial = df_cat[df_cat['trial_id'] == trial_id]
             for neuron_id in sorted(df_trial['Neuron_ID_3'].unique()):
-                spikes_series = df_trial.loc[df_trial['Neuron_ID_3'] == neuron_id, 'Standardized_Spikes_New'].dropna()
+                spikes_series = df_trial.loc[df_trial['Neuron_ID_3'] == neuron_id, 'Standardized_Spikes'].dropna()
                 for s in first_nonnull_series(spikes_series):
                     arr = parse_spike_entry(s)
                     if arr.size:
@@ -276,7 +264,7 @@ for category in categories:
         for trial_idx, trial_id in enumerate(trial_ids):
             df_trial = df_cat[df_cat['trial_id'] == trial_id]
             for neuron_id in sorted(df_trial['Neuron_ID_3'].unique()):
-                spikes_series = df_trial.loc[df_trial['Neuron_ID_3'] == neuron_id, 'Standardized_Spikes_New'].dropna()
+                spikes_series = df_trial.loc[df_trial['Neuron_ID_3'] == neuron_id, 'Standardized_Spikes'].dropna()
                 cnt = 0
                 for s in first_nonnull_series(spikes_series):
                     arr = parse_spike_entry(s)
@@ -320,9 +308,6 @@ for category in categories:
         common = sorted(set(rm) & set(pm))
         print(f"  -> saved subjects: real={len(rm)} poisson={len(pm)} paired={len(common)}")
 
-# =========================
-# (Optional) sanity table (unchanged)
-# =========================
 if PRINT_DEBUG:
     rows = []
     for cat in categories:
@@ -432,9 +417,8 @@ poisson_means = [category_means[c]["poisson_mean"] for c in categories]
 real_sems     = [category_means[c]["real_sem"]     for c in categories]
 poisson_sems  = [category_means[c]["poisson_sem"]  for c in categories]
 
-# =========================
 # WITHIN-CATEGORY: Real vs Poisson (paired by subject) + FDR-BH (Family A)
-# =========================
+
 stats_within = {cat: {} for cat in categories}
 raw_pvals_within, cats_with_within = [], []
 all_diffs_for_condition_omnibus = []  # y - x (Poisson - Real) to test Condition effect
@@ -477,9 +461,7 @@ if len(raw_pvals_within) > 0:
     reject, p_corr, _, _ = multipletests(raw_pvals_within, alpha=0.05, method='fdr_bh')
     corrected_within = {cat: (bool(r), float(pc)) for cat, r, pc in zip(cats_with_within, reject, p_corr)}
 
-# =========================
-# OMNIBUS #1: Condition main effect (Real vs Poisson) across categories
-# =========================
+# Condition main effect (Real vs Poisson) across categories
 omnibus_condition = {"test": "Wilcoxon on (Poisson-Real) paired diffs across all categories",
                      "stat": np.nan, "p": np.nan, "n_pairs": 0}
 ad = np.asarray(all_diffs_for_condition_omnibus, float)
@@ -545,9 +527,7 @@ else:
 
 df_pairs.to_csv(f"{out_dir}/real_vs_real_pairwise_stats.csv", index=False)
 
-# =========================
 # OMNIBUS #2: Across-category effect on REAL via Friedman (within-subject)
-# =========================
 omnibus_categories = {"test": "Friedman (REAL across categories)", "chi2": np.nan, "p": np.nan, "n_subjects": 0}
 
 # Subjects that exist in ALL categories for REAL
@@ -569,10 +549,7 @@ if real_common_subjects and len(real_common_subjects) >= 3 and len(categories) >
         args = [mat_ok[:, j] for j in range(mat_ok.shape[1])]
         chi2, pf = friedmanchisquare(*args)
         omnibus_categories.update({"chi2": float(chi2), "p": float(pf), "n_subjects": int(mat_ok.shape[0])})
-
-# =========================
-# Plot with annotations
-# =========================
+        
 plt.figure(figsize=(15, 8))
 x = np.arange(len(categories))
 width = 0.35
@@ -655,9 +632,6 @@ plt.savefig(f"{out_dir}/bursting_encoding_vs_poisson_SEM_WITH_PAIRWISE.eps",
             format='eps', dpi=300, bbox_inches='tight')
 plt.show()
 
-# =========================
-# Summaries & Omnibus prints
-# =========================
 within_rows = []
 for cat in categories:
     row = {
@@ -685,9 +659,9 @@ print(df_pairs)
 print("\nOMNIBUS #2 — Across-category effect on REAL (Friedman within-subject):")
 print(omnibus_categories)
 
-# =========================
-# Significance matrix (-log10 p_FDR) with asterisk overlay (REAL vs REAL)
-# =========================
+
+# Significance matrix 
+
 if not df_pairs.empty and df_pairs["p_FDR_BH"].notna().any():
     cats_for_matrix = sorted(set(df_pairs["A"]).union(set(df_pairs["B"])))
     mat = np.full((len(cats_for_matrix), len(cats_for_matrix)), np.nan, dtype=float)
