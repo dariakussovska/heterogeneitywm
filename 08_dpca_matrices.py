@@ -40,7 +40,7 @@ delay_data_with_brain_region = pd.read_excel('/home/daria/PROJECT/graph_data/gra
 fixation_data = fixation_data_with_brain_region
 
 def filter_data(data, subject_ids=None, brain_regions=None, neuron_ids_3=None):
-    filtered_data = data[data['Significance'] == 'Y']  # Start with all significant neurons
+    filtered_data = data[data['Signi'] == 'Y']  # Start with all significant neurons
     if subject_ids:
         filtered_data = filtered_data[filtered_data['subject_id'].isin(subject_ids)]
     if brain_regions:
@@ -162,7 +162,7 @@ brain_regions_to_include = []
 neuron_ids_3_to_include = []
 
 delay_filtered = filter_data(delay_data_with_brain_region, subject_ids_to_include, brain_regions_to_include, neuron_ids_3_to_include)
-delay_filtered = delay_filtered[delay_filtered['Significance'] == 'Y']
+delay_filtered = delay_filtered[delay_filtered['Signi'] == 'Y']
 
 time_bins_delay = np.arange(0, 2.5, 0.002)  
 
