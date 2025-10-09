@@ -5,20 +5,17 @@ import numpy as np
 from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
-# -----------------------------
 # Load data
-# -----------------------------
 file_path = "/home/daria/PROJECT/Clustering_3D.xlsx"
 data = pd.read_excel(file_path)
 data.columns = data.columns.str.strip()
 
-metrics = ["firing_rates", "mean_acg","tau_rise", "tau_decay"]
+metrics = ["firing_rate", "acg_norm","tau_rise", "Burst"]
 labels = {
-    "firing_rates": "Firing Rate",
-    "mean_acg": "ACG (Norm)",
+    "firing_rate": "Firing Rate",
+    "acg_norm": "ACG (Norm)",
     "tau_rise": "τ Rise",
-    "tau_decay": "τ Decay"#,
-  #  "burst": "burst"
+    "Burst": "burst"
 }
 
 # Group separation
@@ -66,9 +63,6 @@ if valid_mask.sum() > 0:
     pvals_corr[valid_mask] = p_corr_v
     rejected[valid_mask] = rej_v
 
-# -----------------------------
-# Star logic (based on FDR-BY)
-# -----------------------------
 def stars_from_p(p):
     if np.isnan(p): return ""
     if p < 0.005:  return "***"
@@ -81,9 +75,6 @@ fdr_results = {}
 for metric, rej, p_corr in zip(metrics, rejected, pvals_corr):
     fdr_results[metric] = (bool(rej), p_corr, stars_from_p(p_corr))
 
-# -----------------------------
-# Plotting
-# -----------------------------
 custom_palette = {"PY": "#B22436", "IN": "#3254A2"}
 sns.set_context("talk")
 
@@ -173,9 +164,6 @@ plt.savefig("/home/daria/PROJECT/metrics_grid.eps",
              format='eps', dpi=300)
 plt.show()
 
-# -----------------------------
-# Summary table (raw & FDR-BY)
-# -----------------------------
 summary = pd.DataFrame({
     "Metric": metrics,
     "p_raw": raw_pvals,
