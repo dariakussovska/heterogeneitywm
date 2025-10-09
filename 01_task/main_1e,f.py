@@ -22,7 +22,6 @@ desired_locations = ['amygdala_left', 'amygdala_right', 'hippocampus_left', 'hip
                     'ventral_medial_prefrontal_cortex_right', 'ventral_medial_prefrontal_cortex_left', 'dorsal_anterior_cingulate_cortex_right', 'dorsal_anterior_cingulate_cortex_left']
 
 
-#desired_locations = ['PY', 'IN']
 # We'll compute the set of neurons that are in these locations:
 
 neurons_in_desired_locations = df_neuron_locations[
@@ -279,5 +278,5 @@ if len(summary_df) > 0:
     ax.set_ylim(-5, ymax + headroom)
     ax.set_title("Observed % significant neurons (Brain Regions)")
     plt.tight_layout()
-    plt.savefig("/home/daria/poisson_load.eps", format='eps', dpi=300)
+    plt.savefig("/home/daria/PROJECT/01_task/poisson_load.eps", format='eps', dpi=300)
     plt.show()
