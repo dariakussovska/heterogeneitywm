@@ -342,8 +342,8 @@ stats_table['p-value'] = np.round(stats_table['p-value'], 4)
 significant_fdr = stats_table[stats_table['FDR_corrected_p'] < 0.05]
 
 # Display
-display(stats_table)
-display(significant_fdr)
+print(stats_table)
+print(significant_fdr)
 
 # Save to CSV
 stats_table.to_csv('/home/daria/PROJECT/load_vs_shuffled_stats_corrected_group.csv', index=False)
