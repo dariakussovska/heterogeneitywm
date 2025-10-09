@@ -13,7 +13,7 @@ subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', '
 print(subject_trials)
 
 y_matrix = subject_trials
-df_delay_filtered = pd.read_excel('/home/daria/PROJECT/graph_data/graph_dela.xlsx')
+df_delay_filtered = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
 df_fixation = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
 
 y_matrix = y_matrix.reset_index(drop=True)
@@ -47,7 +47,7 @@ for trial_idx, row in y_matrix.iterrows():
             (df_delay_filtered['Neuron_ID_3'] == neuron_id)
         ]
         if not match.empty:
-            spikes = parse_spike_times(match['Standardized_Spikes_in_Delay'].values[0])
+            spikes = parse_spike_times(match['Standardized_Spikes'].values[0])
             design_matrix[trial_idx, neuron_idx] = np.array(spikes)
         else:
             design_matrix[trial_idx, neuron_idx] = np.array([])
