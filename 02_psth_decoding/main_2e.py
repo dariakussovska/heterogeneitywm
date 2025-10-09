@@ -99,7 +99,7 @@ for region, locations in region_groups.items():
             tid = row['trial_id']
             for j, n in enumerate(neuron_ids):
                 match = df_r[(df_r['trial_id'] == tid) & (df_r['Neuron_ID_3'] == n)]
-                spikes = parse_spike_times(match['Standardized_Spikes_in_Delay'].values[0]) if not match.empty else []
+                spikes = parse_spike_times(match['Standardized_Spikes'].values[0]) if not match.empty else []
                 design_matrix[i, j] = np.array(spikes)
 
         obs_accs = []
