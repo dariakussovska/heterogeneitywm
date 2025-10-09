@@ -13,7 +13,7 @@ subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', '
 print(subject_trials)
 
 y_matrix = subject_trials
-df_delay_filtered = pd.read_excel('/home/daria/PROJECT/graph_data/graph_dela.xlsx')
+df_delay_filtered = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
 df_fixation = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
 
 y_matrix = y_matrix.reset_index(drop=True)
