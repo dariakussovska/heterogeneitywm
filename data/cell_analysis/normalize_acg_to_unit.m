@@ -1,7 +1,8 @@
 function [acg_unit] = normalize_acg_to_unit(acg)
-% acg: [numBins x numNeurons] (e.g., acg_wide or acg_narrow)
-% Returns acg_unit with each column divided by its column max (ignoring NaNs).
+% acg: [numBins x numNeurons] (e.g., acg_wide or acg_narrow). Here, we need acg_wide.
+% Returns acg_unit with each column divided by its column max.
 % Zero-lag bin is forced to 0 after normalization.
+% acg = spikes.acg.acg_wide; You can put that in the command window to extract the acg_wide from each neuron. 
 
     acg_unit = acg;                       % copy
     [numBins, ~] = size(acg);
