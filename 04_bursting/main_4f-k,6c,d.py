@@ -26,19 +26,19 @@ duration = {
 
 # Per-subject low/high split knobs for ACG/Decay
 PER_SUBJ = 10    # require >= 10 eligible neurons per subject
-OVERLAP  = 1     # set to 2 if you want ~2 neurons overlapping low & high
+OVERLAP  = 1     
 
 # =========================
 # Load data
 # =========================
 df_metadata  = pd.read_excel('/home/daria/PROJECT/Clustering_3D.xlsx')
-df_metadata2 = pd.read_excel('/home/daria/PROJECT/merged_significant_neurons_with_brain_regions.xlsx')
+df_metadata2 = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
 
-df_enc1  = pd.read_excel('/home/daria/PROJECT/graph_encoding1.xlsx')
-df_enc2  = pd.read_excel('/home/daria/PROJECT/graph_encoding2.xlsx')
-df_enc3  = pd.read_excel('/home/daria/PROJECT/graph_encoding3.xlsx')
-df_delay = pd.read_excel('/home/daria/PROJECT/graph_delay.xlsx')
-df_probe = pd.read_excel('/home/daria/PROJECT/graph_probe.xlsx')
+df_enc1  = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding1.xlsx')
+df_enc2  = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding2.xlsx')
+df_enc3  = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding3.xlsx')
+df_delay = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
+df_probe = pd.read_excel('/home/daria/PROJECT/graph_data/graph_probe.xlsx')
 
 # Convenience filtered/meta frames
 df_metadata_decay_acg = df_metadata[df_metadata['R2'] > 0.3].copy()
@@ -58,9 +58,6 @@ categories = [
     "Interneurons", "Pyramidal",
 ]
 
-# =========================
-# Helpers
-# =========================
 def parse_spike_list(x, trial_dur):
     """Safely parse a stringified list of spikes; clip to [0, trial_dur]."""
     if pd.isna(x):
@@ -99,10 +96,6 @@ def split_low_high(df_subj, feature, per_subj=PER_SUBJ, overlap=OVERLAP):
     high_ids = df_sorted.tail(m)["Neuron_ID_3"].tolist()
     return low_ids, high_ids
 
-# =========================
-# Subject ID filtering per category
-# (ACG/Decay require >= PER_SUBJ eligible neurons after R2 & non-NaN feature)
-# =========================
 subject_ids_per_category = {}
 for category in categories:
     if category == "Concept_cells":
@@ -125,9 +118,6 @@ for category in categories:
         threshold = PER_SUBJ
     subject_ids_per_category[category] = subject_counts[subject_counts >= threshold].index.tolist()
 
-# =========================
-# Burst counting container
-# =========================
 burst_counts = {
     cat: {
         period: {load: [] for load in [1, 2, 3]}
@@ -136,9 +126,6 @@ burst_counts = {
     for cat in categories
 }
 
-# =========================
-# Main loop
-# =========================
 for group in categories:
     for subject_id in subject_ids_per_category[group]:
         # Subject-specific metadata
@@ -200,7 +187,7 @@ for group in categories:
                 all_spikes = []
                 for trial_idx, trial_id in enumerate(trial_ids):
                     df_trial = df_group[df_group['trial_id'] == trial_id]
-                    col = 'Standardized_Spikes_New' if period_label == 'Encoding' else f'Standardized_Spikes_in_{period_label}'
+                    col = 'Standardized_Spikes'
                     for neuron_id in sorted(df_trial['Neuron_ID_3'].unique()):
                         series = df_trial[df_trial['Neuron_ID_3'] == neuron_id][col].dropna()
                         # take all rows (if duplicates exist, they’ll just contribute spikes)
@@ -233,9 +220,6 @@ for group in categories:
                 else:
                     burst_counts[group][period_label][load].append(int(len(peaks)))
 
-# =========================
-# Plotting & stats
-# =========================
 periods = ['Encoding', 'Delay_part1', 'Delay_part2', 'Delay_part3', 'Probe']
 
 def symbol_from_p(p_corr):
@@ -283,7 +267,7 @@ for load in [1, 2, 3]:
         ax.set_xlabel('')
         ax.set_ylabel('')
 
-        # ---------- pairwise Wilcoxon across periods (+ FDR) ----------
+        # pairwise Wilcoxon across periods (+ FDR) 
         try:
             comparisons, indices = [], []
             # pairwise over periods; paired only if equal-length vectors
