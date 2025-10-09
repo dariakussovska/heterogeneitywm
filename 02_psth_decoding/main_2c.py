@@ -45,7 +45,7 @@ def calculate_firing_rates(trials, spike_column, time_bins):
 def calculate_z_scores(firing_rates, mean_baseline, std_baseline):
     return (firing_rates - mean_baseline) / std_baseline if std_baseline != 0 else np.zeros_like(firing_rates)
 
-def construct_z_score_tables_encoding_only(enc_data, fixation_data, time_bins, spike_column="Standardized_Spikes_New"):
+def construct_z_score_tables_encoding_only(enc_data, fixation_data, time_bins, spike_column="Standardized_Spikes"):
     neuron_ids = enc_data["Neuron_ID_3"].dropna().unique()
     z_scores_pref = pd.DataFrame(index=[f"Bin_{i}" for i in range(len(time_bins)-1)], columns=neuron_ids)
     z_scores_nonpref = z_scores_pref.copy()
@@ -64,7 +64,7 @@ def construct_z_score_tables_encoding_only(enc_data, fixation_data, time_bins, s
 
     return z_scores_pref, z_scores_nonpref
 
-def construct_z_probe_all_categories(probe_data, fixation_data, time_bins, spike_column="Standardized_Spikes_in_Probe"):
+def construct_z_probe_all_categories(probe_data, fixation_data, time_bins, spike_column="Standardized_Spikes"):
     neuron_ids = probe_data["Neuron_ID_3"].dropna().unique()
     bin_labels = [f"Bin_{i}" for i in range(len(time_bins) - 1)]
 
@@ -104,7 +104,7 @@ delay_L1 = filter_data_by_neuron_id_3(delay[delay["num_images_presented"] == 1],
 probe_L1 = filter_data_by_neuron_id_3(probe[probe["num_images_presented"] == 1], valid_neuron_ids)
 
 z_enc1_L1_pref, z_enc1_L1_nonpref = construct_z_score_tables_encoding_only(enc1_L1, fixation_filtered, time_bins_enc)
-z_delay_L1_pref, z_delay_L1_nonpref = construct_z_score_tables_encoding_only(delay_L1, fixation_filtered, time_bins_delay, spike_column="Standardized_Spikes_in_Delay")
+z_delay_L1_pref, z_delay_L1_nonpref = construct_z_score_tables_encoding_only(delay_L1, fixation_filtered, time_bins_delay, spike_column="Standardized_Spikes")
 zp1_L1, zp2_L1, zp3_L1, zp4_L1 = construct_z_probe_all_categories(probe_L1, fixation_filtered, time_bins_probe)
 
 enc1_L2 = filter_data_by_neuron_id_3(enc1[enc1["num_images_presented"] == 2], valid_neuron_ids)
@@ -113,7 +113,7 @@ delay_L2 = filter_data_by_neuron_id_3(delay[delay["num_images_presented"] == 2],
 
 z_enc1_L2_pref, z_enc1_L2_nonpref = construct_z_score_tables_encoding_only(enc1_L2, fixation_filtered, time_bins_enc)
 z_enc2_L2_pref, z_enc2_L2_nonpref = construct_z_score_tables_encoding_only(enc2_L2, fixation_filtered, time_bins_enc)
-z_delay_L2_pref, z_delay_L2_nonpref = construct_z_score_tables_encoding_only(delay_L2, fixation_filtered, time_bins_delay, spike_column="Standardized_Spikes_in_Delay")
+z_delay_L2_pref, z_delay_L2_nonpref = construct_z_score_tables_encoding_only(delay_L2, fixation_filtered, time_bins_delay, spike_column="Standardized_Spikes")
 
 enc1_L3 = filter_data_by_neuron_id_3(enc1[enc1["num_images_presented"] == 3], valid_neuron_ids)
 enc2_L3 = filter_data_by_neuron_id_3(enc2[enc2["num_images_presented"] == 3], valid_neuron_ids)
@@ -123,7 +123,7 @@ delay_L3 = filter_data_by_neuron_id_3(delay[delay["num_images_presented"] == 3],
 z_enc1_L3_pref, z_enc1_L3_nonpref = construct_z_score_tables_encoding_only(enc1_L3, fixation_filtered, time_bins_enc)
 z_enc2_L3_pref, z_enc2_L3_nonpref = construct_z_score_tables_encoding_only(enc2_L3, fixation_filtered, time_bins_enc)
 z_enc3_L3_pref, z_enc3_L3_nonpref = construct_z_score_tables_encoding_only(enc3_L3, fixation_filtered, time_bins_enc)
-z_delay_L3_pref, z_delay_L3_nonpref = construct_z_score_tables_encoding_only(delay_L3, fixation_filtered, time_bins_delay, spike_column="Standardized_Spikes_in_Delay")
+z_delay_L3_pref, z_delay_L3_nonpref = construct_z_score_tables_encoding_only(delay_L3, fixation_filtered, time_bins_delay, spike_column="Standardized_Spikes")
 
 probe_L2 = filter_data_by_neuron_id_3(probe[probe["num_images_presented"] == 2], valid_neuron_ids)
 zp1_L2, zp2_L2, zp3_L2, zp4_L2 = construct_z_probe_all_categories(probe_L2, fixation_filtered, time_bins_probe)
