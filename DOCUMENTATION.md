@@ -3,7 +3,7 @@
 ## DATA EXTRACTION
 
 1) Install the dataset (from https://www.nature.com/articles/s41597-024-02943-8) and put it in a folder on your local computer. Here, I am using the folder PROJECT, and the dataset files are in the folder 000469. 
-2) Run the scripts data_extraction.py and data_extraction_2.py. 
+2) Run the scripts 01_data_extraction.py and 02_trial_info.py. 
 
 - These scripts are aimed to make the extraction of necessary data for the analysis easier and more convenient.
 - They take subject id, trial id, start time and end time of each trial, neuron id, stimulus identity id, spike rate, and individual spikes for every neuron in each trial from the fixation, encoding, delay, and probe periods.
@@ -52,7 +52,7 @@ For plotting electrodes locations on an anatomical image (sagittal plane) of the
 
 Here, we are preparing the data for subsequent analyses. We are standardizing, normalizing, aligning the data, and coming up with a new neuron id, so that we can pool all the neurons together for more statistical power. Important note: we are generating two types of excel files: ones that start with cleaned_{task period} and ones that start with graph_{task period}. We are doing this because the decoding also requires a different standardizing method for some of the figures, and we do not want to mess up with the original Excel sheets too much. 
 
-- Run the code standardization.py
+- Run the code 03_standardization.py
 - This code standardizes the data by the start time of encoding period 1 to the existing Excel. This type of standardization is needed for our cross-temporal decoding analysis, where we run continuous decoding throughout the entire trial (and not only the delay period). 
 - Make sure that you have downloaded new_trial_info.xlsx and trial_info_final.xlsx, as these are needed for the code. It is important to balance the design matrix and y matrix by the identity of images that are presented. For that, we need the new_trial_final.xlsx excel sheet with our new trial identities. As we will also use the balanced by load trial identities, we also add a new_trial_id column using the new_trial_info.xlsx file. 
 - This code adds a new neuron id (subject id + 0 + neuron id) for easier pooling of the neurons.
@@ -99,7 +99,7 @@ These files contain standardized spikes (relative to the start time of encoding 
 
 ## CONCEPT CELLS
 
-- Run the code concept_cell_defition.py
+- Run the code 04_concept_cells.py
 - This code performs statistical analysis on the spikings of all neurons in the encoding 1 period of all the trials. 
 - It plots the concept cells firing rate with mean and standard error of the mean, throughout the five different image identities they react to. 
 - It merges all_neuron_brain_regions_cleaned.xlsx (brain regions for each of the neurons) to the concept cell definition (specified from the Neuron_Check_Significant_All.xlsx file as Signi == Y for concept cell and Signi == N for a non-concept cell)
@@ -133,7 +133,7 @@ concept_cell_distribution.eps: an EPS file showing a pie chart of the percentage
 
 Here, we are preparing the existing files for plotting the firing rates across concept and non-concept cells for preferred image identities versus non-preferred image identities. 
 
-- First, we need to run the code 06_add_category to add the corresponding trial type ("Category" column) to say whether the trial was preferred or non-preferred for that particular neuron and subject id combination. 
+- First, we need to run the code 06_add_category.py to add the corresponding trial type ("Category" column) to say whether the trial was preferred or non-preferred for that particular neuron and subject id combination. 
 - Under the 02_psth_decoding >> main_2a,b, we choose a neuron to plot. We run the code to load the data and filter by the number of images presented (to show only load 1 trials). We count spikes and convert to firing rates in the corresponding time bins, and subsequently smooth the data. We calculate calculate z-scores (subtracting the mean firing rate in the baseline and dividing by the standard deviation), and the confidence intervals for plotting later. Finally, we plot the z-scores and confidence intervals for the encoding, delay and probe periods.
 - The script also includes the generation of a raster with the spike times of this particular neuron over the task epochs. 
 
@@ -205,12 +205,12 @@ RT_all.eps, RT_concept.eps, load_all.eps, load_concept.eps: .eps files that (dep
 
 ## DIMENSIONALITY REDUCTION
 
-Here, we are preparing the data for dimensionality reduction and fitting it to dPCA. Then, we are projecting the data onto a 3D plane and visualizing the trajectories of each stimulus identity. We quantify separability by calculating pairwise Euclidean distances between stimulus identities in different conditions and perform stats between conditions. 
+Here, we are preparing the data for dimensionality reduction. We prepare the data matrices in 08_dpca_matrices.py. When we have the matrices, then we will use 03_dpca >> main_3(any) to fit the data to dPCA. We can also use the codes for visualizing the trajectories of each stimulus identity. We quantify separability by calculating pairwise Euclidean distances between stimulus identities in different conditions and perform stats between conditions. 
 
 - The script filters and balances the data, bins and standardizes the spike times in encoding and maintenance, and creates X matrices.
 - It performs stratified splitting (100 splits) on Encoding and Maintenance data, fits the train data to dPCA and transforms the test data onto the established fit. It also calculates pairwise distances between stimulus trajectories in each iteration and performs statistical analysis. This function also plots the explained variance by dPCs in each of the 100 iterations. 
 - Then it does the same, but on Early and Late Maintenance data. 
-- the script is also designed to repeat the same analsis but with just a single split, used for visualization. Running this script returns all panels associated with Fig.3 and Fig. S2. 
+- The script is also designed to repeat the same analsis but with just a single split, used for visualization. Running this script returns all panels associated with Fig.3 and Fig. S2. 
 
 **Inputs:** 
 
@@ -250,15 +250,16 @@ Here, we are performing a bursting analysis in all cells and across subjects to 
 
 Here, we are extracting waveforms and spike times and using Cell Explorer functions to find properties of the waveforms and attempt to label the neurons by Interneurons and Pyramidal cells.
 
-- We run the script to extract the spike times of each neuron from the original .nwb files. Save with UIDs to make it easier for subsequent analysis. We extract the brain regions for every UID.
+- We have provided an intial matrix with spike times and total number of neurons under data >> cell_analysis >> spikes_struct.m. We have also provided the functions needed to calculate ACGs (raw and normalized), calculate mean ACG, fit the ACG (CellExplorer function) to get parameters such as decay time constant, ACG tau rise, and others. 
 
 IN MATLAB: 
-- In order for Cell Explorer to run smoothly, we need to organize a struct, which include the neurons' full spike trains, as well as the number of spikes for each neuron throughout the entire session. This is already provided under data >> project.mat. The struct also includes a UID (Neuron_ID_3) and some other important parameters that will be useful for subsequent analyses.
-- As we already have the full spike trains and spike times, we can run the function calc_ACG_metrics.m, provided by CellExplorer. This function calculates narrow and wide ACG values, as well as the burst indices (Royer and Doublets) used in subsequent cell-type related analyses.
-- After calculating the wide and narrow ACGs, we can calculate the mean normalized ACG values with the function Mean_ACG.m.
+- In order for Cell Explorer to run smoothly, we need to organize a struct, which include the neurons' full spike trains, as well as the number of spikes for each neuron throughout the entire session. This is already provided under data >> cell_analysis >> spikes_struct.m. The struct also includes a UID (Neuron_ID_3) and some other important parameters that will be useful for subsequent analyses.
+- As we already have the full spike trains and spike times, we can run the function calc_ACG_metrics.m, provided under data >> cell_analysis. This function calculates narrow and wide ACG values, as well as the burst indices (Royer and Doublets) used in subsequent cell-type related analyses.
+- After calculating the wide and narrow ACGs, we can calculate the normalized ACG values with the function normalize_acg_to_unit.m to calculate normalized wide and narrow ACGs.
+- After calculating those, we can also calculate a mean ACG by using instructions provided in cell_analysis >> Mean_ACG.m. 
 - Subsequently, we can use the fit_ACG.m function (by CellExplorer) to fit a triple-exponential function to calculate certain ACG parameters, such as ACG tau decay, tau rise, and variance explained (R squared) of the function fit, which are all needed for our cell-type classification. 
 - cv2 and firing rate were already calculated in the second script in the repository (02_trial_info.py).
-- After extracting these values, they can be neatly put in one Excel file. We have provided this under data >> Cell_analysis.xlsx
+- After extracting these values, they can be neatly put in one Excel file. We have provided this under data >> Cell_metrics.xlsx >> Cell_analysis.xlsx
 
 IN PYTHON: 
 - To visualise the autocorrelograms, we can use the script main_5a,b. This returns all autocorrelograms (one for each neuron).  
