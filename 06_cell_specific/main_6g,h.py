@@ -1,5 +1,6 @@
 import numpy as np
 import ast
+import matplotlib.pyplot as plt
 
 def generate_filtered_spike_trains(df_encoding, df_delay, cell_type_map,
                                    encoding_col='Standardized_Spikes',
