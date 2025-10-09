@@ -58,7 +58,7 @@ ax2.pie(
 ax2.set_title('Distribution of Concept Cells Across Brain Regions')
 
 plt.tight_layout()
-output_path = "/home/daria/PROJECT/combined_distributions.eps"
+output_path = "/home/daria/PROJECT/01_task/combined_distributions.eps"
 plt.savefig(output_path, format='eps', dpi=300)
 plt.show()
 print(f"EPS file saved at: {output_path}")
