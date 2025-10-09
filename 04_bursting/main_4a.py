@@ -5,7 +5,6 @@ import scipy.signal as signal
 from scipy.ndimage import gaussian_filter1d
 import matplotlib.pyplot as plt
 
-# ----------- Load & filter (same as you, but safer parsing) -----------
 df_enc1_filtered = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding1.xlsx')
 
 subject_id = 14
@@ -64,7 +63,7 @@ common_threshold = np.percentile(smoothed_real, 95) if smoothed_real.size else 0
 real_peaks, _ = signal.find_peaks(smoothed_real, prominence=common_threshold)
 num_real_bursts = len(real_peaks)
 
-# ----------- Poisson surrogates: keep traces so we can plot them -----------
+# Poisson surrogates
 num_poisson_repeats = 100
 poisson_burst_counts = []
 poisson_smoothed_traces = []
@@ -97,7 +96,7 @@ std_poi = poisson_smoothed_traces.std(axis=0)
 mean_poisson_bursts = float(np.mean(poisson_burst_counts)) if poisson_burst_counts else 0.0
 std_poisson_bursts = float(np.std(poisson_burst_counts)) if poisson_burst_counts else 0.0
 
-# ----------- Plot: real + Poisson mean (with ±1 SD band) -----------
+# Plot: real + Poisson mean (with ±1 SD band) 
 plt.figure(figsize=(15, 5))
 plt.plot(bin_centers, smoothed_real, label='Real Data')
 plt.scatter(bin_centers[real_peaks], smoothed_real[real_peaks],
@@ -124,7 +123,7 @@ real_concat = np.concatenate(valid_real) if valid_real else np.array([])
 real_counts, _ = np.histogram(real_concat, bins=time_bins)
 smoothed_real = gaussian_filter1d(real_counts.astype(float), sigma=sigma_bins, mode='nearest')
 
-# ---- ONE Poisson run, using per-(neuron,trial) rates you computed ----
+#ONE Poisson run, using per-(neuron,trial) rates 
 # neuron_spike_counts is {(neuron_id, trial_idx): count_in_that_trial}
 neuron_firing_rates = {k: v / TRIAL_DUR for k, v in neuron_spike_counts.items()}  # spikes/sec
 
