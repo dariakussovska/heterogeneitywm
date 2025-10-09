@@ -1,7 +1,7 @@
 function acg_metrics = calc_ACG_metrics(spikes, sr)
     % Inputs:
     %   spikes - structure containing 'times' (cell array of spike times) and 'total' (number of spikes)
-    %   sr - sampling rate
+    %   sr - sampling rate = 32000
     
     % Ensure that spikes.times is a cell array
     if ~iscell(spikes.times)
