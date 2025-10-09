@@ -1,3 +1,4 @@
+import pandas as pd 
 import numpy as np
 import ast
 from dPCA import dPCA
@@ -10,7 +11,7 @@ from scipy.spatial.distance import pdist
 import scipy.stats as sps
 import scikit_posthocs as sp
 
-trial_info = pd.read_excel('/home/daria/new_trial_info.xlsx')
+trial_info = pd.read_excel('/home/daria/PROJECT/new_trial_info.xlsx')
 subject_trials = trial_info[(trial_info['subject_id'] == 14) & (trial_info['num_images_presented'] == 1)][['new_trial_id', 'num_images_presented', 'stimulus_index']]
 y_matrix = subject_trials
 
@@ -32,9 +33,9 @@ print(balanced_distribution)
 
 balanced_y_matrix = y_matrix_balanced
 
-fixation_data_with_brain_region = pd.read_excel('/home/daria/graph_data/graph_fixation.xlsx')
-enc1_data_with_brain_region = pd.read_excel('/home/daria/clean_data/cleaned_Encoding1.xlsx')
-delay_data_with_brain_region = pd.read_excel('/home/daria/graph_data/graph_delay.xlsx')
+fixation_data_with_brain_region = pd.read_excel('/home/daria/PROJECT/graph_data/graph_fixation.xlsx')
+enc1_data_with_brain_region = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Encoding1.xlsx')
+delay_data_with_brain_region = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
 
 fixation_data = fixation_data_with_brain_region
 
