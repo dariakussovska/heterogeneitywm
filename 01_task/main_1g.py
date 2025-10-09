@@ -127,5 +127,5 @@ plot_raster_and_psth_grouped_by_stimulus(
     time_range=(0, 1),
     bin_size=0.05,
     smooth_sigma=1,
-    save_dir='/home/daria/PROJECT'
+    save_dir='/home/daria/PROJECT/01_task'
 )
