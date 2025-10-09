@@ -6,8 +6,6 @@ import os
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import DBSCAN, SpectralClustering, KMeans
 from mpl_toolkits.mplot3d import Axes3D
-from sklearn.mixture import GaussianMixture
-import hdbscan
 import umap
 import warnings
 warnings.filterwarnings("ignore")
