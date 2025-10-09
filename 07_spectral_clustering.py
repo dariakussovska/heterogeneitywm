@@ -10,7 +10,7 @@ import umap
 import warnings
 warnings.filterwarnings("ignore")
 
-df = pd.read_excel("/home/daria/PROJECT/data/Cell_metrics.xlsx")
+df = pd.read_excel("/home/daria/PROJECT/data/cell_analysis/Cell_metrics.xlsx")
 
 df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "tau_rise"]).copy()
 
