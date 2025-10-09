@@ -6,10 +6,11 @@ import os
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import DBSCAN, SpectralClustering, KMeans
 from mpl_toolkits.mplot3d import Axes3D
-import umap
+import umap.umap_ as umap
 import warnings
 warnings.filterwarnings("ignore")
 
+# Load and preprocess data
 df = pd.read_excel("/home/daria/PROJECT/data/cell_analysis/Cell_metrics.xlsx")
 
 df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "tau_rise"]).copy()
@@ -17,11 +18,12 @@ df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "t
 hex_palette = {  
     "Spectral": ['#3254A2', '#941A37']
 }
+
 # Feature matrix
 X = df_filtered[["firing_rate", "acg_norm", "tau_rise"]].values
 X_scaled = StandardScaler().fit_transform(X)
 
-# Spectral
+# Spectral clustering
 df_filtered["Spectral"] = SpectralClustering(n_clusters=2, affinity='nearest_neighbors', random_state=42).fit_predict(X_scaled)
 
 # UMAP for Visualization
@@ -31,38 +33,22 @@ df_filtered["UMAP_1"] = embedding[:, 0]
 df_filtered["UMAP_2"] = embedding[:, 1]
 df_filtered["UMAP_3"] = embedding[:, 2]
 
-methods = ["Spectral"]
-fig, axes = plt.subplots(1, len(methods), figsize=(20, 4))
-
-for ax, method in zip(axes, methods):
-    sns.scatterplot(
-        data=df_filtered,
-        x="UMAP_1",
-        y="UMAP_2",
-        hue=method,
-        palette=hex_palette[method],
-        ax=ax,
-        legend=False,
-        s=30
-    )
-    ax.set_title(f"{method} Clustering")
-    ax.set_xlabel("")
-    ax.set_ylabel("")
-
-axes[0].set_ylabel("UMAP 2")
-axes[len(methods) // 2].set_xlabel("UMAP 1")
+# Single 2D UMAP plot (no subplots needed for one method)
+plt.figure(figsize=(8, 6))
+sns.scatterplot(
+    data=df_filtered,
+    x="UMAP_1",
+    y="UMAP_2",
+    hue="Spectral",
+    palette=hex_palette["Spectral"],
+    legend=False,
+    s=30
+)
+plt.title("Spectral Clustering")
+plt.xlabel("UMAP 1")
+plt.ylabel("UMAP 2")
 plt.tight_layout()
 plt.show()
-
-# Save to Excel
-output_path = "/home/daria/PROJECT/Clustering_3D.xlsx"
-df_filtered.to_excel(output_path, index=False)
-print(f"\n Clustered data saved to: {output_path}")
-
-# Load dataset
-file_path = "/home/daria/PROJECT/Clustering_3D.xlsx"
-df_clustered = pd.read_excel(file_path)
-print(f"Total neurons: {len(df_clustered)}")
 
 # Assign cell types based on Spectral clustering
 def map_spectral_to_type(spectral_label):
@@ -73,15 +59,16 @@ def map_spectral_to_type(spectral_label):
     elif int(spectral_label) == 0:
         return "IN"
     else:
-        return None  # or handle additional clusters as needed
+        return None
 
-df_clustered["Cell_Type_New"] = df_clustered["Spectral"].apply(map_spectral_to_type)
+df_filtered["Cell_Type_New"] = df_filtered["Spectral"].apply(map_spectral_to_type)
 
 # Count results
-count_py = len(df_clustered[df_clustered["Cell_Type_New"] == "PY"])
-count_in = len(df_clustered[df_clustered["Cell_Type_New"] == "IN"])
-count_unlabeled = len(df_clustered[df_clustered["Cell_Type_New"].isna()])
+count_py = len(df_filtered[df_filtered["Cell_Type_New"] == "PY"])
+count_in = len(df_filtered[df_filtered["Cell_Type_New"] == "IN"])
+count_unlabeled = len(df_filtered[df_filtered["Cell_Type_New"].isna()])
 
+print(f"Total neurons: {len(df_filtered)}")
 print(f"Putative Pyramidal cells (PY): {count_py}")
 print(f"Putative Interneurons (IN): {count_in}")
 print(f"Unlabeled cells: {count_unlabeled}")
@@ -96,7 +83,7 @@ color_map = {
 fig = plt.figure(figsize=(10, 7))
 ax = fig.add_subplot(111, projection='3d')
 
-for idx, row in df_clustered.iterrows():
+for idx, row in df_filtered.iterrows():
     label = row["Cell_Type_New"]
     color = color_map.get(label, 'gray')
     
@@ -130,6 +117,8 @@ plt.tight_layout()
 plt.savefig("/home/daria/PROJECT/spectral_clustering.eps", format='eps', dpi=300)
 plt.show()
 
-# Save Excel file with new Cell_Type_New column
-df_clustered.to_excel("/home/daria/PROJECT/Clustering_3D.xlsx", index=False)
+# Save Excel file with all results
+output_path = "/home/daria/PROJECT/Clustering_3D.xlsx"
+df_filtered.to_excel(output_path, index=False)
+print(f"\nClustered data saved to: {output_path}")
 print("Added 'Cell_Type_New' based on Spectral clustering and saved updated file.")
