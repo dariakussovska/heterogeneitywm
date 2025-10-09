@@ -1,6 +1,6 @@
 # Neural-heterogeneity-shapes-the-temporal-structure-of-human-working-memory
 
-This is a repository that includes all the codes necessary to create all main and supplementary figures of the ... 2026 paper. 
+This is a repository that includes all the codes necessary to create all main and supplementary figures of the Kussovska et al., 2026 paper. 
 There are some notebooks for pre-processing steps, but we have also provided extracted and cleaned data for analysis as part of this repo. 
 
 # Downloading the dataset
@@ -67,9 +67,15 @@ python 06_add_category.py
 ```
 # Inferring cell types
 
-The last step needed to recreate all figures with ease is to perform the cell-classification analysis. For preprocessing and how we get the cell metrics needed to classify neurons into pyramidal cells and interneurons, you can read the corresponding section in the DOCUMENTATION.md file. This analysis is done in Matlab with the help of the software CellExplorer, and functions required for it are listed in the "data" folder. However, here, we have provided the outputs of the CellExplorer function under data >> Cell_analysis.xlsx. With the code 07_cell_types.py, we will just run the spectral clustering on those metrics and assign neurons as pyramidal (PY) or interneurons (IN) for subsequent analysis. 
+This step needed to recreate all figures with ease is to perform the cell-classification analysis. For preprocessing and how we get the cell metrics needed to classify neurons into pyramidal cells and interneurons, you can read the corresponding section in the DOCUMENTATION.md file. This analysis is done in Matlab with the help of the software CellExplorer, and functions required for it are listed in the "data" folder. However, here, we have provided the outputs of the CellExplorer function under data >> Cell_analysis.xlsx. With the code 07_cell_types.py, we will just run the spectral clustering on those metrics and assign neurons as pyramidal (PY) or interneurons (IN) for subsequent analysis. 
 
 ```
 python 07_cell_types.py
+```
+# Dimensionality reduction matrices
+
+This step is needed to create the matrices used in dimensionality reduction (dPCA) analyses. It creates two .npy files -- one for encoding and one for maintenance, and saves them to your designated folder. After running this, you will be able to run all the analyses for Fig.3 and Fig.S2. 
+```
+python 08_dpca_matrices.py
 ```
 Now that we've ran all of the initial files for data extraction, standardization, and concept cell definition we can proceed with the main analyses used in each of our figures. Each main figure and the panels associated with it have a folder (ex. 01_task, 02_psth_decoding). They include all scripts, needed to recreate the main figures in the manuscript. Note that some figures just require running the same code twice, but with a different set of neurons. If that is the case, then this will be specified as a comment in the specific code. Run each .py file to get the corresponding panel from a main figure.  
