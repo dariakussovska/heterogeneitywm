@@ -1,8 +1,8 @@
-% Extract the ACG matrix (wide or narrow)
-acg_values = spikes.acg.wide_norm;  % Use acg_narrow if needed
+% Extract the ACG matrix 
+acg_values = spikes.acg.wide_norm;  
 
 % Compute the mean ACG for each neuron (column-wise mean)
-mean_acg_values = mean(acg_values, 1, 'omitnan');  % Ignore NaNs if present
+mean_acg_values = mean(acg_values, 1, 'omitnan'); 
 
 % Display the first few mean ACG values
 disp('Mean ACG values for first 5 neurons:');
