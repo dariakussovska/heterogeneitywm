@@ -2,8 +2,8 @@ import numpy as np
 import ast
 
 def generate_filtered_spike_trains(df_encoding, df_delay, cell_type_map,
-                                   encoding_col='Standardized_Spikes_New',
-                                   delay_col='Standardized_Spikes_in_Delay',
+                                   encoding_col='Standardized_Spikes',
+                                   delay_col='Standardized_Spikes',
                                    trial_col='trial_id',
                                    encoding_duration=1,
                                    delay_duration=2.5,
