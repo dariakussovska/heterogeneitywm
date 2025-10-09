@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from ast import literal_eval
+import matplotlib.pyplot as plt
 
 # === Load Data ===
 fixation_data = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
