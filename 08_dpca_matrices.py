@@ -194,7 +194,7 @@ def construct_stimulus_tables_no_avg_delay(delay_data, fixation_data, balanced_y
                 (delay_data['subject_id'] == subject_id)
             ]
 
-            trial_firing_rates = calculate_firing_rates(stimulus_trials, 'Standardized_Spikes_in_Delay', time_bins_delay)
+            trial_firing_rates = calculate_firing_rates(stimulus_trials, 'Standardized_Spikes', time_bins_delay)
             trial_z_scores = np.array([calculate_z_scores(fr, baseline_mean, baseline_std) for fr in trial_firing_rates])
             smoothed_z_scores = np.array([gaussian_filter1d(z, sigma=smoothing_sigma) for z in trial_z_scores])
             if label not in z_scores_by_stimulus[stimulus]:
