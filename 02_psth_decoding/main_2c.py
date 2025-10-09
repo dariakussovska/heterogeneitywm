@@ -78,19 +78,19 @@ def construct_z_probe_all_categories(probe_data, fixation_data, time_bins, spike
         neuron_trials = probe_data[probe_data["Neuron_ID_3"] == neuron_id]
 
         z_pref_encoded[neuron_id] = calculate_z_scores(
-            calculate_firing_rates(neuron_trials[neuron_trials["Category_Probe"] == "Preferred Encoded"], spike_column, time_bins),
+            calculate_firing_rates(neuron_trials[neuron_trials["Probe_Category"] == "Preferred Encoded"], spike_column, time_bins),
             baseline_mean, baseline_std
         )
         z_pref_nonencoded[neuron_id] = calculate_z_scores(
-            calculate_firing_rates(neuron_trials[neuron_trials["Category_Probe"] == "Preferred Nonencoded"], spike_column, time_bins),
+            calculate_firing_rates(neuron_trials[neuron_trials["Probe_Category"] == "Preferred Nonencoded"], spike_column, time_bins),
             baseline_mean, baseline_std
         )
         z_nonpref_encoded[neuron_id] = calculate_z_scores(
-            calculate_firing_rates(neuron_trials[neuron_trials["Category_Probe"] == "Nonpreferred Encoded"], spike_column, time_bins),
+            calculate_firing_rates(neuron_trials[neuron_trials["Probe_Category"] == "Nonpreferred Encoded"], spike_column, time_bins),
             baseline_mean, baseline_std
         )
         z_nonpref_nonencoded[neuron_id] = calculate_z_scores(
-            calculate_firing_rates(neuron_trials[neuron_trials["Category_Probe"] == "Nonpreferred Nonencoded"], spike_column, time_bins),
+            calculate_firing_rates(neuron_trials[neuron_trials["Probe_Category"] == "Nonpreferred Nonencoded"], spike_column, time_bins),
             baseline_mean, baseline_std
         )
 
