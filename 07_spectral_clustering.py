@@ -12,15 +12,15 @@ import umap
 import warnings
 warnings.filterwarnings("ignore")
 
-df = pd.read_excel("/home/daria/PROJECT/Cell_analysis.xlsx")
+df = pd.read_excel("/home/daria/PROJECT/data/Cell_metrics.xlsx")
 
-df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "Mean_ACG", "Tau_rise"]).copy() #[(df["R2"] >= 0.1)]
+df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "tau_rise"]).copy()
 
 hex_palette = {  
     "Spectral": ['#3254A2', '#941A37']
 }
 # Feature matrix
-X = df_filtered[["firing_rate", "Mean_ACG", "Tau_rise"]].values
+X = df_filtered[["firing_rate", "acg_norm", "tau_rise"]].values
 X_scaled = StandardScaler().fit_transform(X)
 
 # Spectral
@@ -129,9 +129,9 @@ ax.set_zlabel("UMAP 3")
 ax.set_title("3D UMAP: Spectral Cluster-Based Cell Type Assignment")
 ax.view_init(elev=34, azim=-61)
 plt.tight_layout()
-plt.savefig("/home/daria/PROJECT/Figures/Cell_Classification/clustering_3D.eps", format='eps', dpi=300)
+plt.savefig("/home/daria/PROJECT/spectral_clustering.eps", format='eps', dpi=300)
 plt.show()
 
 # Save Excel file with new Cell_Type_New column
-df_clustered.to_excel("/Users/darikussovska/Desktop/PROJECT/Clustering_3D.xlsx", index=False)
+df_clustered.to_excel("/home/daria/PROJECT/Clustering_3D.xlsx", index=False)
 print("Added 'Cell_Type_New' based on Spectral clustering and saved updated file.")
