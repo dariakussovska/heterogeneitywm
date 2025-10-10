@@ -236,7 +236,7 @@ plt.legend()
 plt.grid(axis='y', linestyle='--', alpha=0.6)
 plt.tight_layout()
 
-folder_path = '/Users/darikussovska/Desktop/PROJECT/Figures'
+folder_path = '/home/daria/PROJECT/'
 os.makedirs(folder_path, exist_ok=True)
 save_path = os.path.join(folder_path, "decoding_timebins_new.eps")
 plt.savefig(save_path, format='eps', dpi=300)
