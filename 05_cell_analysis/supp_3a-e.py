@@ -11,9 +11,9 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # ===================== PATHS =====================
-in_path  = "/Users/darikussovska/Desktop/heterogeneity_wm/validation_data.xlsx"
-out_xlsx = "/Users/darikussovska/Desktop/PROJECT/Validation_clustering.xlsx"
-fig_dir  = "/Users/darikussovska/Desktop/PROJECT/Figures/Cell_Classification"
+in_path  = "/home/daria/heterogeneity_wm/data/cell_analysis/validation_data.xlsx"
+out_xlsx = "/home/daria/PROJECT/Validation_clustering.xlsx"
+fig_dir  = "/home/daria/PROJECT/Figures/Cell_Classification"
 os.makedirs(fig_dir, exist_ok=True)
 
 # ===================== LOAD ONCE =====================
