@@ -65,9 +65,6 @@ def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_typ
     """Add Category to non-encoding files using preferred stimulus from ANY encoding period"""
     print(f"Adding Category to {file_type}...")
     
-    # Clean up existing columns first (for maintenance and probe files)
-    target_df = cleanup_existing_columns(target_df, file_type)
-    
     # Create new columns
     target_df['Category'] = 'Unknown'
     target_df['im_cat_1st'] = None  # Store the preferred stimulus
