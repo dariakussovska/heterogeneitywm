@@ -59,6 +59,7 @@ enc3_graph.to_excel(os.path.join(GRAPH_DATA_DIR, 'graph_encoding3.xlsx'), index=
 
 print("All encoding files updated with Category")
 
+# Add Category to non-encoding files (Delay, Fixation, Probe)
 def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_type):
     """Add Category to non-encoding files by matching with the correct encoding period"""
     print(f"Adding Category to {file_type}...")
@@ -80,54 +81,91 @@ def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_typ
         subject_id = row['subject_id']
         trial_id = row['trial_id']
         neuron_id = row['Neuron_ID']
-        current_stimulus = row.get('stimulus_index')
         
-        # For non-encoding files, we need to find if this stimulus is preferred in ANY encoding period
-        is_preferred = False
-        
-        if num_images >= 1:
-            # Look in Encoding1 for this specific stimulus
+        if num_images == 1:
+            # Look in Encoding1
+            match = enc1_ref[
+                (enc1_ref['subject_id'] == subject_id) & 
+                (enc1_ref['trial_id'] == trial_id) & 
+                (enc1_ref['Neuron_ID'] == neuron_id)
+            ]
+            if not match.empty and 'Category' in match.columns:
+                target_df.at[idx, 'Category'] = match.iloc[0]['Category']
+                
+        elif num_images == 2:
+            # For load 2, check Encoding1 AND Encoding2 - if ANY have "Preferred", use "Preferred"
+            is_preferred = False
+            
+            # Check Encoding1
             match_enc1 = enc1_ref[
                 (enc1_ref['subject_id'] == subject_id) & 
                 (enc1_ref['trial_id'] == trial_id) & 
-                (enc1_ref['Neuron_ID'] == neuron_id) &
-                (enc1_ref['stimulus_index'] == current_stimulus)
+                (enc1_ref['Neuron_ID'] == neuron_id)
             ]
             if not match_enc1.empty and 'Category' in match_enc1.columns:
                 if match_enc1.iloc[0]['Category'] == 'Preferred':
                     is_preferred = True
-        
-        if not is_preferred and num_images >= 2:
-            # Look in Encoding2 for this specific stimulus
-            match_enc2 = enc2_ref[
-                (enc2_ref['subject_id'] == subject_id) & 
-                (enc2_ref['trial_id'] == trial_id) & 
-                (enc2_ref['Neuron_ID'] == neuron_id) &
-                (enc2_ref['stimulus_index'] == current_stimulus)
+            
+            # Check Encoding2
+            if not is_preferred:
+                match_enc2 = enc2_ref[
+                    (enc2_ref['subject_id'] == subject_id) & 
+                    (enc2_ref['trial_id'] == trial_id) & 
+                    (enc2_ref['Neuron_ID'] == neuron_id)
+                ]
+                if not match_enc2.empty and 'Category' in match_enc2.columns:
+                    if match_enc2.iloc[0]['Category'] == 'Preferred':
+                        is_preferred = True
+            
+            # Set category based on whether ANY encoding period has "Preferred"
+            if is_preferred:
+                target_df.at[idx, 'Category'] = 'Preferred'
+            else:
+                # If we found matches but none were "Preferred", set to "Non-Preferred"
+                target_df.at[idx, 'Category'] = 'Non-Preferred'
+                
+        elif num_images == 3:
+            # For load 3, check ALL encoding periods - if ANY have "Preferred", use "Preferred"
+            is_preferred = False
+            
+            # Check Encoding1
+            match_enc1 = enc1_ref[
+                (enc1_ref['subject_id'] == subject_id) & 
+                (enc1_ref['trial_id'] == trial_id) & 
+                (enc1_ref['Neuron_ID'] == neuron_id)
             ]
-            if not match_enc2.empty and 'Category' in match_enc2.columns:
-                if match_enc2.iloc[0]['Category'] == 'Preferred':
+            if not match_enc1.empty and 'Category' in match_enc1.columns:
+                if match_enc1.iloc[0]['Category'] == 'Preferred':
                     is_preferred = True
-        
-        if not is_preferred and num_images >= 3:
-            # Look in Encoding3 for this specific stimulus
-            match_enc3 = enc3_ref[
-                (enc3_ref['subject_id'] == subject_id) & 
-                (enc3_ref['trial_id'] == trial_id) & 
-                (enc3_ref['Neuron_ID'] == neuron_id) &
-                (enc3_ref['stimulus_index'] == current_stimulus)
-            ]
-            if not match_enc3.empty and 'Category' in match_enc3.columns:
-                if match_enc3.iloc[0]['Category'] == 'Preferred':
-                    is_preferred = True
-        
-        # Set category based on whether it's preferred in ANY encoding period
-        if is_preferred:
-            target_df.at[idx, 'Category'] = 'Preferred'
-        else:
-            # Only set to Non-Preferred if we actually checked the encoding periods
-            # and didn't find it as Preferred in any of them
-            target_df.at[idx, 'Category'] = 'Non-Preferred'
+            
+            # Check Encoding2
+            if not is_preferred:
+                match_enc2 = enc2_ref[
+                    (enc2_ref['subject_id'] == subject_id) & 
+                    (enc2_ref['trial_id'] == trial_id) & 
+                    (enc2_ref['Neuron_ID'] == neuron_id)
+                ]
+                if not match_enc2.empty and 'Category' in match_enc2.columns:
+                    if match_enc2.iloc[0]['Category'] == 'Preferred':
+                        is_preferred = True
+            
+            # Check Encoding3
+            if not is_preferred:
+                match_enc3 = enc3_ref[
+                    (enc3_ref['subject_id'] == subject_id) & 
+                    (enc3_ref['trial_id'] == trial_id) & 
+                    (enc3_ref['Neuron_ID'] == neuron_id)
+                ]
+                if not match_enc3.empty and 'Category' in match_enc3.columns:
+                    if match_enc3.iloc[0]['Category'] == 'Preferred':
+                        is_preferred = True
+            
+            # Set category based on whether ANY encoding period has "Preferred"
+            if is_preferred:
+                target_df.at[idx, 'Category'] = 'Preferred'
+            else:
+                # If we found matches but none were "Preferred", set to "Non-Preferred"
+                target_df.at[idx, 'Category'] = 'Non-Preferred'
     
     category_counts = target_df['Category'].value_counts()
     print(f"Category distribution for {file_type}: {category_counts.to_dict()}")
