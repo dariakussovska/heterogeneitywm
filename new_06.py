@@ -5,6 +5,19 @@ BASE_DIR = '/home/daria/PROJECT'
 CLEAN_DATA_DIR = os.path.join(BASE_DIR, 'clean_data')
 GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 
+def cleanup_existing_columns(df, file_type):
+    """Remove existing Category and Probe_Category columns to ensure clean updates"""
+    print(f"Cleaning up existing columns for {file_type}...")
+    
+    columns_to_drop = ['Category', 'Probe_Category', 'im_cat_1st']
+    existing_columns_to_drop = [col for col in columns_to_drop if col in df.columns]
+    
+    if existing_columns_to_drop:
+        df = df.drop(columns=existing_columns_to_drop)
+        print(f"  Dropped columns: {existing_columns_to_drop}")
+    
+    return df
+
 def get_preferred_stimulus_for_trial(enc1_ref, enc2_ref, enc3_ref, subject_id, trial_id, neuron_id):
     """Get the preferred stimulus for a trial by checking ALL encoding periods"""
     preferred_stimulus = None
@@ -43,6 +56,10 @@ def get_preferred_stimulus_for_trial(enc1_ref, enc2_ref, enc3_ref, subject_id, t
 def add_category_to_encoding(df, encoding_name):
     """Add Category column to encoding files: Preferred if im_cat_1st == stimulus_index"""
     print(f"Processing {encoding_name}...")
+    
+    # Clean up existing columns first
+    df = cleanup_existing_columns(df, encoding_name)
+    
     if 'im_cat_1st' in df.columns and 'stimulus_index' in df.columns:
         df['Category'] = df.apply(
             lambda row: 'Preferred' if row['im_cat_1st'] == row['stimulus_index'] else 'Non-Preferred', 
@@ -57,6 +74,9 @@ def add_category_to_encoding(df, encoding_name):
 def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_type):
     """Add Category to non-encoding files using the preferred stimulus from ANY encoding period"""
     print(f"Adding Category to {file_type}...")
+    
+    # Clean up existing columns first
+    target_df = cleanup_existing_columns(target_df, file_type)
     
     target_df['Category'] = 'Unknown'
     target_df['im_cat_1st'] = None  # Add this column to store the preferred stimulus
@@ -89,6 +109,10 @@ def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_typ
 def add_probe_category(df):
     """Add Probe_Category column for probe files using consistent preferred stimulus"""
     print("Adding Probe_Category...")
+    
+    # Ensure we don't have old Probe_Category column
+    if 'Probe_Category' in df.columns:
+        df = df.drop(columns=['Probe_Category'])
     
     def categorize_probe(row):
         preferred = row['im_cat_1st']
