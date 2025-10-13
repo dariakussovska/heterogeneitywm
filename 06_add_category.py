@@ -60,14 +60,19 @@ enc3_graph.to_excel(os.path.join(GRAPH_DATA_DIR, 'graph_encoding3.xlsx'), index=
 print("All encoding files updated with Category")
 
 # Add Category to non-encoding files (Delay, Fixation, Probe)
+
 def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_type):
-    """Add Category to non-encoding files by matching with the correct encoding period"""
+    """Add Category to non-encoding files using preferred stimulus from ANY encoding period"""
     print(f"Adding Category to {file_type}...")
     
-    # Create a new Category column
-    target_df['Category'] = 'Unknown'  # Default value
+    # Clean up existing columns first (for maintenance and probe files)
+    target_df = cleanup_existing_columns(target_df, file_type)
     
-    # Process each row based on num_images_presented
+    # Create new columns
+    target_df['Category'] = 'Unknown'
+    target_df['im_cat_1st'] = None  # Store the preferred stimulus
+    
+    # Process each row
     for idx, row in target_df.iterrows():
         num_images = row.get('num_images_presented')
         if pd.isna(num_images):
@@ -81,36 +86,48 @@ def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_typ
         subject_id = row['subject_id']
         trial_id = row['trial_id']
         neuron_id = row['Neuron_ID']
+        current_stimulus = row.get('stimulus_index')
         
-        if num_images == 1:
-            # Look in Encoding1
-            match = enc1_ref[
-                (enc1_ref['subject_id'] == subject_id) & 
-                (enc1_ref['trial_id'] == trial_id) & 
-                (enc1_ref['Neuron_ID'] == neuron_id)
-            ]
-            if not match.empty and 'Category' in match.columns:
-                target_df.at[idx, 'Category'] = match.iloc[0]['Category']
-                
-        elif num_images == 2:
-            # Look in Encoding2
-            match = enc2_ref[
+        # Get preferred stimulus from ANY encoding period
+        preferred_stimulus = None
+    
+        # Always check ALL encoding periods regardless of num_images
+        # Check Encoding1
+        match_enc1 = enc1_ref[
+            (enc1_ref['subject_id'] == subject_id) & 
+            (enc1_ref['trial_id'] == trial_id) & 
+            (enc1_ref['Neuron_ID'] == neuron_id)
+        ]
+        if not match_enc1.empty and 'im_cat_1st' in match_enc1.columns:
+            preferred_stimulus = match_enc1.iloc[0]['im_cat_1st']
+        
+        # If not found in Encoding1, check Encoding2
+        if preferred_stimulus is None:
+            match_enc2 = enc2_ref[
                 (enc2_ref['subject_id'] == subject_id) & 
                 (enc2_ref['trial_id'] == trial_id) & 
                 (enc2_ref['Neuron_ID'] == neuron_id)
             ]
-            if not match.empty and 'Category' in match.columns:
-                target_df.at[idx, 'Category'] = match.iloc[0]['Category']
-                
-        elif num_images == 3:
-            # Look in Encoding3
-            match = enc3_ref[
+            if not match_enc2.empty and 'im_cat_1st' in match_enc2.columns:
+                preferred_stimulus = match_enc2.iloc[0]['im_cat_1st']
+        
+        # If still not found, check Encoding3
+        if preferred_stimulus is None:
+            match_enc3 = enc3_ref[
                 (enc3_ref['subject_id'] == subject_id) & 
                 (enc3_ref['trial_id'] == trial_id) & 
                 (enc3_ref['Neuron_ID'] == neuron_id)
             ]
-            if not match.empty and 'Category' in match.columns:
-                target_df.at[idx, 'Category'] = match.iloc[0]['Category']
+            if not match_enc3.empty and 'im_cat_1st' in match_enc3.columns:
+                preferred_stimulus = match_enc3.iloc[0]['im_cat_1st']
+        
+        # Categorize based on the found preferred stimulus
+        if preferred_stimulus is not None and current_stimulus is not None:
+            target_df.at[idx, 'im_cat_1st'] = preferred_stimulus
+            if current_stimulus == preferred_stimulus:
+                target_df.at[idx, 'Category'] = 'Preferred'
+            else:
+                target_df.at[idx, 'Category'] = 'Non-Preferred'
     
     category_counts = target_df['Category'].value_counts()
     print(f"Category distribution for {file_type}: {category_counts.to_dict()}")
