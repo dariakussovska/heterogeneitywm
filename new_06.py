@@ -57,9 +57,7 @@ def add_category_to_encoding(df, encoding_name):
     """Add Category column to encoding files: Preferred if im_cat_1st == stimulus_index"""
     print(f"Processing {encoding_name}...")
     
-    # Clean up existing columns first
-    df = cleanup_existing_columns(df, encoding_name)
-    
+    # NO cleanup for encoding files - keep original structure
     if 'im_cat_1st' in df.columns and 'stimulus_index' in df.columns:
         df['Category'] = df.apply(
             lambda row: 'Preferred' if row['im_cat_1st'] == row['stimulus_index'] else 'Non-Preferred', 
@@ -75,7 +73,7 @@ def add_category_from_encoding(target_df, enc1_ref, enc2_ref, enc3_ref, file_typ
     """Add Category to non-encoding files using the preferred stimulus from ANY encoding period"""
     print(f"Adding Category to {file_type}...")
     
-    # Clean up existing columns first
+    # CLEANUP ONLY for maintenance and probe files
     target_df = cleanup_existing_columns(target_df, file_type)
     
     target_df['Category'] = 'Unknown'
@@ -110,7 +108,7 @@ def add_probe_category(df):
     """Add Probe_Category column for probe files using consistent preferred stimulus"""
     print("Adding Probe_Category...")
     
-    # Ensure we don't have old Probe_Category column
+    # Ensure we don't have old Probe_Category column (only for probe files)
     if 'Probe_Category' in df.columns:
         df = df.drop(columns=['Probe_Category'])
     
@@ -148,7 +146,7 @@ print("\n" + "="*50)
 print("ADDING CATEGORY TO ENCODING FILES")
 print("="*50)
 
-# Add Category to CLEAN encoding files
+# Add Category to CLEAN encoding files (NO cleanup)
 enc1_data = add_category_to_encoding(enc1_data, "Encoding1 (clean)")
 enc2_data = add_category_to_encoding(enc2_data, "Encoding2 (clean)")
 enc3_data = add_category_to_encoding(enc3_data, "Encoding3 (clean)")
@@ -158,7 +156,7 @@ enc1_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.xlsx'), index
 enc2_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding2.xlsx'), index=False)
 enc3_data.to_excel(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.xlsx'), index=False)
 
-# Add Category to GRAPH encoding files
+# Add Category to GRAPH encoding files (NO cleanup)
 print("\nProcessing graph encoding files...")
 enc1_graph = pd.read_excel(os.path.join(GRAPH_DATA_DIR, 'graph_encoding1.xlsx'))
 enc2_graph = pd.read_excel(os.path.join(GRAPH_DATA_DIR, 'graph_encoding2.xlsx'))
@@ -177,7 +175,7 @@ print("\n" + "="*50)
 print("PROCESSING NON-ENCODING FILES")
 print("="*50)
 
-# Process Delay files
+# Process Delay files (WITH cleanup)
 delay_clean_path = os.path.join(CLEAN_DATA_DIR, 'cleaned_Delay.xlsx')
 delay_graph_path = os.path.join(GRAPH_DATA_DIR, 'graph_delay.xlsx')
 
@@ -196,7 +194,7 @@ if os.path.exists(delay_clean_path):
     
     print("Delay files updated")
 
-# Process Probe files
+# Process Probe files (WITH cleanup)
 probe_clean_path = os.path.join(CLEAN_DATA_DIR, 'cleaned_Probe.xlsx')
 probe_graph_path = os.path.join(GRAPH_DATA_DIR, 'graph_probe.xlsx')
 
@@ -217,21 +215,23 @@ if os.path.exists(probe_clean_path):
     
     print("Probe files updated")
 
-# Process Fixation files (if they exist)
+# Process Fixation files (NO cleanup - keep as is)
 fixation_clean_path = os.path.join(CLEAN_DATA_DIR, 'cleaned_Fixation.xlsx')
 fixation_graph_path = os.path.join(GRAPH_DATA_DIR, 'graph_fixation.xlsx')
 
 if os.path.exists(fixation_clean_path):
     print("\nProcessing Fixation files...")
     
-    # Clean data
+    # Clean data - use the regular function WITHOUT cleanup
     fixation_clean = pd.read_excel(fixation_clean_path)
-    fixation_clean = add_category_from_encoding(fixation_clean, enc1_data, enc2_data, enc3_data, "Fixation (clean)")
+    if 'Category' not in fixation_clean.columns:  # Only add if not exists
+        fixation_clean = add_category_from_encoding(fixation_clean, enc1_data, enc2_data, enc3_data, "Fixation (clean)")
     fixation_clean.to_excel(fixation_clean_path, index=False)
     
-    # Graph data
+    # Graph data - use the regular function WITHOUT cleanup
     fixation_graph = pd.read_excel(fixation_graph_path)
-    fixation_graph = add_category_from_encoding(fixation_graph, enc1_graph, enc2_graph, enc3_graph, "Fixation (graph)")
+    if 'Category' not in fixation_graph.columns:  # Only add if not exists
+        fixation_graph = add_category_from_encoding(fixation_graph, enc1_graph, enc2_graph, enc3_graph, "Fixation (graph)")
     fixation_graph.to_excel(fixation_graph_path, index=False)
     
     print("Fixation files updated")
