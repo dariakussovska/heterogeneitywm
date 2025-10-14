@@ -17,4 +17,4 @@ def convert_excel_to_feather(directory):
     print("Conversion complete! Use .feather files for faster loading.")
 
 # Convert all your files
-convert_excel_to_feather('/home/daria/PROJECT/')
+convert_excel_to_feather('/home/daria/PROJECT/clean_data')
