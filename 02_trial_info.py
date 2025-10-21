@@ -97,8 +97,8 @@ for filepath in filepaths:
 
 if not all_metrics.empty:
     plot_metrics(all_metrics) 
-    all_metrics.to_excel('/./all_spike_rate_metrics.xlsx', index=False)
-    print("Data has been saved to all_spike_rate_metrics.xlsx")
+    all_metrics.to_feather('/./all_spike_rate_metrics.feather', index=False)
+    print("Data has been saved to all_spike_rate_metrics.feather")
 else:
     print("Failed to read data from NWB files.")
 
@@ -138,12 +138,12 @@ def create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3):
 
     return trial_info_df
 
-all_data_enc1 = pd.read_excel(f'/./all_spike_rate_data_encoding1.xlsx')
-all_data_enc2 = pd.read_excel(f'/./all_spike_rate_data_encoding2.xlsx')
-all_data_enc3 = pd.read_excel(f'/./all_spike_rate_data_encoding3.xlsx')
+all_data_enc1 = pd.read_feather(f'/./all_spike_rate_data_encoding1.feather')
+all_data_enc2 = pd.read_feather(f'/./all_spike_rate_data_encoding2.feather')
+all_data_enc3 = pd.read_feather(f'/./all_spike_rate_data_encoding3.feather')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
-output_path = '/./data/trial_info.xlsx'
-trial_info_df.to_excel(output_path, index=False)
+output_path = '/./data/trial_info.feather'
+trial_info_df.to_feather(output_path, index=False)
 
 print(f"Trial info has been saved to {output_path}")
