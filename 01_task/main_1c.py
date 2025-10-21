@@ -5,11 +5,11 @@ import seaborn as sns
 from scipy.stats import kruskal, mannwhitneyu
 import itertools
 
-spike_data_path = "/./all_spike_rate_data_probe.xlsx"
-trial_info_path = "/./trial_info.xlsx"
+spike_data_path = "/./all_spike_rate_data_probe.feather"
+trial_info_path = "/./trial_info.feather"
 
-df = pd.read_excel(spike_data_path)
-trial_info = pd.read_excel(trial_info_path)
+df = pd.read_feather(spike_data_path)
+trial_info = pd.read_feather(trial_info_path)
 df = df.merge(trial_info[['subject_id', 'trial_id', 'num_images_presented']], 
               on=['subject_id', 'trial_id'], how='left')
 df = df.dropna(subset=['num_images_presented', 'response_accuracy'])
