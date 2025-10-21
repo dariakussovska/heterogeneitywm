@@ -1,11 +1,19 @@
+import numpy as np
+import ast
+from dPCA import dPCA
+import matplotlib.pyplot as plt
+from ast import literal_eval
+from scipy.ndimage import gaussian_filter1d
+from dPCA.dPCA import dPCA
+from collections import defaultdict
+from scipy.spatial.distance import pdist
+import scipy.stats as sps
+import scikit_posthocs as sp
 
+trialE = np.load(f"/./trialE.npy")
+trialD = np.load(f"/./trialD.npy")
 
-
-# ------------------------------------------------------------------
-#  (1)  data arrive here
-# ------------------------------------------------------------------
-trialE = Xtrial        # encoding   (n_rep, n_neurons, n_stim, n_tE)
-trialD = Dtrial        # maintenance(n_rep, n_neurons, n_stim, n_tD)
+trialX = trialE
 
 n_rep, n_neurons, n_stim, tE = trialE.shape
 _,      _,           _,     tD = trialD.shape
@@ -13,7 +21,7 @@ n_train = n_rep // 2
 n_test  = n_rep - n_train
 
 # ------------------------------------------------------------------
-#  (2)  one 50/50 split – stratified over stimuli
+# one 50/50 split – stratified over stimuli
 # ------------------------------------------------------------------
 rng = np.random.default_rng(seed=0)
 
