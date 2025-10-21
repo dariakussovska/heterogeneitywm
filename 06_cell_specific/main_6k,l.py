@@ -8,7 +8,7 @@ from scipy.stats import binom
 from scipy.ndimage import label, find_objects
 import ast
 
-trial_info = pd.read_feather('/./new_trial_final.feather')
+trial_info = pd.read_feather('../new_trial_final.feather')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
 
@@ -16,12 +16,12 @@ y_matrix = subject_trials
 
 # 1. Load Spike Data from All Periods
 # ===============================
-df_enc1 = pd.read_feather('/./clean_data/cleaned_Encoding1.feather')
-df_enc2 = pd.read_feather('/./clean_data/cleaned_Encoding2.feather')
-df_enc3 = pd.read_feather('/./clean_data/cleaned_Encoding3.feather')
-df_delay = pd.read_feather('/./clean_data/cleaned_Delay.feather')
-df_probe = pd.read_feather('/./clean_data/cleaned_Probe.feather')
-df_fixation = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
+df_enc1 = pd.read_feather('../clean_data/cleaned_Encoding1.feather')
+df_enc2 = pd.read_feather('../clean_data/cleaned_Encoding2.feather')
+df_enc3 = pd.read_feather('../clean_data/cleaned_Encoding3.feather')
+df_delay = pd.read_feather('../clean_data/cleaned_Delay.feather')
+df_probe = pd.read_feather('../clean_data/cleaned_Probe.feather')
+df_fixation = pd.read_feather('../clean_data/cleaned_Fixation.feather')
 
 y_matrix = y_matrix.reset_index(drop=True)
 #neuron_ids = df_enc1[df_enc1['Significance'] == 'Y']['Neuron_ID_3'].unique()
@@ -191,7 +191,7 @@ for idx, load in enumerate([1, 2, 3]):
 
 fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.75, label="Accuracy (%)")
 plt.suptitle("Cross-Temporal Decoding Accuracy by Load", fontsize=16)
-folder_path = "/./06_cell_specific/"
+folder_path = "./"
 os.makedirs(folder_path, exist_ok=True)
 save_path = os.path.join(folder_path, "main_6kl.eps")
 plt.savefig(save_path, format='eps', dpi=300)
