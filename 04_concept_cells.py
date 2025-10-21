@@ -23,9 +23,9 @@ def compute_firing_rate(df, start_time=0.2, end_time=1.0):
     df['Spike_Rate_new'] = spike_rates
     return df
 
-# Load input Excel file
-input_path = "/./clean_data/cleaned_Encoding1.xlsx"
-df = pd.read_excel(input_path)
+# Load input feather file
+input_path = "/./clean_data/cleaned_Encoding1.feather"
+df = pd.read_feather(input_path)
 
 # Compute firing rates
 df = compute_firing_rate(df)
@@ -110,8 +110,8 @@ def run_significance_test(df, iteration=1000):
     return df
 
 df_final = run_significance_test(df_top_2)
-df_final.to_excel('/./Neuron_Check_Significant_All.xlsx', index=False)
-print("Final file saved at: Neuron_Check_Significant_All.xlsx")
+df_final.to_feather('/./Neuron_Check_Significant_All.feather', index=False)
+print("Final file saved at: Neuron_Check_Significant_All.feather")
 
 significant_neurons = df_final[df_final['Signi'] == 'Y']
 print("Significant Neurons:")
