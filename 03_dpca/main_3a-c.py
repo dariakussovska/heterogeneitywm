@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+from dPCA import dPCA
+from ast import literal_eval
+from scipy.ndimage import gaussian_filter1d
+from dPCA.dPCA import dPCA
 
 trialE = np.load(f"/./trialE.npy")
 trialD = np.load(f"/./trialD.npy")
