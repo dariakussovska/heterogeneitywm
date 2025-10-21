@@ -8,13 +8,13 @@ import os
 from tqdm import tqdm
 from statsmodels.stats.multitest import multipletests
 
-trial_info = pd.read_feather('/./new_trial_final.feather')
+trial_info = pd.read_feather('../new_trial_final.feather')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
 
 y_matrix = subject_trials
-df_delay_filtered = pd.read_feather('/./graph_data/graph_delay.feather')
-df_fixation = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
+df_delay_filtered = pd.read_feather('../graph_data/graph_delay.feather')
+df_fixation = pd.read_feather('../clean_data/cleaned_Fixation.feather')
 
 y_matrix = y_matrix.reset_index(drop=True)
 
@@ -236,7 +236,7 @@ plt.legend()
 plt.grid(axis='y', linestyle='--', alpha=0.6)
 plt.tight_layout()
 
-folder_path = '/./02_psth_decoding/'
+folder_path = './'
 os.makedirs(folder_path, exist_ok=True)
 save_path = os.path.join(folder_path, "decoding_timebins_new.eps")
 plt.savefig(save_path, format='eps', dpi=300)
