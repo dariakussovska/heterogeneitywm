@@ -11,8 +11,8 @@ import scipy.stats as sps
 import scikit_posthocs as sp
 
 # Same but for Early vs Late maintenance
-trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
-trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+trialE = np.load(f"/./trialE.npy")
+trialD = np.load(f"/./trialD.npy")
 
 trialX = trialE
 
@@ -219,7 +219,7 @@ measure_dict, kw_p, dunn_df, explvar_early, explvar_late = run_dpca_distance_res
      time_split=624,
      selected_dpcs=[0, 1, 2, 3, 4],
      stim_indices=[0, 1, 2, 3, 4],
-     savefig_path='/home/daria/icant_2.eps',
+     savefig_path='/./03_dpca/var_explained_late_early.eps',
 )
 # Plot variance explained
 plt.boxplot(explvar_early[:, :5]) # Or explvar_late
