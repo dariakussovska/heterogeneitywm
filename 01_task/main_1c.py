@@ -5,8 +5,8 @@ import seaborn as sns
 from scipy.stats import kruskal, mannwhitneyu
 import itertools
 
-spike_data_path = "/home/daria/PROJECT/all_spike_rate_data_probe.xlsx"
-trial_info_path = "/home/daria/PROJECT/trial_info.xlsx"
+spike_data_path = "/./all_spike_rate_data_probe.xlsx"
+trial_info_path = "/./trial_info.xlsx"
 
 df = pd.read_excel(spike_data_path)
 trial_info = pd.read_excel(trial_info_path)
@@ -83,5 +83,5 @@ for i, r in enumerate(results):
     add_sig_bracket(ax, x1, x2, y, h=0.02 + 0.1*step, stars=r['stars'])
 
 plt.tight_layout()
-plt.savefig("/home/daria/PROJECT/01_task/main_1c.eps", format="eps", dpi=300)
+plt.savefig("/./01_task/main_1c.eps", format="eps", dpi=300)
 plt.show()
