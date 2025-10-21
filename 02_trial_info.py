@@ -138,9 +138,9 @@ def create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3):
 
     return trial_info_df
 
-all_data_enc1 = pd.read_feather(f'/./all_spike_rate_data_encoding1.feather')
-all_data_enc2 = pd.read_feather(f'/./all_spike_rate_data_encoding2.feather')
-all_data_enc3 = pd.read_feather(f'/./all_spike_rate_data_encoding3.feather')
+all_data_enc1 = pd.read_feather(f'./all_spike_rate_data_encoding1.feather')
+all_data_enc2 = pd.read_feather(f'./all_spike_rate_data_encoding2.feather')
+all_data_enc3 = pd.read_feather(f'./all_spike_rate_data_encoding3.feather')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
 output_path = '/./trial_info.feather'
