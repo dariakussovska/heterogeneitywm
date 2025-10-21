@@ -5,10 +5,10 @@ from scipy.ndimage import gaussian_filter1d
 from ipywidgets import interact, widgets, SelectMultiple
 
 # Load the data
-fixation_data_full = pd.read_excel('/./clean_data/cleaned_Fixation.xlsx')
-enc_data_full = pd.read_excel('/./graph_data/graph_encoding1.xlsx')
-delay_data_full = pd.read_excel('/./graph_data/graph_delay.xlsx')
-probe_data_full = pd.read_excel('/./graph_data/graph_probe.xlsx')
+fixation_data_full = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
+enc_data_full = pd.read_feather('/./graph_data/graph_encoding1.feather')
+delay_data_full = pd.read_feather('/./graph_data/graph_delay.feather')
+probe_data_full = pd.read_feather('/./graph_data/graph_probe.feather')
 
 from ast import literal_eval
 
