@@ -11,13 +11,13 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # ===================== PATHS =====================
-in_path  = "/./data/cell_analysis/validation_data.xlsx"
-out_xlsx = "/./Validation_clustering.xlsx"
+in_path  = "/./data/cell_analysis/validation_data.feather"
+out_feather = "/./Validation_clustering.feather"
 fig_dir  = "/./05_cell_analysis/"
 os.makedirs(fig_dir, exist_ok=True)
 
 # ===================== LOAD ONCE =====================
-df = pd.read_excel(in_path)
+df = pd.read_feather(in_path)
 df.columns = df.columns.str.strip()
 
 # Columns we’ll need
@@ -203,8 +203,8 @@ metrics_fig_path = os.path.join(fig_dir, "supp_4ad.eps")
 plt.savefig(metrics_fig_path, format="eps", dpi=300)
 plt.show()
 
-df.to_excel(out_xlsx, index=False)
-print(f"\nSaved once to: {out_xlsx}")
+df.to_feather(out_feather, index=False)
+print(f"\nSaved once to: {out_feather}")
 print(f"UMAP fig:    {umap_fig_path}")
 print(f"Metrics fig: {metrics_fig_path}")
 
