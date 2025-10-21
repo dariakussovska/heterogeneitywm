@@ -278,5 +278,5 @@ if len(summary_df) > 0:
     ax.set_ylim(-5, ymax + headroom)
     ax.set_title("Observed % significant neurons (Brain Regions)")
     plt.tight_layout()
-    plt.savefig("/01_task/poisson_load.eps", format='eps', dpi=300)
+    plt.savefig("./poisson_load.eps", format='eps', dpi=300)
     plt.show()
