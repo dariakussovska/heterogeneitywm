@@ -11,7 +11,7 @@ from scipy.spatial.distance import pdist
 import scipy.stats as sps
 import scikit_posthocs as sp
 
-trial_info = pd.read_feather('/./new_trial_info.feather')
+trial_info = pd.read_feather('/./data/new_trial_info.feather')
 subject_trials = trial_info[(trial_info['subject_id'] == 14) & (trial_info['num_images_presented'] == 1)][['new_trial_id', 'num_images_presented', 'stimulus_index']]
 y_matrix = subject_trials
 
