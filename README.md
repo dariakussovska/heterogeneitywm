@@ -4,6 +4,15 @@ This is a repository that includes all the codes necessary to create all main an
 There are some notebooks for pre-processing steps, but we have also provided extracted and cleaned data for analysis as part of this repo. 
 
 # Installing requirements and downloading the dataset
+
+Clone this repository on your local computer or server by running this line of code in your terminal: 
+
+```
+git clone https://github.com/dariakussovska/heterogeneity_wm/
+cd heterogeneity_wm
+```
+This will create a folder "heterogeneity_wm" which will have all the necessary files and python codes to generate all the figures in the Kussovska et al., 2026 paper. 
+
 Install the dataset (from https://www.nature.com/articles/s41597-024-02943-8) and put it in a folder on your computer. There are multiple ways of installing this dataset, all of them detailed in the github repository of the Kyzar et al., 2024 paper. 
 
 One way is to use dandi (install with conda or pip), which is added to the requirements.txt file 
@@ -26,15 +35,6 @@ pip install -e .
 ```
 
 # Data extraction and organization
-
-After you have downloaded the dataset from the original paper by Kyzar et al., 2024, you can use clone this repository on your local computer or server by running this line of code in your terminal: 
-
-```
-git clone https://github.com/dariakussovska/heterogeneity_wm/
-```
-This will create a folder "heterogeneity_wm" which will have all the necessary files and python codes to generate all the figures in the Kussovska et al., 2026 paper. 
-
-I highly recommend that you also have a separate directory for all your newly generated files. In my case, I use a folder called "PROJECT" as you will see on all of the codes. That is where the raw NWB files are stored, and that is where I move all the dependencies installed from this repository. 
 
 To extact data for main analysis, you can use the code 1_data_extraction.py by going into the heterogeneity_wm folder on your terminal and running
 
