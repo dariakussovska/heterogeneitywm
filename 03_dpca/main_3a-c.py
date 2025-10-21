@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
-trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
-trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+trialE = np.load(f"/./trialE.npy")
+trialD = np.load(f"/./trialD.npy")
 
 trialX = trialE
 
@@ -65,6 +65,6 @@ ax.view_init(elev=20, azim=40)
 ax.grid(True)
 
 # Save or show
-plt.savefig("/home/daria/maintenance_onto_maintenance.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("/./03_dpca/maintenance_onto_maintenance.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
 
