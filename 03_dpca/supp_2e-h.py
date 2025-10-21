@@ -7,8 +7,8 @@ from ast import literal_eval
 from scipy.ndimage import gaussian_filter1d
 from dPCA.dPCA import dPCA
 
-trialE = np.load(f"/./trialE.npy")
-trialD = np.load(f"/./trialD.npy")
+trialE = np.load(f"../trialE.npy")
+trialD = np.load(f"../trialD.npy")
 
 trialX = trialE
 
@@ -69,6 +69,6 @@ ax.view_init(elev=20, azim=40)
 ax.grid(True)
 
 # Save or show
-plt.savefig("/./03_dpca/maintenance_onto_maintenance.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("./maintenance_onto_maintenance.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
 
