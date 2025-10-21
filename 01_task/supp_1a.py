@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the Excel file
-file_path = "/home/daria/PROJECT/all_spike_rate_data_probe.xlsx"  
+file_path = "/./all_spike_rate_data_probe.xlsx"  
 df = pd.read_excel(file_path)
 
 accuracy_df = df.groupby('subject_id')['response_accuracy'].agg(['sum', 'count'])
@@ -33,5 +33,5 @@ plt.xticks(accuracy_df['rank'])
 plt.ylim(0.5, 1) 
 plt.grid(True)
 plt.legend()
-plt.savefig("/home/daria/PROJECT/01_task/supp_1a.eps", format="eps", dpi=300)
+plt.savefig("/./01_task/supp_1a.eps", format="eps", dpi=300)
 plt.show()
