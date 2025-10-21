@@ -87,7 +87,7 @@ for filename in clean_files:
     df_updated = add_all_columns_to_file(file_path, significant_neurons_filtered, trial_info_df, brain_regions_df)
     
     # Save back to the same file
-    df_updated.to_feather(file_path, index=False)
+    df_updated.to_feather(file_path)
     print(f"Saved: {filename}\n")
 
 # Process all graph_data files
@@ -102,5 +102,5 @@ for filename in graph_files:
     df_updated = add_all_columns_to_file(file_path, significant_neurons_filtered, trial_info_df, brain_regions_df)
     
     # Save back to the same file
-    df_updated.to_feather(file_path, index=False)
+    df_updated.to_feather(file_path)
     print(f" Saved: {filename}\n")
