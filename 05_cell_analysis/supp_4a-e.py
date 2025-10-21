@@ -11,9 +11,9 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # ===================== PATHS =====================
-in_path  = "/home/daria/heterogeneity_wm/data/cell_analysis/validation_data.xlsx"
-out_xlsx = "/home/daria/PROJECT/Validation_clustering.xlsx"
-fig_dir  = "/home/daria/PROJECT/Figures/Cell_Classification"
+in_path  = "/./data/cell_analysis/validation_data.xlsx"
+out_xlsx = "/./Validation_clustering.xlsx"
+fig_dir  = "/./05_cell_analysis/"
 os.makedirs(fig_dir, exist_ok=True)
 
 # ===================== LOAD ONCE =====================
@@ -98,7 +98,7 @@ ax.set_xlabel("UMAP 1"); ax.set_ylabel("UMAP 2"); ax.set_zlabel("UMAP 3")
 ax.set_title("3D UMAP • Spectral majority vs. actual cell_type")
 ax.legend(loc="best", fontsize=9)
 plt.tight_layout()
-umap_fig_path = os.path.join(fig_dir, "clustering_umap3d.eps")
+umap_fig_path = os.path.join(fig_dir, "supp_4e.eps")
 plt.savefig(umap_fig_path, format="eps", dpi=300)
 plt.show()
 
@@ -199,17 +199,15 @@ handles = [
 fig.legend(handles=handles, title="Neuron Type", loc="upper right", fontsize=11)
 plt.tight_layout(rect=[0, 0, 0.98, 0.98])
 
-metrics_fig_path = os.path.join(fig_dir, "metrics_grid_CE.eps")
+metrics_fig_path = os.path.join(fig_dir, "supp_4ad.eps")
 plt.savefig(metrics_fig_path, format="eps", dpi=300)
 plt.show()
 
-# ===================== SAVE ONCE =====================
 df.to_excel(out_xlsx, index=False)
 print(f"\nSaved once to: {out_xlsx}")
 print(f"UMAP fig:    {umap_fig_path}")
 print(f"Metrics fig: {metrics_fig_path}")
 
-# ===================== SUMMARY TABLE =====================
 summary = pd.DataFrame({
     "Metric": metrics_for_tests,
     "p_raw": raw_pvals,
