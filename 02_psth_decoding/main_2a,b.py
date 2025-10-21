@@ -5,10 +5,10 @@ from scipy.ndimage import gaussian_filter1d
 from ipywidgets import interact, widgets, SelectMultiple
 
 # Load the data
-fixation_data_full = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
-enc_data_full = pd.read_feather('/./graph_data/graph_encoding1.feather')
-delay_data_full = pd.read_feather('/./graph_data/graph_delay.feather')
-probe_data_full = pd.read_feather('/./graph_data/graph_probe.feather')
+fixation_data_full = pd.read_feather('../clean_data/cleaned_Fixation.feather')
+enc_data_full = pd.read_feather('../graph_data/graph_encoding1.feather')
+delay_data_full = pd.read_feather('../graph_data/graph_delay.feather')
+probe_data_full = pd.read_feather('../graph_data/graph_probe.feather')
 
 from ast import literal_eval
 
@@ -289,7 +289,7 @@ for ax in axs:
     ax.set_ylim(ymin, ymax)
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 
-save_path = "/./single_PSTH_4052_load1.eps"
+save_path = "./single_PSTH_4052_load1.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 print(f"Saved EPS figure with FDR-corrected significance: {save_path}")
 plt.show()
@@ -398,6 +398,6 @@ axs[2].legend(
     frameon=True
 )
 plt.tight_layout(rect=[0, 0, 1, 0.93])
-save_path = "/./02_psth_decoding/raster_plots_4052.eps"
+save_path = "./raster_plots_4052.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
