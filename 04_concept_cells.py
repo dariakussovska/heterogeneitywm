@@ -110,7 +110,7 @@ def run_significance_test(df, iteration=1000):
     return df
 
 df_final = run_significance_test(df_top_2)
-df_final.to_feather('/./Neuron_Check_Significant_All.feather', index=False)
+df_final.to_feather('/./Neuron_Check_Significant_All.feather')
 print("Final file saved at: Neuron_Check_Significant_All.feather")
 
 significant_neurons = df_final[df_final['Signi'] == 'Y']
