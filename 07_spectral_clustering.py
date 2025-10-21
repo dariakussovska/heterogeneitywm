@@ -102,6 +102,6 @@ plt.show()
 
 # Save feather file with all results
 output_path = "./Clustering_3D.feather"
-df_filtered.to_feather(output_path, index=False)
+df_filtered.to_feather(output_path)
 print(f"\nClustered data saved to: {output_path}")
 print("Added 'Cell_Type_New' based on Spectral clustering and saved updated file.")
