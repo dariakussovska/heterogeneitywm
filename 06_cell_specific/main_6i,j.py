@@ -8,13 +8,13 @@ import os
 from tqdm import tqdm
 from statsmodels.stats.multitest import multipletests
 
-trial_info = pd.read_excel('/home/daria/PROJECT/new_trial_final.xlsx')
+trial_info = pd.read_excel('/./new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
 
 y_matrix = subject_trials
-df_delay_filtered = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
-df_fixation = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
+df_delay_filtered = pd.read_excel('/./graph_data/graph_delay.xlsx')
+df_fixation = pd.read_excel('/./clean_data/cleaned_Fixation.xlsx')
 
 y_matrix = y_matrix.reset_index(drop=True)
 
@@ -236,9 +236,9 @@ plt.legend()
 plt.grid(axis='y', linestyle='--', alpha=0.6)
 plt.tight_layout()
 
-folder_path = '/Users/darikussovska/Desktop/PROJECT/Figures'
+folder_path = '/./06_cell_specific/'
 os.makedirs(folder_path, exist_ok=True)
-save_path = os.path.join(folder_path, "decoding_timebins_in.eps")
+save_path = os.path.join(folder_path, "main_6ij.eps")
 plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
 
