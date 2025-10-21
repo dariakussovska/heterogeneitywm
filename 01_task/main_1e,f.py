@@ -4,18 +4,18 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import PoissonRegressor
 from tqdm import tqdm
 
-trial_info = pd.read_feather('/./new_trial_info.feather')
+trial_info = pd.read_feather('../data/new_trial_info.feather')
 subject_trials = trial_info[trial_info['subject_id'] == 1][['new_trial_id', 'num_images_presented', 'stimulus_index', 'RT', 'response_accuracy']]
 y_matrix = subject_trials
 
 # 1) Load Your Main Data
 
-df_delay_filtered = pd.read_feather('/./graph_delay.feather')
+df_delay_filtered = pd.read_feather('../graph_delay.feather')
 y_matrix = y_matrix.reset_index(drop=True)
 
 # 2) Load Neuron Locations Data (for location-based filtering)
 
-df_neuron_locations = pd.read_feather('/./merged_significant_neurons_with_brain_regions.feather')
+df_neuron_locations = pd.read_feather('../merged_significant_neurons_with_brain_regions.feather')
 
 # Example list of desired locations for filtering
 desired_locations = ['amygdala_left', 'amygdala_right', 'hippocampus_left', 'hippocampus_right', 'pre_supplementary_motor_area_right', 'pre_supplementary_motor_area_left',
@@ -278,5 +278,5 @@ if len(summary_df) > 0:
     ax.set_ylim(-5, ymax + headroom)
     ax.set_title("Observed % significant neurons (Brain Regions)")
     plt.tight_layout()
-    plt.savefig("/./01_task/poisson_load.eps", format='eps', dpi=300)
+    plt.savefig("/01_task/poisson_load.eps", format='eps', dpi=300)
     plt.show()
