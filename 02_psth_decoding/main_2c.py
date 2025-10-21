@@ -4,14 +4,14 @@ from ast import literal_eval
 import matplotlib.pyplot as plt
 
 # === Load Data ===
-fixation_data = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
-enc1 = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding1.xlsx')
-enc2 = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding2.xlsx')
-enc3 = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding3.xlsx')
-delay = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
-probe = pd.read_excel('/home/daria/PROJECT/graph_data/graph_probe.xlsx')
+fixation_data = pd.read_excel('/./clean_data/cleaned_Fixation.xlsx')
+enc1 = pd.read_excel('/./graph_data/graph_encoding1.xlsx')
+enc2 = pd.read_excel('/./graph_data/graph_encoding2.xlsx')
+enc3 = pd.read_excel('/./graph_data/graph_encoding3.xlsx')
+delay = pd.read_excel('/./graph_data/graph_delay.xlsx')
+probe = pd.read_excel('/./graph_data/graph_probe.xlsx')
 
-classification_df = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
+classification_df = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
 classification_df = classification_df[
     (classification_df["Signi"] == "Y")] # & (classification_df["Cell_Type_New"] == "IN")]
 valid_neuron_ids = classification_df["Neuron_ID_3"].dropna().unique().tolist()
@@ -403,7 +403,7 @@ ax.legend()
 axs[1, 3].axis('off')
 
 plt.tight_layout(rect=[0, 0, 1, 0.96])
-save_path = "/home/daria/PROJECT/PSTH_concept.eps"
+save_path = "/./02_psth_decoding/PSTH_concept.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 print(f"Saved EPS figure with bootstrapped confidence intervals + FDR stars to: {save_path}")
 plt.show()
