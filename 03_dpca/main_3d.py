@@ -10,8 +10,8 @@ from scipy.spatial.distance import pdist
 import scipy.stats as sps
 import scikit_posthocs as sp
 
-trialE = np.load(f"/./trialE.npy")
-trialD = np.load(f"/./trialD.npy")
+trialE = np.load(f"../trialE.npy")
+trialD = np.load(f"../trialD.npy")
 
 trialX = trialE
 
@@ -221,7 +221,7 @@ measure_dict, kw_p, dunn_df, explE, explD = run_dpca_distance_resampling_E_vs_D(
                 n_iter        = 100,              
                 selected_dpcs = (0,1,2,3,4),      # which dPCs enter the distance
                 stim_indices  = (0,1,2,3,4),      # which of the 5 stimuli to keep
-                savefig_path  = "/./03_dpca/variance.eps",
+                savefig_path  = "./variance.eps",
                 random_seed   = 1
         )
 
@@ -244,5 +244,5 @@ ax[1].set_title("Maintenance")
 
 plt.suptitle(f"Variance explained across {n_iter} splits")
 plt.tight_layout()
-plt.savefig("/./03_dpca/enc_maintenance_training_var.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("./enc_maintenance_training_var.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
