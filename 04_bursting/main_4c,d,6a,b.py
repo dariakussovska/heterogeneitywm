@@ -25,9 +25,9 @@ min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 # =========================
 # Paths (edit as needed)
 # =========================
-path_decay_acg  = '/./Clustering_3D.feather'
-path_all_meta   = '/./all_neuron_brain_regions_cleaned.feather'
-path_trials     = '/./graph_data/graph_encoding1.feather'
+path_decay_acg  = '../Clustering_3D.feather'
+path_all_meta   = '../data/all_neuron_brain_regions_cleaned.feather'
+path_trials     = '../graph_data/graph_encoding1.feather'
 
 # =========================
 # Load data
@@ -329,7 +329,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import wilcoxon, mannwhitneyu, friedmanchisquare
 from statsmodels.stats.multitest import multipletests
 
-out_dir = "/home/daria/PROJECT/Figures/Bursting"
+out_dir = "./"
 os.makedirs(out_dir, exist_ok=True)
 
 def symbol_from_p(p):
@@ -690,7 +690,7 @@ if not df_pairs.empty and df_pairs["p_FDR_BH"].notna().any():
                 plt.text(j, i, stars_mat[i][j], ha="center", va="center", fontweight="bold")
     plt.title("REAL vs REAL: FDR-corrected pairwise significance")
     plt.tight_layout()
-    plt.savefig(f"{out_dir}/04_bursting/significance_matrix.png", dpi=300, bbox_inches="tight")
+    plt.savefig(f"{out_dir}/significance_matrix.png", dpi=300, bbox_inches="tight")
     plt.show()
 else:
     print("\n[Note] Skipping significance matrix: no valid FDR-corrected pairwise p-values.")
