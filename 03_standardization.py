@@ -143,7 +143,7 @@ def clean_standardized_data():
         df_cleaned = df.drop(columns=columns_to_remove, errors='ignore')
 
         output_file = os.path.join(cleaned_data_dir, f'cleaned_{period_name}.feather')
-        df_cleaned.to_feather(output_file, index=False)
+        df_cleaned.to_feather(output_file)
         print(f"Cleaned data for {period_name} saved to: {output_file}")
 
 clean_standardized_data()
@@ -221,7 +221,7 @@ if standardized_fixation_data is not None:
     ).astype(int)
 
     output_file = os.path.join(cleaned_data_dir, 'cleaned_Fixation.feather')
-    standardized_fixation_data.to_feather(output_file, index=False)
+    standardized_fixation_data.to_feather(output_file)
     print(f"Cleaned fixation data saved to: {output_file}")
 
 print("Fixation period cleaning and saving completed.")
@@ -324,7 +324,7 @@ def create_graph_data():
             df_graph = standardized_data[period_name].copy()
         
         output_file = os.path.join(graph_data_dir, f'graph_{period_name.lower()}.feather')
-        df_graph.to_feather(output_file, index=False)
+        df_graph.to_feather(output_file)
         print(f"Graph data for {period_name} saved to: {output_file}")
 
 create_graph_data()
@@ -333,7 +333,7 @@ print("Graph data creation completed.")
 # For fixation graph data (already uses its own start time)
 fixation_graph_data = pd.read_feather(os.path.join(cleaned_data_dir, 'cleaned_Fixation.feather'))
 fixation_graph_output = os.path.join(graph_data_dir, 'graph_fixation.feather')
-fixation_graph_data.to_feather(fixation_graph_output, index=False)
+fixation_graph_data.to_feather(fixation_graph_output)
 print(f"Fixation graph data saved to: {fixation_graph_output}")
 
 print("All processing completed!")
