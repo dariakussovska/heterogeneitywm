@@ -24,6 +24,3 @@ dandi>=0.60.0
 
 # Utils
 tqdm>=4.66
-
-# dPCA (demixed PCA) — package name can vary
-dPCA
