@@ -5,7 +5,7 @@ import scipy.signal as signal
 from scipy.ndimage import gaussian_filter1d
 import matplotlib.pyplot as plt
 
-df_enc1_filtered = pd.read_feather('/./graph_data/graph_encoding1.feather')
+df_enc1_filtered = pd.read_feather('../graph_data/graph_encoding1.feather')
 
 subject_id = 14
 selected_neurons = [11, 13, 14, 15, 16, 17, 19, 20, 24, 26, 27, 34, 38]
@@ -153,7 +153,7 @@ plt.ylabel("Smoothed spike count (a.u.)")
 plt.title("Burst detection: Real vs. single Poisson surrogate")
 plt.legend()
 plt.tight_layout()
-save_path = "/./04_bursting/main_4a.eps"
+save_path = "./main_4a.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
 
