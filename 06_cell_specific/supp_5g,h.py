@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import ttest_rel
 
 # Load feather
-df = pd.read_feather("/./data/cell_analysis/decay_constant_change.feather")
+df = pd.read_feather("../data/cell_analysis/decay_constant_change.feather")
 df.columns = df.columns.str.strip()
 
 # Ensure required columns
@@ -65,7 +65,7 @@ for i, p in enumerate(pvals_in):
     ax.text(x[i] + width, y, '*' if p < 0.05 else 'n.s.', ha='center', color='red', fontsize=12)
 
 plt.tight_layout()
-save_path = "/./06_cell_specific/supp_5gh.eps"
+save_path = "./supp_5gh.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
 print(pvals_py)
