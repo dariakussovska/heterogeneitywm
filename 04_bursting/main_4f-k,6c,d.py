@@ -31,14 +31,14 @@ OVERLAP  = 1
 # =========================
 # Load data
 # =========================
-df_metadata  = pd.read_excel('/home/daria/PROJECT/Clustering_3D.xlsx')
-df_metadata2 = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
+df_metadata  = pd.read_excel('/./Clustering_3D.xlsx')
+df_metadata2 = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
 
-df_enc1  = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding1.xlsx')
-df_enc2  = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding2.xlsx')
-df_enc3  = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding3.xlsx')
-df_delay = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
-df_probe = pd.read_excel('/home/daria/PROJECT/graph_data/graph_probe.xlsx')
+df_enc1  = pd.read_excel('/./graph_data/graph_encoding1.xlsx')
+df_enc2  = pd.read_excel('/./graph_data/graph_encoding2.xlsx')
+df_enc3  = pd.read_excel('/./graph_data/graph_encoding3.xlsx')
+df_delay = pd.read_excel('/./graph_data/graph_delay.xlsx')
+df_probe = pd.read_excel('/./graph_data/graph_probe.xlsx')
 
 # Convenience filtered/meta frames
 df_metadata_decay_acg = df_metadata[df_metadata['R2'] > 0.3].copy()
@@ -305,6 +305,6 @@ for load in [1, 2, 3]:
     plt.suptitle(f"Burst Count Across Periods (Delay in 3 Parts) - Load {load}",
                  fontsize=20, y=1.02)
     plt.tight_layout()
-    plt.savefig(f"/home/daria/PROJECT/combined_burst_load{load}.eps",
+    plt.savefig(f"/./04_bursting/combined_burst_load{load}.eps",
                 format='eps', dpi=300)
     plt.show()
