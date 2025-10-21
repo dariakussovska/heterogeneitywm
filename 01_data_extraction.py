@@ -412,5 +412,5 @@ if __name__ == "__main__":
     import warnings
     warnings.filterwarnings("ignore")
     
-    filepaths = [f"/./000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
+    filepaths = [f"./000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
     process_all_files(filepaths)
