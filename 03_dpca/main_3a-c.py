@@ -10,8 +10,8 @@ from scipy.spatial.distance import pdist
 import scipy.stats as sps
 import scikit_posthocs as sp
 
-trialE = np.load(f"/./trialE.npy")
-trialD = np.load(f"/./trialD.npy")
+trialE = np.load(f"../trialE.npy")
+trialD = np.load(f"../trialD.npy")
 
 trialX = trialE
 
@@ -102,5 +102,5 @@ ax.view_init(elev=20, azim=40)
 ax.grid(True)
 
 # Save or show
-plt.savefig("/./03_dpca/enc_on_encoding_test.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("./enc_on_encoding_test.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
