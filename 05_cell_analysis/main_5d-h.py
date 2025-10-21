@@ -6,7 +6,7 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # Load data
-file_path = "/./Clustering_3D.feather"
+file_path = "../Clustering_3D.feather"
 data = pd.read_feather(file_path)
 data.columns = data.columns.str.strip()
 
@@ -160,7 +160,7 @@ fig.legend(handles=handles, title="Neuron Type", loc="upper right", fontsize=11)
 
 plt.tight_layout(rect=[0, 0, 0.98, 0.98])
 # Save if you want:
-plt.savefig("/./05_cell_analysis/main_5dh.eps",
+plt.savefig("./main_5dh.eps",
              format='eps', dpi=300)
 plt.show()
 
