@@ -2,9 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Load the Excel file
-file_path = "/./all_spike_rate_data_probe.xlsx"  
-df = pd.read_excel(file_path)
+# Load the feather file
+file_path = "/./all_spike_rate_data_probe.feather"  
+df = pd.read_feather(file_path)
 
 accuracy_df = df.groupby('subject_id')['response_accuracy'].agg(['sum', 'count'])
 accuracy_df['response_accuracy'] = accuracy_df['sum'] / accuracy_df['count']  # Correct trials / Total trials
