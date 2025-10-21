@@ -4,8 +4,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from dPCA.dPCA import dPCA 
 
-trialE = np.load(f"/home/daria/PROJECT/trialE.npy")
-trialD = np.load(f"/home/daria/PROJECT/trialD.npy")
+trialE = np.load(f"/./trialE.npy")
+trialD = np.load(f"/./trialD.npy")
 
 trialX = trialE
 
@@ -106,5 +106,5 @@ ax.view_init(elev=20, azim=60)
 ax.grid(True)
 
 # Save or show
-plt.savefig("/home/daria/PROJECT/late_on_early.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("/./03_dpca/late_on_early.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
