@@ -143,7 +143,7 @@ all_data_enc2 = pd.read_feather(f'/./all_spike_rate_data_encoding2.feather')
 all_data_enc3 = pd.read_feather(f'/./all_spike_rate_data_encoding3.feather')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
-output_path = '/./data/trial_info.feather'
+output_path = '/./trial_info.feather'
 trial_info_df.to_feather(output_path, index=False)
 
 print(f"Trial info has been saved to {output_path}")
