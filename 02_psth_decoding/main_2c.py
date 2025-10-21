@@ -4,14 +4,14 @@ from ast import literal_eval
 import matplotlib.pyplot as plt
 
 # === Load Data ===
-fixation_data = pd.read_excel('/./clean_data/cleaned_Fixation.xlsx')
-enc1 = pd.read_excel('/./graph_data/graph_encoding1.xlsx')
-enc2 = pd.read_excel('/./graph_data/graph_encoding2.xlsx')
-enc3 = pd.read_excel('/./graph_data/graph_encoding3.xlsx')
-delay = pd.read_excel('/./graph_data/graph_delay.xlsx')
-probe = pd.read_excel('/./graph_data/graph_probe.xlsx')
+fixation_data = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
+enc1 = pd.read_feather('/./graph_data/graph_encoding1.feather')
+enc2 = pd.read_feather('/./graph_data/graph_encoding2.feather')
+enc3 = pd.read_feather('/./graph_data/graph_encoding3.feather')
+delay = pd.read_feather('/./graph_data/graph_delay.feather')
+probe = pd.read_feather('/./graph_data/graph_probe.feather')
 
-classification_df = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
+classification_df = pd.read_feather('/./all_neuron_brain_regions_cleaned.feather')
 classification_df = classification_df[
     (classification_df["Signi"] == "Y")] # & (classification_df["Cell_Type_New"] == "IN")]
 valid_neuron_ids = classification_df["Neuron_ID_3"].dropna().unique().tolist()
