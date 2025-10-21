@@ -11,9 +11,9 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # ===================== PATHS =====================
-in_path  = "/./data/cell_analysis/validation_data.feather"
-out_feather = "/./Validation_clustering.feather"
-fig_dir  = "/./05_cell_analysis/"
+in_path  = "../data/cell_analysis/validation_data.feather"
+out_feather = "./Validation_clustering.feather"
+fig_dir  = "./"
 os.makedirs(fig_dir, exist_ok=True)
 
 # ===================== LOAD ONCE =====================
