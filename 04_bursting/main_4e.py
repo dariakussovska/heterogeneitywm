@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-file_path = "/./Clustering_3D.feather"
+file_path = "../Clustering_3D.feather"
 data = pd.read_excel(file_path)
 
 # Clean column names
@@ -35,5 +35,5 @@ plt.ylim(0, 50)  # Adjust as needed depending on your data range
 plt.grid(True, linestyle="--", alpha=0.8)
 
 plt.tight_layout()
-plt.savefig("/./04_bursting/main_4e.eps", format='eps', dpi=300)
+plt.savefig("./main_4e.eps", format='eps', dpi=300)
 plt.show()
