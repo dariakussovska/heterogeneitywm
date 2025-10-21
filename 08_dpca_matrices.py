@@ -11,7 +11,7 @@ from scipy.spatial.distance import pdist
 import scipy.stats as sps
 import scikit_posthocs as sp
 
-trial_info = pd.read_feather('/./data/new_trial_info.feather')
+trial_info = pd.read_feather('./data/new_trial_info.feather')
 subject_trials = trial_info[(trial_info['subject_id'] == 14) & (trial_info['num_images_presented'] == 1)][['new_trial_id', 'num_images_presented', 'stimulus_index']]
 y_matrix = subject_trials
 
@@ -33,9 +33,9 @@ print(balanced_distribution)
 
 balanced_y_matrix = y_matrix_balanced
 
-fixation_data_with_brain_region = pd.read_feather('/./graph_data/graph_fixation.feather')
-enc1_data_with_brain_region = pd.read_feather('/./clean_data/cleaned_Encoding1.feather')
-delay_data_with_brain_region = pd.read_feather('/./graph_data/graph_delay.feather')
+fixation_data_with_brain_region = pd.read_feather('./graph_data/graph_fixation.feather')
+enc1_data_with_brain_region = pd.read_feather('./clean_data/cleaned_Encoding1.feather')
+delay_data_with_brain_region = pd.read_feather('./graph_data/graph_delay.feather')
 
 fixation_data = fixation_data_with_brain_region
 
@@ -237,7 +237,7 @@ print(trialD.shape)
 import numpy as np
 
 # Define your directory path
-save_directory = "/./"  # Replace with your desired path
+save_directory = "./"  # Replace with your desired path
 
 # Save individual files
 np.save(f"{save_directory}trialE.npy", trialE)
