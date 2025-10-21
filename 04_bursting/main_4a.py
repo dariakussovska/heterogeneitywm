@@ -5,7 +5,7 @@ import scipy.signal as signal
 from scipy.ndimage import gaussian_filter1d
 import matplotlib.pyplot as plt
 
-df_enc1_filtered = pd.read_excel('/./graph_data/graph_encoding1.xlsx')
+df_enc1_filtered = pd.read_feather('/./graph_data/graph_encoding1.feather')
 
 subject_id = 14
 selected_neurons = [11, 13, 14, 15, 16, 17, 19, 20, 24, 26, 27, 34, 38]
