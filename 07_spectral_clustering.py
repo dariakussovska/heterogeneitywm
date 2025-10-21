@@ -11,7 +11,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Load and preprocess data
-df = pd.read_feather("/./data/cell_analysis/Cell_metrics.feather")
+df = pd.read_feather("./data/cell_analysis/Cell_metrics.feather")
 
 df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "tau_rise"]).copy()
 
@@ -97,11 +97,11 @@ ax.set_zlabel("UMAP 3")
 ax.set_title("3D UMAP: Spectral Cluster-Based Cell Type Assignment")
 ax.view_init(elev=34, azim=-61)
 plt.tight_layout()
-plt.savefig("/./spectral_clustering.eps", format='eps', dpi=300)
+plt.savefig("./spectral_clustering.eps", format='eps', dpi=300)
 plt.show()
 
 # Save feather file with all results
-output_path = "/./Clustering_3D.feather"
+output_path = "./Clustering_3D.feather"
 df_filtered.to_feather(output_path, index=False)
 print(f"\nClustered data saved to: {output_path}")
 print("Added 'Cell_Type_New' based on Spectral clustering and saved updated file.")
