@@ -25,16 +25,16 @@ min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 # =========================
 # Paths (edit as needed)
 # =========================
-path_decay_acg  = '/./Clustering_3D.xlsx'
-path_all_meta   = '/./all_neuron_brain_regions_cleaned.xlsx'
-path_trials     = '/./graph_data/graph_encoding1.xlsx'
+path_decay_acg  = '/./Clustering_3D.feather'
+path_all_meta   = '/./all_neuron_brain_regions_cleaned.feather'
+path_trials     = '/./graph_data/graph_encoding1.feather'
 
 # =========================
 # Load data
 # =========================
-df_metadata_decay_acg = pd.read_excel(path_decay_acg)
-df_metadata_all       = pd.read_excel(path_all_meta)
-df_enc1_filtered      = pd.read_excel(path_trials)
+df_metadata_decay_acg = pd.read_feather(path_decay_acg)
+df_metadata_all       = pd.read_feather(path_all_meta)
+df_enc1_filtered      = pd.read_feather(path_trials)
 
 # Apply R² filter only to decay/ACG categories
 df_metadata_decay_acg = df_metadata_decay_acg[df_metadata_decay_acg["R2"] > 0.3]
