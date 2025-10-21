@@ -351,7 +351,7 @@ def process_probe_periods(nwbfile, subject_id: int) -> pd.DataFrame:
 # Main processing pipeline
 def process_all_files(filepaths: List[str]) -> None:
     """Process all NWB files for all periods."""
-    output_dir = "/home/daria/PROJECT/"
+    output_dir = "/./"
     os.makedirs(output_dir, exist_ok=True)
     
     # Initialize data containers
@@ -412,5 +412,5 @@ if __name__ == "__main__":
     import warnings
     warnings.filterwarnings("ignore")
     
-    filepaths = [f"/home/daria/PROJECT/000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
+    filepaths = [f"/./000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
     process_all_files(filepaths)
