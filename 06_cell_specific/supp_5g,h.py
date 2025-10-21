@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import ttest_rel
 
-# Load Excel
-df = pd.read_excel("/./data/cell_analysis/decay_constant_change.xlsx")
+# Load feather
+df = pd.read_feather("/./data/cell_analysis/decay_constant_change.feather")
 df.columns = df.columns.str.strip()
 
 # Ensure required columns
