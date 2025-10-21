@@ -6,10 +6,10 @@ import ast
 from statsmodels.stats.multitest import multipletests
 
 # Load data
-df_delay = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
-df_fixation = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
-df_regions = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
-trial_info = pd.read_excel('/home/daria/PROJECT/trial_info.xlsx')
+df_delay = pd.read_excel('/./graph_data/graph_delay.xlsx')
+df_fixation = pd.read_excel('/./clean_data/cleaned_Fixation.xlsx')
+df_regions = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
+trial_info = pd.read_excel('/./trial_info.xlsx')
 
 region_groups = {
     'amygdala': ['amygdala_left', 'amygdala_right'],
@@ -280,7 +280,7 @@ ax.set_ylabel("Decoding Accuracy (%)")
 ax.set_title("Decoding Accuracy by Region & Load vs. Average Shuffled Baseline")
 ax.legend(loc='upper right')
 plt.tight_layout()
-plt.savefig("/home/daria/brain_regions_decoding.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("/./brain_regions_decoding.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
 
 import pandas as pd
@@ -346,4 +346,4 @@ print(stats_table)
 print(significant_fdr)
 
 # Save to CSV
-stats_table.to_csv('/home/daria/PROJECT/load_vs_shuffled_stats_corrected_group.csv', index=False)
+stats_table.to_csv('/./load_vs_shuffled_stats_corrected_group.csv', index=False)
