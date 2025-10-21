@@ -8,7 +8,7 @@ GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 # Load all source data
 significant_neurons_df = pd.read_feather('/./Neuron_Check_Significant_All.feather')
 trial_info_df = pd.read_feather('/./trial_info.feather')
-brain_regions_df = pd.read_feather('/./all_neuron_brain_regions_cleaned.feather')
+brain_regions_df = pd.read_feather('/./data/all_neuron_brain_regions_cleaned.feather')
 
 # Filter significant neurons to only include Y or N
 significant_neurons_filtered = significant_neurons_df[significant_neurons_df['Signi'].isin(['Y', 'N'])]
