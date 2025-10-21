@@ -2,7 +2,7 @@ import pandas as pd
 import ast
 import os
 
-BASE_DIR = '/home/daria/PROJECT'
+BASE_DIR = '/./'
 
 filtered_files = {
     'Encoding1': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding1.xlsx'),
