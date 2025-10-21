@@ -24,7 +24,7 @@ def compute_firing_rate(df, start_time=0.2, end_time=1.0):
     return df
 
 # Load input Excel file
-input_path = "/home/daria/PROJECT/clean_data/cleaned_Encoding1.xlsx"
+input_path = "/./clean_data/cleaned_Encoding1.xlsx"
 df = pd.read_excel(input_path)
 
 # Compute firing rates
@@ -110,7 +110,7 @@ def run_significance_test(df, iteration=1000):
     return df
 
 df_final = run_significance_test(df_top_2)
-df_final.to_excel('/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx', index=False)
+df_final.to_excel('/./Neuron_Check_Significant_All.xlsx', index=False)
 print("Final file saved at: Neuron_Check_Significant_All.xlsx")
 
 significant_neurons = df_final[df_final['Signi'] == 'Y']
@@ -174,6 +174,6 @@ def plot_example_concept_cells(df_original, df_sig, save_dir, max_plots=2):
 plot_example_concept_cells(
     df_original=df,
     df_sig=df_final,
-    save_dir='/home/daria/PROJECT',
+    save_dir='/./',
     max_plots=2
 )
