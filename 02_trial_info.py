@@ -83,7 +83,7 @@ def plot_metrics(metrics):
     plt.tight_layout()
     plt.show()
 
-filepaths = [f"/home/daria/PROJECT/000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
+filepaths = [f"/./000469/sub-{i+1}/sub-{i+1}_ses-2_ecephys+image.nwb" for i in range(21)]
 
 all_metrics = pd.DataFrame()
 
@@ -97,7 +97,7 @@ for filepath in filepaths:
 
 if not all_metrics.empty:
     plot_metrics(all_metrics) 
-    all_metrics.to_excel('/home/daria/PROJECT/all_spike_rate_metrics.xlsx', index=False)
+    all_metrics.to_excel('/./all_spike_rate_metrics.xlsx', index=False)
     print("Data has been saved to all_spike_rate_metrics.xlsx")
 else:
     print("Failed to read data from NWB files.")
@@ -138,12 +138,12 @@ def create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3):
 
     return trial_info_df
 
-all_data_enc1 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding1.xlsx')
-all_data_enc2 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding2.xlsx')
-all_data_enc3 = pd.read_excel(f'/home/daria/PROJECT/all_spike_rate_data_encoding3.xlsx')
+all_data_enc1 = pd.read_excel(f'/./all_spike_rate_data_encoding1.xlsx')
+all_data_enc2 = pd.read_excel(f'/./all_spike_rate_data_encoding2.xlsx')
+all_data_enc3 = pd.read_excel(f'/./all_spike_rate_data_encoding3.xlsx')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
-output_path = '/home/daria/PROJECT/trial_info.xlsx'
+output_path = '/./data/trial_info.xlsx'
 trial_info_df.to_excel(output_path, index=False)
 
 print(f"Trial info has been saved to {output_path}")
