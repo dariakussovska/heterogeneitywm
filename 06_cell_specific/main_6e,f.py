@@ -4,18 +4,18 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import PoissonRegressor
 from tqdm import tqdm
 
-trial_info = pd.read_feather('/./new_trial_info.feather')
+trial_info = pd.read_feather('../new_trial_info.feather')
 subject_trials = trial_info[trial_info['subject_id'] == 1][['new_trial_id', 'num_images_presented', 'stimulus_index', 'RT', 'response_accuracy']]
 y_matrix = subject_trials
 
 # 1) Load Your Main Data
 
-df_delay_filtered = pd.read_feather('/./graph_data/graph_delay.feather')
+df_delay_filtered = pd.read_feather('../graph_data/graph_delay.feather')
 y_matrix = y_matrix.reset_index(drop=True)
 
 # 2) Load Neuron Locations Data (for location-based filtering)
 
-df_neuron_locations = pd.read_feather('/./Clustering_3D.feather')
+df_neuron_locations = pd.read_feather('../Clustering_3D.feather')
 
 desired_locations = ['PY', 'IN']
 # We'll compute the set of neurons that are in these locations:
@@ -264,5 +264,5 @@ if len(summary_df) > 0:
     ax.set_ylim(-5, ymax + headroom)
     ax.set_title("Observed % significant neurons (Brain Regions)")
     plt.tight_layout()
-    plt.savefig("/./06_cell_specific/main_6ef.eps", format='eps', dpi=300)
+    plt.savefig("./main_6ef.eps", format='eps', dpi=300)
     plt.show()
