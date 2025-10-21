@@ -75,6 +75,7 @@ python 07_cell_types.py
 # Dimensionality reduction matrices
 
 This step is needed to create the matrices used in dimensionality reduction (dPCA) analyses. It creates two .npy files -- one for encoding and one for maintenance, and saves them to your designated folder. After running this, you will be able to run all the analyses for Fig.3 and Fig.S2. 
+
 ```
 python 08_dpca_matrices.py
 ```
