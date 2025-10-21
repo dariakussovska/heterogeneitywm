@@ -12,8 +12,18 @@ One way is to use dandi (install with conda or pip), which is added to the requi
 pip install -r requirements.txt
 dandi download DANDI:000469/0.240123.1806
 ```
-
 Detailed description of the dataset is included in the original paper by Kyzar et al., 2024. 
+
+If you don't have dCPA installed, you can do it like this:
+```
+git clone https://github.com/machenslab/dPCA.git
+cd dPCA
+cd python
+pip install -e .
+% If it gives you a mistake with the sklearn, you can do the following:
+% nano setup.py
+% Change sklearn to scikit-learn
+```
 
 # Data extraction and organization
 
