@@ -116,7 +116,7 @@ def plot_raster_and_psth_grouped_by_stimulus(
 
 import pandas as pd
 
-df_spikes = pd.read_feather('/./clean_data/cleaned_Encoding1.feather')
+df_spikes = pd.read_feather('../clean_data/cleaned_Encoding1.feather')
 
 plot_raster_and_psth_grouped_by_stimulus(
     data=df_spikes,
@@ -127,5 +127,5 @@ plot_raster_and_psth_grouped_by_stimulus(
     time_range=(0, 1),
     bin_size=0.05,
     smooth_sigma=1,
-    save_dir='/./01_task'
+    save_dir='./01_task'
 )
