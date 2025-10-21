@@ -81,9 +81,9 @@ import pandas as pd
 import numpy as np 
 
 # Load your metadata and spikes
-df_meta = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/Clustering_3D.xlsx')
-df_encoding = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/graph_encoding1.xlsx')
-df_delay    = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/graph_dela.xlsx')
+df_meta = pd.read_excel('/./Clustering_3D.xlsx')
+df_encoding = pd.read_excel('/./clean_data/graph_encoding1.xlsx')
+df_delay    = pd.read_excel('/./clean_data/graph_dela.xlsx')
 
 # Filter metadata to significant neurons
 df_meta = df_meta[df_meta['Signi'] == 'Y']
@@ -175,13 +175,14 @@ max_in = max(in_means) + max(in_stds)
 add_sig_star(p_py, x[0] - width/2, x[1] - width/2, max_py)
 add_sig_star(p_in, x[0] + width/2, x[1] + width/2, max_in)
 
-# Aesthetics
 ax.set_ylabel('CV2')
 ax.set_title('CV2 in Encoding vs Delay')
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
 plt.tight_layout()
+save_path = "/./06_cell_specific/main_6gh.eps"
+plt.savefig(save_path, format='eps', dpi=300
 plt.show()
 
 # Print p-values
