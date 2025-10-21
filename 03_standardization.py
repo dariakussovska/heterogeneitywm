@@ -5,21 +5,21 @@ import os
 BASE_DIR = '/./'
 
 filtered_files = {
-    'Encoding1': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding1.xlsx'),
-    'Encoding2': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding2.xlsx'),
-    'Encoding3': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding3.xlsx'),
-    'Delay': os.path.join(BASE_DIR, 'all_spike_rate_data_delay.xlsx'),
-    'Probe': os.path.join(BASE_DIR, 'all_spike_rate_data_probe.xlsx')
+    'Encoding1': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding1.feather'),
+    'Encoding2': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding2.feather'),
+    'Encoding3': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding3.feather'),
+    'Delay': os.path.join(BASE_DIR, 'all_spike_rate_data_delay.feather'),
+    'Probe': os.path.join(BASE_DIR, 'all_spike_rate_data_probe.feather')
 }
 
 def load_enc1_start_times(enc1_path):
-    enc1_df = pd.read_excel(enc1_path)
+    enc1_df = pd.read_feather(enc1_path)
     return enc1_df[['subject_id', 'trial_id', 'start_time']].drop_duplicates().rename(columns={'start_time': 'start_time_enc1'})
 
 enc1_start_times = load_enc1_start_times(filtered_files['Encoding1'])
 
 def standardize_spikes(file_path, spikes_column, period_name):
-    df = pd.read_excel(file_path)
+    df = pd.read_feather(file_path)
     
     df = pd.merge(
         df,
@@ -68,7 +68,7 @@ def standardize_spikes(file_path, spikes_column, period_name):
 
 # Test with one file first to see the actual data structure
 print("Testing with Encoding1 file...")
-test_df = pd.read_excel(filtered_files['Encoding1'])
+test_df = pd.read_feather(filtered_files['Encoding1'])
 print("Sample spike data:")
 print(test_df['Spikes'].head(3))
 print("Data types:")
@@ -93,8 +93,8 @@ for period_name, file_path in filtered_files.items():
 
 print("Standardization completed for all filtered files.")
 
-trial_info_new = pd.read_excel(os.path.join(BASE_DIR, 'new_trial_info.xlsx'))
-trial_info_final = pd.read_excel(os.path.join(BASE_DIR, 'new_trial_final.xlsx'))
+trial_info_new = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_info.feather'))
+trial_info_final = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_final.feather'))
 
 trial_info_new['subject_id'] = trial_info_new['subject_id'].astype(str).str.strip()
 trial_info_new['trial_id'] = trial_info_new['trial_id'].astype(int)
@@ -142,17 +142,17 @@ def clean_standardized_data():
 
         df_cleaned = df.drop(columns=columns_to_remove, errors='ignore')
 
-        output_file = os.path.join(cleaned_data_dir, f'cleaned_{period_name}.xlsx')
-        df_cleaned.to_excel(output_file, index=False)
+        output_file = os.path.join(cleaned_data_dir, f'cleaned_{period_name}.feather')
+        df_cleaned.to_feather(output_file, index=False)
         print(f"Cleaned data for {period_name} saved to: {output_file}")
 
 clean_standardized_data()
 print("All standardized data has been cleaned and saved in the clean_data folder.")
 
-fixation_file_path = os.path.join(BASE_DIR, 'all_spike_rate_data_fixation.xlsx')
+fixation_file_path = os.path.join(BASE_DIR, 'all_spike_rate_data_fixation.feather')
 
 def standardize_fixation_period(file_path, spikes_column, start_time_column):
-    df = pd.read_excel(file_path)
+    df = pd.read_feather(file_path)
 
     if start_time_column in df.columns and spikes_column in df.columns:
         def standardize_row_spikes(row):
@@ -220,16 +220,16 @@ if standardized_fixation_data is not None:
         standardized_fixation_data['Neuron_ID'].astype(str)
     ).astype(int)
 
-    output_file = os.path.join(cleaned_data_dir, 'cleaned_Fixation.xlsx')
-    standardized_fixation_data.to_excel(output_file, index=False)
+    output_file = os.path.join(cleaned_data_dir, 'cleaned_Fixation.feather')
+    standardized_fixation_data.to_feather(output_file, index=False)
     print(f"Cleaned fixation data saved to: {output_file}")
 
 print("Fixation period cleaning and saving completed.")
 
 def create_graph_data():
     # First load and prepare trial info for graph data
-    trial_info_new_graph = pd.read_excel(os.path.join(BASE_DIR, 'new_trial_info.xlsx'))
-    trial_info_final_graph = pd.read_excel(os.path.join(BASE_DIR, 'new_trial_final.xlsx'))
+    trial_info_new_graph = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_info.feather'))
+    trial_info_final_graph = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_final.feather'))
     
     trial_info_new_graph['subject_id'] = trial_info_new_graph['subject_id'].astype(str).str.strip()
     trial_info_new_graph['trial_id'] = trial_info_new_graph['trial_id'].astype(int)
@@ -238,7 +238,7 @@ def create_graph_data():
     
     for period_name, file_path in filtered_files.items():
         # Load original data for this period
-        df_graph = pd.read_excel(file_path)
+        df_graph = pd.read_feather(file_path)
         
         # Clean and prepare the data
         df_graph['subject_id'] = df_graph['subject_id'].astype(str).str.strip()
@@ -323,17 +323,17 @@ def create_graph_data():
             # If columns missing, use the cleaned data but this shouldn't happen
             df_graph = standardized_data[period_name].copy()
         
-        output_file = os.path.join(graph_data_dir, f'graph_{period_name.lower()}.xlsx')
-        df_graph.to_excel(output_file, index=False)
+        output_file = os.path.join(graph_data_dir, f'graph_{period_name.lower()}.feather')
+        df_graph.to_feather(output_file, index=False)
         print(f"Graph data for {period_name} saved to: {output_file}")
 
 create_graph_data()
 print("Graph data creation completed.")
 
 # For fixation graph data (already uses its own start time)
-fixation_graph_data = pd.read_excel(os.path.join(cleaned_data_dir, 'cleaned_Fixation.xlsx'))
-fixation_graph_output = os.path.join(graph_data_dir, 'graph_fixation.xlsx')
-fixation_graph_data.to_excel(fixation_graph_output, index=False)
+fixation_graph_data = pd.read_feather(os.path.join(cleaned_data_dir, 'cleaned_Fixation.feather'))
+fixation_graph_output = os.path.join(graph_data_dir, 'graph_fixation.feather')
+fixation_graph_data.to_feather(fixation_graph_output, index=False)
 print(f"Fixation graph data saved to: {fixation_graph_output}")
 
 print("All processing completed!")
