@@ -174,6 +174,6 @@ def plot_example_concept_cells(df_original, df_sig, save_dir, max_plots=2):
 plot_example_concept_cells(
     df_original=df,
     df_sig=df_final,
-    save_dir='/./',
+    save_dir='./',
     max_plots=2
 )
