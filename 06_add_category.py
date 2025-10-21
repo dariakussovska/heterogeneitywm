@@ -38,9 +38,9 @@ enc2_data = add_category_to_encoding(enc2_data, "Encoding2 (clean)")
 enc3_data = add_category_to_encoding(enc3_data, "Encoding3 (clean)")
 
 # Save the updated clean encoding files
-enc1_data.to_feather(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.feather'), index=False)
-enc2_data.to_feather(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding2.feather'), index=False)
-enc3_data.to_feather(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.feather'), index=False)
+enc1_data.to_feather(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding1.feather'))
+enc2_data.to_feather(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding2.feather'))
+enc3_data.to_feather(os.path.join(CLEAN_DATA_DIR, 'cleaned_Encoding3.feather'))
 
 # Add Category to GRAPH encoding files
 print("\nProcessing graph encoding files...")
@@ -53,9 +53,9 @@ enc2_graph = add_category_to_encoding(enc2_graph, "Encoding2 (graph)")
 enc3_graph = add_category_to_encoding(enc3_graph, "Encoding3 (graph)")
 
 # Save the updated graph encoding files
-enc1_graph.to_feather(os.path.join(GRAPH_DATA_DIR, 'graph_encoding1.feather'), index=False)
-enc2_graph.to_feather(os.path.join(GRAPH_DATA_DIR, 'graph_encoding2.feather'), index=False)
-enc3_graph.to_feather(os.path.join(GRAPH_DATA_DIR, 'graph_encoding3.feather'), index=False)
+enc1_graph.to_feather(os.path.join(GRAPH_DATA_DIR, 'graph_encoding1.feather'))
+enc2_graph.to_feather(os.path.join(GRAPH_DATA_DIR, 'graph_encoding2.feather'))
+enc3_graph.to_feather(os.path.join(GRAPH_DATA_DIR, 'graph_encoding3.feather'))
 
 print("All encoding files updated with Category")
 
@@ -213,12 +213,12 @@ if os.path.exists(delay_clean_path):
     # Clean data
     delay_clean = pd.read_feather(delay_clean_path)
     delay_clean = add_category_from_encoding(delay_clean, enc1_data, enc2_data, enc3_data, "Delay (clean)")
-    delay_clean.to_feather(delay_clean_path, index=False)
+    delay_clean.to_feather(delay_clean_path)
     
     # Graph data
     delay_graph = pd.read_feather(delay_graph_path)
     delay_graph = add_category_from_encoding(delay_graph, enc1_graph, enc2_graph, enc3_graph, "Delay (graph)")
-    delay_graph.to_feather(delay_graph_path, index=False)
+    delay_graph.to_feather(delay_graph_path)
     
     print("Delay files updated")
 
@@ -233,13 +233,13 @@ if os.path.exists(probe_clean_path):
     probe_clean = pd.read_feather(probe_clean_path)
     probe_clean = add_category_from_encoding(probe_clean, enc1_data, enc2_data, enc3_data, "Probe (clean)")
     probe_clean = add_probe_category(probe_clean)
-    probe_clean.to_feather(probe_clean_path, index=False)
+    probe_clean.to_feather(probe_clean_path)
     
     # Graph data
     probe_graph = pd.read_feather(probe_graph_path)
     probe_graph = add_category_from_encoding(probe_graph, enc1_graph, enc2_graph, enc3_graph, "Probe (graph)")
     probe_graph = add_probe_category(probe_graph)
-    probe_graph.to_feather(probe_graph_path, index=False)
+    probe_graph.to_feather(probe_graph_path)
     
     print("Probe files updated")
 
@@ -253,12 +253,12 @@ if os.path.exists(fixation_clean_path):
     # Clean data
     fixation_clean = pd.read_feather(fixation_clean_path)
     fixation_clean = add_category_from_encoding(fixation_clean, enc1_data, enc2_data, enc3_data, "Fixation (clean)")
-    fixation_clean.to_feather(fixation_clean_path, index=False)
+    fixation_clean.to_feather(fixation_clean_path)
     
     # Graph data
     fixation_graph = pd.read_feather(fixation_graph_path)
     fixation_graph = add_category_from_encoding(fixation_graph, enc1_graph, enc2_graph, enc3_graph, "Fixation (graph)")
-    fixation_graph.to_feather(fixation_graph_path, index=False)
+    fixation_graph.to_feather(fixation_graph_path)
     
     print("Fixation files updated")
 
