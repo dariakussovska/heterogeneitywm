@@ -11,7 +11,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Load and preprocess data
-df = pd.read_excel("/./data/cell_analysis/Cell_metrics.xlsx")
+df = pd.read_feather("/./data/cell_analysis/Cell_metrics.feather")
 
 df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "tau_rise"]).copy()
 
@@ -100,8 +100,8 @@ plt.tight_layout()
 plt.savefig("/./spectral_clustering.eps", format='eps', dpi=300)
 plt.show()
 
-# Save Excel file with all results
-output_path = "/./Clustering_3D.xlsx"
-df_filtered.to_excel(output_path, index=False)
+# Save feather file with all results
+output_path = "/./Clustering_3D.feather"
+df_filtered.to_feather(output_path, index=False)
 print(f"\nClustered data saved to: {output_path}")
 print("Added 'Cell_Type_New' based on Spectral clustering and saved updated file.")
