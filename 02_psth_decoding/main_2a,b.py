@@ -5,10 +5,10 @@ from scipy.ndimage import gaussian_filter1d
 from ipywidgets import interact, widgets, SelectMultiple
 
 # Load the data
-fixation_data_full = pd.read_excel('/home/daria/PROJECT/clean_data/cleaned_Fixation.xlsx')
-enc_data_full = pd.read_excel('/home/daria/PROJECT/graph_data/graph_encoding1.xlsx')
-delay_data_full = pd.read_excel('/home/daria/PROJECT/graph_data/graph_delay.xlsx')
-probe_data_full = pd.read_excel('/home/daria/PROJECT/graph_data/graph_probe.xlsx')
+fixation_data_full = pd.read_excel('/./clean_data/cleaned_Fixation.xlsx')
+enc_data_full = pd.read_excel('/./graph_data/graph_encoding1.xlsx')
+delay_data_full = pd.read_excel('/./graph_data/graph_delay.xlsx')
+probe_data_full = pd.read_excel('/./graph_data/graph_probe.xlsx')
 
 from ast import literal_eval
 
@@ -289,9 +289,9 @@ for ax in axs:
     ax.set_ylim(ymin, ymax)
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 
-save_path = "/home/daria/PROJECT/single_PSTH_4052_load1.eps"
+save_path = "/./single_PSTH_4052_load1.eps"
 plt.savefig(save_path, format='eps', dpi=300)
-print(f"✅ Saved EPS figure with FDR-corrected significance: {save_path}")
+print(f"Saved EPS figure with FDR-corrected significance: {save_path}")
 plt.show()
 
 import matplotlib.pyplot as plt
@@ -398,6 +398,6 @@ axs[2].legend(
     frameon=True
 )
 plt.tight_layout(rect=[0, 0, 1, 0.93])
-save_path = "/home/daria/PROJECT/raster_plots_4052.eps"
+save_path = "/./02_psth_decoding/raster_plots_4052.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
