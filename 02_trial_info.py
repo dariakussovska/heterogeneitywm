@@ -97,7 +97,7 @@ for filepath in filepaths:
 
 if not all_metrics.empty:
     plot_metrics(all_metrics) 
-    all_metrics.to_feather('/./all_spike_rate_metrics.feather', index=False)
+    all_metrics.to_feather('/./all_spike_rate_metrics.feather')
     print("Data has been saved to all_spike_rate_metrics.feather")
 else:
     print("Failed to read data from NWB files.")
@@ -144,6 +144,6 @@ all_data_enc3 = pd.read_feather(f'./all_spike_rate_data_encoding3.feather')
 
 trial_info_df = create_trial_info_df(all_data_enc1, all_data_enc2, all_data_enc3)
 output_path = '/./trial_info.feather'
-trial_info_df.to_feather(output_path, index=False)
+trial_info_df.to_feather(output_path)
 
 print(f"Trial info has been saved to {output_path}")
