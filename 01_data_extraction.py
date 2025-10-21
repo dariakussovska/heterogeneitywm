@@ -45,7 +45,9 @@ def visualize_and_rank_stimulus_images(nwbfile) -> Dict:
         ax.axis('off')
     
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)   # non-blocking
+    plt.pause(2.0)        # lets the GUI render
+    plt.close(fig)          # free memory before next subject
     
     return image_order
 
@@ -351,7 +353,7 @@ def process_probe_periods(nwbfile, subject_id: int) -> pd.DataFrame:
 # Main processing pipeline
 def process_all_files(filepaths: List[str]) -> None:
     """Process all NWB files for all periods."""
-    output_dir = "/./"
+    output_dir = "./"
     os.makedirs(output_dir, exist_ok=True)
     
     # Initialize data containers
