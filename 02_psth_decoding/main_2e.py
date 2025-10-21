@@ -6,10 +6,10 @@ import ast
 from statsmodels.stats.multitest import multipletests
 
 # Load data
-df_delay = pd.read_feather('/./graph_data/graph_delay.feather')
-df_fixation = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
-df_regions = pd.read_feather('/./all_neuron_brain_regions_cleaned.feather')
-trial_info = pd.read_feather('/./trial_info.feather')
+df_delay = pd.read_feather('../graph_data/graph_delay.feather')
+df_fixation = pd.read_feather('../clean_data/cleaned_Fixation.feather')
+df_regions = pd.read_feather('../all_neuron_brain_regions_cleaned.feather')
+trial_info = pd.read_feather('../trial_info.feather')
 
 region_groups = {
     'amygdala': ['amygdala_left', 'amygdala_right'],
@@ -280,7 +280,7 @@ ax.set_ylabel("Decoding Accuracy (%)")
 ax.set_title("Decoding Accuracy by Region & Load vs. Average Shuffled Baseline")
 ax.legend(loc='upper right')
 plt.tight_layout()
-plt.savefig("/./brain_regions_decoding.eps", format='eps', bbox_inches='tight', dpi=300)
+plt.savefig("./brain_regions_decoding.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
 
 import pandas as pd
@@ -346,4 +346,4 @@ print(stats_table)
 print(significant_fdr)
 
 # Save to CSV
-stats_table.to_csv('/./load_vs_shuffled_stats_corrected_group.csv', index=False)
+stats_table.to_csv('./load_vs_shuffled_stats_corrected_group.csv', index=False)
