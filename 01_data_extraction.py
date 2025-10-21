@@ -395,7 +395,7 @@ def process_all_files(filepaths: List[str]) -> None:
     def save_data(data_list, filename):
         if data_list:
             combined = pd.concat([d for d in data_list if not d.empty], ignore_index=True)
-            combined.to_feather(os.path.join(output_dir, filename), index=False)
+            combined.to_feather(os.path.join(output_dir, filename))
             print(f"Saved {filename} with {len(combined)} rows")
         else:
             print(f"No data for {filename}")
