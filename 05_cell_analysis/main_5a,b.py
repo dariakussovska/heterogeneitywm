@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 
-mat_file_path = '/home/daria/PROJECT/data/cell_analysis/acg.mat'  
+mat_file_path = '/./data/cell_analysis/acg.mat'  
 data = loadmat(mat_file_path)
 
 acg_narrow = data['acg']['narrow'][0,0]  
