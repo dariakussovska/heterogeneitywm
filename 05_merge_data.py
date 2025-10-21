@@ -6,9 +6,9 @@ CLEAN_DATA_DIR = os.path.join(BASE_DIR, 'clean_data')
 GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 
 # Load all source data
-significant_neurons_df = pd.read_excel('/./Neuron_Check_Significant_All.xlsx')
-trial_info_df = pd.read_excel('/./trial_info.xlsx')
-brain_regions_df = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
+significant_neurons_df = pd.read_feather('/./Neuron_Check_Significant_All.feather')
+trial_info_df = pd.read_feather('/./trial_info.feather')
+brain_regions_df = pd.read_feather('/./all_neuron_brain_regions_cleaned.feather')
 
 # Filter significant neurons to only include Y or N
 significant_neurons_filtered = significant_neurons_df[significant_neurons_df['Signi'].isin(['Y', 'N'])]
@@ -18,7 +18,7 @@ def add_all_columns_to_file(file_path, sig_neurons_df, trial_info_df, brain_regi
     """Add Signi, im_cat_1st, num_images_presented, and Location to a single file"""
     
     # Load the file
-    df = pd.read_excel(file_path)
+    df = pd.read_feather(file_path)
     
     # STEP 2A: Add Signi and im_cat_1st from significant neurons
     if 'subject_id' in df.columns and 'Neuron_ID' in df.columns:
@@ -78,7 +78,7 @@ def add_all_columns_to_file(file_path, sig_neurons_df, trial_info_df, brain_regi
 # Process all clean_data files
 print("PROCESSING CLEAN_DATA FILES")
 
-clean_files = [f for f in os.listdir(CLEAN_DATA_DIR) if f.startswith('cleaned_') and f.endswith('.xlsx')]
+clean_files = [f for f in os.listdir(CLEAN_DATA_DIR) if f.startswith('cleaned_') and f.endswith('.feather')]
 
 for filename in clean_files:
     file_path = os.path.join(CLEAN_DATA_DIR, filename)
@@ -87,13 +87,13 @@ for filename in clean_files:
     df_updated = add_all_columns_to_file(file_path, significant_neurons_filtered, trial_info_df, brain_regions_df)
     
     # Save back to the same file
-    df_updated.to_excel(file_path, index=False)
+    df_updated.to_feather(file_path, index=False)
     print(f"Saved: {filename}\n")
 
 # Process all graph_data files
 print("PROCESSING GRAPH_DATA FILES")
 
-graph_files = [f for f in os.listdir(GRAPH_DATA_DIR) if f.startswith('graph_') and f.endswith('.xlsx')]
+graph_files = [f for f in os.listdir(GRAPH_DATA_DIR) if f.startswith('graph_') and f.endswith('.feather')]
 
 for filename in graph_files:
     file_path = os.path.join(GRAPH_DATA_DIR, filename)
@@ -102,5 +102,5 @@ for filename in graph_files:
     df_updated = add_all_columns_to_file(file_path, significant_neurons_filtered, trial_info_df, brain_regions_df)
     
     # Save back to the same file
-    df_updated.to_excel(file_path, index=False)
+    df_updated.to_feather(file_path, index=False)
     print(f" Saved: {filename}\n")
