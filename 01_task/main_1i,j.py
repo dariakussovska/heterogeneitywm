@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-merged_df = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
+merged_df = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
 
 def categorize_region(location):
     vmPFC = ['ventral_medial_prefrontal_cortex_left', 'ventral_medial_prefrontal_cortex_right']
@@ -58,7 +58,7 @@ ax2.pie(
 ax2.set_title('Distribution of Concept Cells Across Brain Regions')
 
 plt.tight_layout()
-output_path = "/home/daria/PROJECT/01_task/combined_distributions.eps"
+output_path = "/./01_task/combined_distributions.eps"
 plt.savefig(output_path, format='eps', dpi=300)
 plt.show()
 print(f"EPS file saved at: {output_path}")
