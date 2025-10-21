@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-BASE_DIR = '/./'
+BASE_DIR = './'
 CLEAN_DATA_DIR = os.path.join(BASE_DIR, 'clean_data')
 GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 
