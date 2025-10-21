@@ -14,8 +14,8 @@ TRIAL_WIN = 1                       # seconds per trial window (delay epoch leng
 prominence_threshold_percentile = 90 # percentile on smoothed rate
 min_inter_burst_interval = 0.14      # seconds (distance between peaks)
 PRINT_DEBUG = True
-path_all_meta   = '/./data/all_neuron_brain_regions_cleaned.feather'
-path_trials     = '/./graph_data/graph_encoding1.feather'
+path_all_meta   = '../data/all_neuron_brain_regions_cleaned.feather'
+path_trials     = '../graph_data/graph_encoding1.feather'
 
 df_metadata_all_cells = pd.read_feather(path_all_meta)
 df_enc1_filtered      = pd.read_feather(path_trials)
@@ -177,6 +177,6 @@ if __name__ == "__main__":
     plt.xticks(rotation=45)
     plt.yticks(rotation=0)
     plt.tight_layout()
-    plt.savefig(f"/./04_bursting/supp_3a.eps",
+    plt.savefig(f"./supp_3a.eps",
                 format='eps', dpi=300)
     plt.show()
