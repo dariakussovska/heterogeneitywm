@@ -4,14 +4,14 @@ from ast import literal_eval
 import matplotlib.pyplot as plt
 
 # === Load Data ===
-fixation_data = pd.read_feather('/./clean_data/cleaned_Fixation.feather')
-enc1 = pd.read_feather('/./graph_data/graph_encoding1.feather')
-enc2 = pd.read_feather('/./graph_data/graph_encoding2.feather')
-enc3 = pd.read_feather('/./graph_data/graph_encoding3.feather')
-delay = pd.read_feather('/./graph_data/graph_delay.feather')
-probe = pd.read_feather('/./graph_data/graph_probe.feather')
+fixation_data = pd.read_feather('../clean_data/cleaned_Fixation.feather')
+enc1 = pd.read_feather('../graph_data/graph_encoding1.feather')
+enc2 = pd.read_feather('../graph_data/graph_encoding2.feather')
+enc3 = pd.read_feather('../graph_data/graph_encoding3.feather')
+delay = pd.read_feather('../graph_data/graph_delay.feather')
+probe = pd.read_feather('../graph_data/graph_probe.feather')
 
-classification_df = pd.read_feather('/./all_neuron_brain_regions_cleaned.feather')
+classification_df = pd.read_feather('../all_neuron_brain_regions_cleaned.feather')
 classification_df = classification_df[
     (classification_df["Signi"] == "Y")] # & (classification_df["Cell_Type_New"] == "IN")]
 valid_neuron_ids = classification_df["Neuron_ID_3"].dropna().unique().tolist()
@@ -403,7 +403,7 @@ ax.legend()
 axs[1, 3].axis('off')
 
 plt.tight_layout(rect=[0, 0, 1, 0.96])
-save_path = "/./02_psth_decoding/PSTH_concept.eps"
+save_path = "./PSTH_concept.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 print(f"Saved EPS figure with bootstrapped confidence intervals + FDR stars to: {save_path}")
 plt.show()
