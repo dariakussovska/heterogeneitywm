@@ -1,14 +1,14 @@
 import pandas as pd
 import os
 
-BASE_DIR = '/home/daria/PROJECT'
+BASE_DIR = '/./'
 CLEAN_DATA_DIR = os.path.join(BASE_DIR, 'clean_data')
 GRAPH_DATA_DIR = os.path.join(BASE_DIR, 'graph_data')
 
 # Load all source data
-significant_neurons_df = pd.read_excel('/home/daria/PROJECT/Neuron_Check_Significant_All.xlsx')
-trial_info_df = pd.read_excel('/home/daria/PROJECT/trial_info.xlsx')
-brain_regions_df = pd.read_excel('/home/daria/PROJECT/all_neuron_brain_regions_cleaned.xlsx')
+significant_neurons_df = pd.read_excel('/./Neuron_Check_Significant_All.xlsx')
+trial_info_df = pd.read_excel('/./trial_info.xlsx')
+brain_regions_df = pd.read_excel('/./all_neuron_brain_regions_cleaned.xlsx')
 
 # Filter significant neurons to only include Y or N
 significant_neurons_filtered = significant_neurons_df[significant_neurons_df['Signi'].isin(['Y', 'N'])]
