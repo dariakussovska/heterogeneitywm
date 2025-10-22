@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import ttest_rel
 
 # Load feather
-df = pd.read_feather("../data/cell_analysis/decay_constant_change.feather")
+df = pd.read_excel("../data/cell_analysis/decay_constant_change.xlsx")
 df.columns = df.columns.str.strip()
 
 # Ensure required columns
