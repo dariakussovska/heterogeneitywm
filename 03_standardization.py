@@ -3,6 +3,7 @@ import ast
 import os
 
 BASE_DIR = './'
+DATA_DIR = './data/'
 
 filtered_files = {
     'Encoding1': os.path.join(BASE_DIR, 'all_spike_rate_data_encoding1.feather'),
@@ -93,8 +94,8 @@ for period_name, file_path in filtered_files.items():
 
 print("Standardization completed for all filtered files.")
 
-trial_info_new = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_info.feather'))
-trial_info_final = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_final.feather'))
+trial_info_new = pd.read_feather(os.path.join(DATA_DIR, 'new_trial_info.feather'))
+trial_info_final = pd.read_feather(os.path.join(DATA_DIR, 'new_trial_final.feather'))
 
 trial_info_new['subject_id'] = trial_info_new['subject_id'].astype(str).str.strip()
 trial_info_new['trial_id'] = trial_info_new['trial_id'].astype(int)
@@ -228,8 +229,8 @@ print("Fixation period cleaning and saving completed.")
 
 def create_graph_data():
     # First load and prepare trial info for graph data
-    trial_info_new_graph = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_info.feather'))
-    trial_info_final_graph = pd.read_feather(os.path.join(BASE_DIR, 'new_trial_final.feather'))
+    trial_info_new_graph = pd.read_feather(os.path.join(DATA_DIR, 'new_trial_info.feather'))
+    trial_info_final_graph = pd.read_feather(os.path.join(DATA_DIR, 'new_trial_final.feather'))
     
     trial_info_new_graph['subject_id'] = trial_info_new_graph['subject_id'].astype(str).str.strip()
     trial_info_new_graph['trial_id'] = trial_info_new_graph['trial_id'].astype(int)
