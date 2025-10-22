@@ -14,13 +14,13 @@ filtered_files = {
 }
 
 def load_enc1_start_times(enc1_path):
-    enc1_df = pd.read_xlsx(enc1_path)
+    enc1_df = pd.read_excel(enc1_path)
     return enc1_df[['subject_id', 'trial_id', 'start_time']].drop_duplicates().rename(columns={'start_time': 'start_time_enc1'})
 
 enc1_start_times = load_enc1_start_times(filtered_files['Encoding1'])
 
 def standardize_spikes(file_path, spikes_column, period_name):
-    df = pd.read_xlsx(file_path)
+    df = pd.read_excel(file_path)
     
     df = pd.merge(
         df,
@@ -69,7 +69,7 @@ def standardize_spikes(file_path, spikes_column, period_name):
 
 # Test with one file first to see the actual data structure
 print("Testing with Encoding1 file...")
-test_df = pd.read_xlsx(filtered_files['Encoding1'])
+test_df = pd.read_excel(filtered_files['Encoding1'])
 print("Sample spike data:")
 print(test_df['Spikes'].head(3))
 print("Data types:")
@@ -94,8 +94,8 @@ for period_name, file_path in filtered_files.items():
 
 print("Standardization completed for all filtered files.")
 
-trial_info_new = pd.read_xlsx(os.path.join(DATA_DIR, 'new_trial_info.xlsx'))
-trial_info_final = pd.read_xlsx(os.path.join(DATA_DIR, 'new_trial_final.xlsx'))
+trial_info_new = pd.read_excel(os.path.join(DATA_DIR, 'new_trial_info.xlsx'))
+trial_info_final = pd.read_excel(os.path.join(DATA_DIR, 'new_trial_final.xlsx'))
 
 trial_info_new['subject_id'] = trial_info_new['subject_id'].astype(str).str.strip()
 trial_info_new['trial_id'] = trial_info_new['trial_id'].astype(int)
@@ -153,7 +153,7 @@ print("All standardized data has been cleaned and saved in the clean_data folder
 fixation_file_path = os.path.join(BASE_DIR, 'all_spike_rate_data_fixation.xlsx')
 
 def standardize_fixation_period(file_path, spikes_column, start_time_column):
-    df = pd.read_xlsx(file_path)
+    df = pd.read_excel(file_path)
 
     if start_time_column in df.columns and spikes_column in df.columns:
         def standardize_row_spikes(row):
@@ -229,8 +229,8 @@ print("Fixation period cleaning and saving completed.")
 
 def create_graph_data():
     # First load and prepare trial info for graph data
-    trial_info_new_graph = pd.read_xlsx(os.path.join(DATA_DIR, 'new_trial_info.xlsx'))
-    trial_info_final_graph = pd.read_xlsx(os.path.join(DATA_DIR, 'new_trial_final.xlsx'))
+    trial_info_new_graph = pd.read_excel(os.path.join(DATA_DIR, 'new_trial_info.xlsx'))
+    trial_info_final_graph = pd.read_excel(os.path.join(DATA_DIR, 'new_trial_final.xlsx'))
     
     trial_info_new_graph['subject_id'] = trial_info_new_graph['subject_id'].astype(str).str.strip()
     trial_info_new_graph['trial_id'] = trial_info_new_graph['trial_id'].astype(int)
@@ -239,7 +239,7 @@ def create_graph_data():
     
     for period_name, file_path in filtered_files.items():
         # Load original data for this period
-        df_graph = pd.read_xlsx(file_path)
+        df_graph = pd.read_excel(file_path)
         
         # Clean and prepare the data
         df_graph['subject_id'] = df_graph['subject_id'].astype(str).str.strip()
@@ -332,7 +332,7 @@ create_graph_data()
 print("Graph data creation completed.")
 
 # For fixation graph data (already uses its own start time)
-fixation_graph_data = pd.read_xlsx(os.path.join(cleaned_data_dir, 'cleaned_Fixation.xlsx'))
+fixation_graph_data = pd.read_excel(os.path.join(cleaned_data_dir, 'cleaned_Fixation.xlsx'))
 fixation_graph_output = os.path.join(graph_data_dir, 'graph_fixation.xlsx')
 fixation_graph_data.to_excel(fixation_graph_output)
 print(f"Fixation graph data saved to: {fixation_graph_output}")
