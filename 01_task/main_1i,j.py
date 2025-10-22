@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-merged_df = pd.read_excel('../all_neuron_brain_regions_cleaned.xlsx')
+merged_df = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
 
 def categorize_region(location):
     vmPFC = ['ventral_medial_prefrontal_cortex_left', 'ventral_medial_prefrontal_cortex_right']
