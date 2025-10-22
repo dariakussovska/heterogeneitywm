@@ -8,13 +8,13 @@ import os
 from tqdm import tqdm
 from statsmodels.stats.multitest import multipletests
 
-trial_info = pd.read_feather('../new_trial_final.feather')
+trial_info = pd.read_excel('../new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
 
 y_matrix = subject_trials
-df_delay_filtered = pd.read_feather('../graph_data/graph_delay.feather')
-df_fixation = pd.read_feather('../clean_data/cleaned_Fixation.feather')
+df_delay_filtered = pd.read_excel('../graph_data/graph_delay.xlsx')
+df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
 
 y_matrix = y_matrix.reset_index(drop=True)
 
