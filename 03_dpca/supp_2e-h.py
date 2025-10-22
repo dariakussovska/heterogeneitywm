@@ -28,9 +28,9 @@ print(R_train_centered.shape, RD_train_centered.shape)
 dpca_maintenance = dPCA(labels='st', regularizer='auto')
 dpca_maintenance.opt_regularizer_flag = True  # Enable regularization optimization
 dpca_maintenance.protect = []  # No axes are protected
-Z_maintenance = dpca_maintenance.fit_transform(RD_train_centered, trialD)
+Z_maintenance = dpca_maintenance.fit_transform(RD_train_centered, trialD) ### FOR FIG S2E and S2F, CHANGE (RD_train_centered, trialD) to (R_train_centered, trialX)
 
-ZD_test = dpca_maintenance.transform(RD_train_centered)
+ZD_test = dpca_maintenance.transform(RD_train_centered)  ### FOR FIG S2E and S2F, CHANGE TO (R_train_centered)
 
 for key in dpca_maintenance.explained_variance_ratio_:
     variance_components = dpca_maintenance.explained_variance_ratio_[key]
@@ -44,7 +44,7 @@ marginalization_key = 's'
 Z_encoding_train = ZD_test[marginalization_key]
 
 # Define conditions to plot (e.g., stimuli 2-5)
-condition_range = [1, 2, 3, 4] 
+condition_range = [1, 2, 3, 4] ### OR FOR FIG. S2E and S2G, CHANGE TO [0,1,2,3]
 colors = ['red', 'blue', 'green', 'black', 'purple']
 
 fig = plt.figure(figsize=(10, 8))
