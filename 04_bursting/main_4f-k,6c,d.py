@@ -31,14 +31,14 @@ OVERLAP  = 1
 # =========================
 # Load data
 # =========================
-df_metadata  = pd.read_feather('../Clustering_3D.feather')
-df_metadata2 = pd.read_feather('../data/all_neuron_brain_regions_cleaned.feather')
+df_metadata  = pd.read_excel('../Clustering_3D.xlsx')
+df_metadata2 = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
 
-df_enc1  = pd.read_feather('../graph_data/graph_encoding1.feather')
-df_enc2  = pd.read_feather('../graph_data/graph_encoding2.feather')
-df_enc3  = pd.read_feather('../graph_data/graph_encoding3.feather')
-df_delay = pd.read_feather('../graph_data/graph_delay.feather')
-df_probe = pd.read_feather('../graph_data/graph_probe.feather')
+df_enc1  = pd.read_excel('../graph_data/graph_encoding1.xlsx')
+df_enc2  = pd.read_excel('../graph_data/graph_encoding2.xlsx')
+df_enc3  = pd.read_excel('../graph_data/graph_encoding3.xlsx')
+df_delay = pd.read_excel('../graph_data/graph_delay.xlsx')
+df_probe = pd.read_excel('../graph_data/graph_probe.xlsx')
 
 # Convenience filtered/meta frames
 df_metadata_decay_acg = df_metadata[df_metadata['R2'] > 0.3].copy()
