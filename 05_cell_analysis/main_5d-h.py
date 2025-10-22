@@ -6,8 +6,8 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # Load data
-file_path = "../Clustering_3D.feather"
-data = pd.read_feather(file_path)
+file_path = "../Clustering_3D.xlsx"
+data = pd.read_excel(file_path)
 data.columns = data.columns.str.strip()
 
 metrics = ["firing_rate", "acg_norm","tau_rise", "Burst"]
