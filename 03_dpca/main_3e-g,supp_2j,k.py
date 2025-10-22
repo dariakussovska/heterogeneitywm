@@ -67,9 +67,9 @@ RD_late_test_centered  = RD_late_test - RD_late_test_mean
 
 dpca_early = dPCA(labels='st', regularizer='auto')
 dpca_early.opt_regularizer_flag = True  # Enable regularization optimization
-dpca_early.protect = []  # No axes are protected
-Z_early_again = dpca_early.fit_transform(RD_early_train_centered, early_train)
-Z_early_test = dpca_early.transform(RD_early_test_centered)
+dpca_early.protect = []  
+Z_early_again = dpca_early.fit_transform(RD_early_train_centered, early_train) ### FOR FIG.3F AND FIG.S2K CHANGE (RD_early_train_centered, early_train) to (RD_late_train_centered, late_train). LEAVE AS IS FOR FIG.3G and FIG. S2J. 
+Z_early_test = dpca_early.transform(RD_early_test_centered) ### FOR FIG.3F and 3G, CHANGE TO RD_late_test_centered. FOR FIG.S2J, CHANGE TO RD_early_train_centered. FOR FIG. S2K, CHANGE TO RD_late_train_centered. 
 
 for key in dpca_early.explained_variance_ratio_:
     variance_components = dpca_early.explained_variance_ratio_[key]
