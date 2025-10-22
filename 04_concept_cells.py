@@ -25,7 +25,7 @@ def compute_firing_rate(df, start_time=0.2, end_time=1.0):
 
 # Load input xlsx file
 input_path = "./clean_data/cleaned_Encoding1.xlsx"
-df = pd.read_xlsx(input_path)
+df = pd.read_excel(input_path)
 
 # Compute firing rates
 df = compute_firing_rate(df)
