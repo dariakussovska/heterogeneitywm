@@ -14,11 +14,11 @@ TRIAL_WIN = 1                       # seconds per trial window (delay epoch leng
 prominence_threshold_percentile = 90 # percentile on smoothed rate
 min_inter_burst_interval = 0.14      # seconds (distance between peaks)
 PRINT_DEBUG = True
-path_all_meta   = '../data/all_neuron_brain_regions_cleaned.feather'
-path_trials     = '../graph_data/graph_encoding1.feather'
+path_all_meta   = '../data/all_neuron_brain_regions_cleaned.xlsx'
+path_trials     = '../graph_data/graph_encoding1.xlsx'
 
-df_metadata_all_cells = pd.read_feather(path_all_meta)
-df_enc1_filtered      = pd.read_feather(path_trials)
+df_metadata_all_cells = pd.read_excel(path_all_meta)
+df_enc1_filtered      = pd.read_excel(path_trials)
 
 def parse_spike_entry(val):
     ""Parse a spike string/list and keep spikes within [0, TRIAL_WIN]."""
