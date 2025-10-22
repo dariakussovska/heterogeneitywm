@@ -8,7 +8,7 @@ from statsmodels.stats.multitest import multipletests
 # Load data
 df_delay = pd.read_excel('../graph_data/graph_delay.xlsx')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
-df_regions = pd.read_excel('../all_neuron_brain_regions_cleaned.xlsx')
+df_regions = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
 trial_info = pd.read_excel('../trial_info.xlsx')
 
 region_groups = {
