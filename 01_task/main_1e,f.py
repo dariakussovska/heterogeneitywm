@@ -10,12 +10,12 @@ y_matrix = subject_trials
 
 # 1) Load Your Main Data
 
-df_delay_filtered = pd.read_excel('../graph_delay.xlsx')
+df_delay_filtered = pd.read_excel('../graph_data/graph_delay.xlsx')
 y_matrix = y_matrix.reset_index(drop=True)
 
 # 2) Load Neuron Locations Data (for location-based filtering)
 
-df_neuron_locations = pd.read_excel('../merged_significant_neurons_with_brain_regions.xlsx')
+df_neuron_locations = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
 
 # Example list of desired locations for filtering
 desired_locations = ['amygdala_left', 'amygdala_right', 'hippocampus_left', 'hippocampus_right', 'pre_supplementary_motor_area_right', 'pre_supplementary_motor_area_left',
