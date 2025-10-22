@@ -11,13 +11,13 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # ===================== PATHS =====================
-in_path  = "../data/cell_analysis/validation_data.feather"
-out_feather = "./Validation_clustering.feather"
+in_path  = "../data/cell_analysis/validation_data.xlsx"
+out_feather = "./Validation_clustering.xlsx"
 fig_dir  = "./"
 os.makedirs(fig_dir, exist_ok=True)
 
 # ===================== LOAD ONCE =====================
-df = pd.read_feather(in_path)
+df = pd.read_excel(in_path)
 df.columns = df.columns.str.strip()
 
 # Columns we’ll need
