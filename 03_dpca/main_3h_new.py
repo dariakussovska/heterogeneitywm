@@ -133,7 +133,7 @@ def run_dpca_distance_resampling_stratified(
 
         dpca_late = dPCA(labels="st", regularizer="auto")
         dpca_late.opt_regularizer_flag = True
-        dpca_late.protect = ['t']
+        dpca_late.protect = []
         Z_late_train = dpca_late.fit_transform(RD_late_train, trialX_late_train)
         Z_late_test  = dpca_late.transform(RD_late_test)
         
