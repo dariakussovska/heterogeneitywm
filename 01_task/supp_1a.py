@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the feather file
-file_path = "./all_spike_rate_data_probe.xlsx"  
+file_path = "../all_spike_rate_data_probe.xlsx"  
 df = pd.read_excel(file_path)
 
 accuracy_df = df.groupby('subject_id')['response_accuracy'].agg(['sum', 'count'])
