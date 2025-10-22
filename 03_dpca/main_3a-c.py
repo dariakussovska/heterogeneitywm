@@ -58,10 +58,10 @@ RD_D_test  = centre_over_neurons(np.mean(trialD_test,  axis=0))
 
 dpca_enc = dPCA(labels='st', regularizer='auto')
 dpca_enc.opt_regularizer_flag = True  # Enable regularization optimization
-dpca_enc.protect = []  # No axes are protected
-Z = dpca_enc.fit_transform(RD_E_train, trialE_train)
+dpca_enc.protect = []  
+Z = dpca_enc.fit_transform(RD_E_train, trialE_train) ### CHANGE TO (RD_D_train, trialD_train) IF YOU WANT TO OBTAIN FIG.3B. IF YOU WANT TO OBTAIN FIG.3C LEAVE AS IS. 
 
-Z_test = dpca_enc.transform(RD_E_test)
+Z_test = dpca_enc.transform(RD_E_test) ### CHANGE TO RD_D_test IF YOU WANT TO OBTAIN FIG.3B AND FIG.3C.
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
