@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-file_path = "../Clustering_3D.feather"
+file_path = "../Clustering_3D.xlsx"
 data = pd.read_excel(file_path)
 
 # Clean column names
