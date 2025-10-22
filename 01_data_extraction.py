@@ -395,17 +395,17 @@ def process_all_files(filepaths: List[str]) -> None:
     def save_data(data_list, filename):
         if data_list:
             combined = pd.concat([d for d in data_list if not d.empty], ignore_index=True)
-            combined.to_feather(os.path.join(output_dir, filename))
+            combined.to_excel(os.path.join(output_dir, filename), index=False)
             print(f"Saved {filename} with {len(combined)} rows")
         else:
             print(f"No data for {filename}")
     
-    save_data(all_enc1, "all_spike_rate_data_encoding1.feather")
-    save_data(all_enc2, "all_spike_rate_data_encoding2.feather") 
-    save_data(all_enc3, "all_spike_rate_data_encoding3.feather")
-    save_data(all_fixation, "all_spike_rate_data_fixation.feather")
-    save_data(all_delay, "all_spike_rate_data_delay.feather")
-    save_data(all_probe, "all_spike_rate_data_probe.feather")
+    save_data(all_enc1, "all_spike_rate_data_encoding1.xlsx")
+    save_data(all_enc2, "all_spike_rate_data_encoding2.xlsx") 
+    save_data(all_enc3, "all_spike_rate_data_encoding3.xlsx")
+    save_data(all_fixation, "all_spike_rate_data_fixation.xlsx")
+    save_data(all_delay, "all_spike_rate_data_delay.xlsx")
+    save_data(all_probe, "all_spike_rate_data_probe.xlsx")
     
     print("All data processing complete!")
 
