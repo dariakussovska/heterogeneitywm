@@ -24,7 +24,7 @@ def compute_firing_rate(df, start_time=0.2, end_time=1.0):
     return df
 
 # Load input feather file
-input_path = "/./clean_data/cleaned_Encoding1.feather"
+input_path = "./clean_data/cleaned_Encoding1.feather"
 df = pd.read_feather(input_path)
 
 # Compute firing rates
@@ -110,7 +110,7 @@ def run_significance_test(df, iteration=1000):
     return df
 
 df_final = run_significance_test(df_top_2)
-df_final.to_feather('/./Neuron_Check_Significant_All.feather')
+df_final.to_feather('./Neuron_Check_Significant_All.feather')
 print("Final file saved at: Neuron_Check_Significant_All.feather")
 
 significant_neurons = df_final[df_final['Signi'] == 'Y']
