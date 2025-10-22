@@ -190,7 +190,8 @@ Here, we fit the spike trains of individual neurons to a Poisson GLM model to se
 - The script 01_task >> main_e,f.py loads trial data and task relevant features. For this script we are using the trials, balanced by load, as this is our main point of interest.
 - It prepares an X matrix with the relevant neurons that you want to use. There are options for concept cells vs all cells, as well as just PY or IN cells. You can also load the neuronal locations if you want to do a region-specific analysis (as done in our Fig. 1).
 - It defines region labels, combining left and right neurons from the same brain regions (neurons with amygdala_left and amygdala_right locations are put under the same underlying label -- amygdala). 
-- Lastly, the script identifes brain regions where the neural activity is significantly modulated by a task variable. See our methods and the description in the notebook for detailed explanation of the procedure and statistical analysis. This notebook allows the creation of the following figures in our paper: Fig. 1e,f ; Fig. 6e,f; Fig. S5 e;f. 
+- Lastly, the script identifes brain regions where the neural activity is significantly modulated by a task variable. See our methods and the description in the notebook for detailed explanation of the procedure and statistical analysis. This notebook allows the creation of the following figures in our paper: Fig. 1e,f ; Fig. 6e,f; Fig. S5 e;f.
+- CURRENTLY THE SCRIPTS ARE SET UP FOR FIG. 1E and Fig. 6E only. IN ORDER TO OBTAIN FIG. 1F, CHANGE LINE 149 OF THE CODE (num_images_presented >> probe). 
 
 **Inputs:**
 
