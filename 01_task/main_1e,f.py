@@ -86,7 +86,7 @@ for trial_index, trial_row in y_matrix.iterrows():
             (df_delay_filtered['Neuron_ID_3'] == neuron_id)
         ]
         if not df_subset.empty:
-            spike_times_str = df_subset['Standardized_Spikes_in_Delay'].values[0]
+            spike_times_str = df_subset['Standardized_Spikes'].values[0]
             spikes_for_this_trial.extend(parse_spike_times(spike_times_str))
 
         design_matrix[trial_index, neuron_index] = np.array(spikes_for_this_trial)
