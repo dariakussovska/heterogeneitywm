@@ -10,7 +10,6 @@ acg_narrow = data['acg']['narrow'][0,0]
 # Create time axis from -50 ms to 50 ms for 201 points
 time_axis = np.linspace(-50, 50, 201)
 
-# Plot only neurons 10-20 (11 neurons total)
 start_neuron = 19
 end_neuron = 38
 neurons_to_plot = range(start_neuron, end_neuron + 1)
