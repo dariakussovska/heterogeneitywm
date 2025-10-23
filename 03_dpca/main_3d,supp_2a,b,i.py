@@ -224,7 +224,7 @@ measure_dict, kw_p, dunn_df, explvar_enc, explvar_maint = run_dpca_distance_resa
                 n_iter        = 100,              
                 selected_dpcs = (0,1,2,3,4),      # which dPCs enter the distance
                 stim_indices  = (0,1,2,3,4),      # which of the 5 stimuli to keep
-                savefig_path  = "./variance.eps",
+                savefig_path  = "./distance_enc_maint.eps",
                 random_seed   = 1
         )
 
@@ -232,12 +232,12 @@ measure_dict, kw_p, dunn_df, explvar_enc, explvar_maint = run_dpca_distance_resa
 fig, ax = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 
 # Encoding
-ax[0].boxplot(explvar_enc[:, :5])
+ax[0].boxplot(explvar_enc[:, :5]*100)
 ax[0].set_title("Encoding")
-ax[0].set_ylabel("explained variance  (%)")
+ax[0].set_ylabel("Explained variance (%)")
 
 # Maintenance
-ax[1].boxplot(explvar_maint[:, :5])
+ax[1].boxplot(explvar_maint[:, :5]*100)
 ax[1].set_title("Maintenance")
 
 plt.suptitle(f"Variance explained across 100 splits")
