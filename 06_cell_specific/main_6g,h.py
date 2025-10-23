@@ -182,7 +182,7 @@ ax.set_xticklabels(labels)
 ax.legend()
 plt.tight_layout()
 save_path = "./main_6gh.eps"
-plt.savefig(save_path, format='eps', dpi=300
+plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
 
 # Print p-values
