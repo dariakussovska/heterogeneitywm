@@ -9,7 +9,7 @@ def generate_filtered_spike_trains(df_encoding, df_delay, cell_type_map,
                                    encoding_duration=1,
                                    delay_duration=2.5,
                                    preferred_col='Category',
-                                   preferred_label='Preferred'):
+                                   preferred_label='Preferred'): ### CHANGE TO "Non-Preferred" FOR FIG 6H
     """
     Returns:
     spike_dict[neuron_uid] = {
@@ -82,8 +82,8 @@ import numpy as np
 
 # Load your metadata and spikes
 df_meta = pd.read_excel('../Clustering_3D.xlsx')
-df_encoding = pd.read_excel('../clean_data/graph_encoding1.xlsx')
-df_delay    = pd.read_excel('../clean_data/graph_dela.xlsx')
+df_encoding = pd.read_excel('../graph_data/graph_encoding1.xlsx')
+df_delay    = pd.read_excel('../graph_data/graph_dela.xlsx')
 
 # Filter metadata to significant neurons
 df_meta = df_meta[df_meta['Signi'] == 'Y']
