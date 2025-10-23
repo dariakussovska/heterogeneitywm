@@ -31,6 +31,9 @@ neurons_in_desired_locations = df_neuron_locations[
 #    (df_neuron_locations['Signi'] == 'Y')
 #]['Neuron_ID_3'].unique()
 
+df_delay_filtered = df_delay_filtered[
+    df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations)
+ ]
 
 # 5) Build the Design Matrix
 # We'll gather the final list of neurons from the filtered df_delay_filtered
