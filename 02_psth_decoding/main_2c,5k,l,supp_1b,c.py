@@ -13,7 +13,7 @@ probe = pd.read_excel('../graph_data/graph_probe.xlsx')
 
 classification_df = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
 classification_df = classification_df[
-    (classification_df["Signi"] == "Y")] # & (classification_df["Cell_Type_New"] == "IN")]
+    (classification_df["Signi"] == "Y")] # & (classification_df["Cell_Type_New"] == "IN")]  ### UNCOMMENT TO GET FIG 5L and UNCOMMENT AND CHANGE TO "PY" INSTEAD OF "IN" TO GET FIG5K
 valid_neuron_ids = classification_df["Neuron_ID_3"].dropna().unique().tolist()
 
 # === Time Bins ===
