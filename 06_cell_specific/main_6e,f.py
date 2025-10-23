@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import PoissonRegressor
 from tqdm import tqdm
 
-trial_info = pd.read_excel('../new_trial_info.xlsx')
+trial_info = pd.read_excel('../data/new_trial_info.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 1][['new_trial_id', 'num_images_presented', 'stimulus_index', 'RT', 'response_accuracy']]
 y_matrix = subject_trials
 
