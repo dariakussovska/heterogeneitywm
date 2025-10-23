@@ -109,7 +109,7 @@ for category in categories:
         subject_counts = df_metadata["subject_id"].value_counts()
         threshold = 10
     elif category in ["5_lowest_ACG", "5_highest_ACG"]:
-        eligible = df_metadata[df_metadata["R2"] > 0.3].dropna(subset=["ACG_Norm"])
+        eligible = df_metadata[df_metadata["R2"] > 0.3].dropna(subset=["acg_norm"])
         subject_counts = eligible["subject_id"].value_counts()
         threshold = PER_SUBJ
     else:  # 5_lowest_decay / 5_highest_decay
@@ -133,7 +133,7 @@ for group in categories:
         df_meta_r2 = df_meta[df_meta['R2'] > 0.3].copy()
 
         # Per-subject low/high splits with overlap for ACG & Decay (from R2-filtered)
-        low_acg,  high_acg  = split_low_high(df_meta_r2, "ACG_Norm", per_subj=PER_SUBJ, overlap=OVERLAP)
+        low_acg,  high_acg  = split_low_high(df_meta_r2, "acg_norm", per_subj=PER_SUBJ, overlap=OVERLAP)
         low_dec,  high_dec  = split_low_high(df_meta_r2, "Decay",    per_subj=PER_SUBJ, overlap=OVERLAP)
 
         # Concept cells (from df_metadata2 to be safe)
