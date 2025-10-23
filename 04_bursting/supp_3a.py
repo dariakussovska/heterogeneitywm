@@ -21,7 +21,6 @@ df_metadata_all_cells = pd.read_excel(path_all_meta)
 df_enc1_filtered      = pd.read_excel(path_trials)
 
 def parse_spike_entry(val):
-    ""Parse a spike string/list and keep spikes within [0, TRIAL_WIN]."""
     if val is None:
         return np.array([], dtype=float)
     if isinstance(val, str):
@@ -40,14 +39,12 @@ def parse_spike_entry(val):
     return arr[(arr >= 0.0) & (arr <= TRIAL_WIN)]
 
 def first_nonnull_series(series):
-    """Return at most one spike-list cell to avoid double-counting duplicates."""
     for v in series:
         if v is not None and not (isinstance(v, float) and np.isnan(v)):
             return [v]
     return []
 
 def subjects_for_all_cells():
-    """Subjects eligible for All_cells category."""
     counts = df_metadata_all_cells["subject_id"].value_counts()
     return counts[counts >= 10].index.tolist()
 
@@ -55,8 +52,7 @@ def subjects_for_all_cells():
 # Grid Search Function
 # =========================
 def run_grid_search():
-    """Run grid search over bin sizes and sigma values for All_cells condition."""
-    
+
     # Get eligible subjects
     subj_ids = subjects_for_all_cells()
 
