@@ -10,12 +10,13 @@ file_path = "../Clustering_3D.xlsx"
 data = pd.read_excel(file_path)
 data.columns = data.columns.str.strip()
 
-metrics = ["firing_rate", "acg_norm","tau_rise", "Burst"]
+metrics = ["firing_rate", "acg_norm","tau_rise", "Burst", "CV2"]
 labels = {
     "firing_rate": "Firing Rate",
     "acg_norm": "ACG (Norm)",
     "tau_rise": "τ Rise",
-    "Burst": "burst"
+    "Burst": "burst",
+    "CV2": "CV2"
 }
 
 # Group separation
@@ -116,7 +117,7 @@ for i, metric in enumerate(metrics):
     )
 
     # Metric-specific y-limits first (so annotation can adapt)
-    if metric == "burst":
+    if metric == "Burst":
         ax.set_ylim(-1, 10)
     elif metric == "ACG_Norm":
         ax.set_ylim(-0.1, 1)
