@@ -19,43 +19,18 @@ y_matrix = y_matrix.reset_index(drop=True)
 df_neuron_locations = pd.read_excel('../Clustering_3D.xlsx')
 
 desired_locations = ['PY', 'IN']
-# We'll compute the set of neurons that are in these locations:
 
+### LIKE THIS IT PRODUCES FIG.6E and FIG.S5F
 neurons_in_desired_locations = df_neuron_locations[
     df_neuron_locations['Cell_Type_New'].isin(desired_locations)
 ]['Neuron_ID_3'].unique()
 
-# 3) Prepare an Optional Hard-Coded List 
-
-#significant_neurons_manual = [401, 403, 4052, 509, 708, 7015, 8065, 1307, 14013, 14016, 16015, 16028, 16030]
-
-# 4) Filter Options – Uncomment Exactly ONE
-
-# Option A: Keep all valid Neuron_ID_3 (no location, no significance)
-#df_delay_filtered = df_delay_filtered[df_delay_filtered['Neuron_ID_3'].notna()]
-
-# Option B: Keep Neuron_ID_3 where Significance == 'Y' (ignore location)
-#df_delay_filtered = df_delay_filtered[
-#     df_delay_filtered['Neuron_ID_3'].notna() &
-#     (df_delay_filtered['Significance'] == 'Y')
-# ]
-
-# Option C: Keep only neurons found in desired locations (ignore significance)
-#df_delay_filtered = df_delay_filtered[
-#     (df_delay_filtered['Significance'] == 'Y') & df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations)
- #]
-
-# Option D: Keep only neurons found in desired locations AND Significance == 'Y'
+# UNCOMMENT TO GET FIG.6F and FIG.SE
 #df_delay_filtered = df_delay_filtered[
 #     df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations) &
 #     (df_delay_filtered['Significance'] == 'Y')
 #]
-    
-# --- Option E: Keep a manually specified list of neuron IDs (ignore location, significance)
-df_delay_filtered = df_delay_filtered[
-    df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations)
- ]
-#
+
 
 # 5) Build the Design Matrix
 # We'll gather the final list of neurons from the filtered df_delay_filtered
@@ -94,7 +69,7 @@ df_design_matrix = pd.DataFrame(
 )
 
 delay_start = 0.0
-delay_end   = 2.5   # set to your exact window
+delay_end   = 2.5   
 
 def count_spikes_in_window(spike_times, start, end):
     if spike_times is None or len(spike_times) == 0:
@@ -130,11 +105,11 @@ alpha_neuron = 0.05      # per-neuron significance threshold (via null quantile)
 
 # Inputs
 # counts_matrix: [n_trials x n_neurons] or [n_trials x n_neurons x timebins]
-# subject_trials: DataFrame with 'RT_Median' and (optional) 'subject_id'
+# subject_trials: DataFrame with 'RT' and 'subject_id'
 # region_labels: array-like [n_neurons], region string per neuron
 
 neural_data = counts_matrix
-X_raw = subject_trials['num_images_presented'].to_numpy().astype(float)
+X_raw = subject_trials['num_images_presented'].to_numpy().astype(float) ###CHANGE TO RT FOR FIG S5F and 6F.
 cell_type_labels = np.asarray(region_labels)  
 
 if neural_data.ndim == 3:
@@ -195,7 +170,7 @@ sig_obs_neuron = (np.abs(real_slopes) >= thr_per_neuron)
 # 4) Null distribution of "number of significant neurons" per region
 #     p-value = (# null iterations >= observed) / (# iterations)
 # =====================
-types = ['amygdala', 'hippocampus', 'preSMA', 'vmPFC', 'dACC']
+types = ['PY', 'IN']
 summary_rows = []
 null_counts_by_type = {}
 
