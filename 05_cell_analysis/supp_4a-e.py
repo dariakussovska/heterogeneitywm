@@ -12,7 +12,7 @@ from statsmodels.stats.multitest import multipletests
 
 # ===================== PATHS =====================
 in_path  = "../data/cell_analysis/validation_data.xlsx"
-out_feather = "./Validation_clustering.xlsx"
+out_excel = "./Validation_clustering.xlsx"
 fig_dir  = "./"
 os.makedirs(fig_dir, exist_ok=True)
 
@@ -203,7 +203,7 @@ metrics_fig_path = os.path.join(fig_dir, "supp_4ad.eps")
 plt.savefig(metrics_fig_path, format="eps", dpi=300)
 plt.show()
 
-df.to_feather(out_feather, index=False)
+df.to_excel(out_excel, index=False)
 print(f"\nSaved once to: {out_feather}")
 print(f"UMAP fig:    {umap_fig_path}")
 print(f"Metrics fig: {metrics_fig_path}")
