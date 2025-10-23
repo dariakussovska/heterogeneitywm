@@ -9,12 +9,12 @@ from scipy.signal.windows import gaussian
 # =========================
 # Parameters
 # =========================
-bin_size = 0.07                     # seconds
-TRIAL_WIN = 1                       # seconds per trial window; change to 2.8 for Delay
+bin_size = 0.07                    
+TRIAL_WIN = 1                       # seconds per trial window; CHANGE TO 2.8 FOR MAINTENANCE
 GLOBAL_SEED = 5
-sigma_sec = 0.04                    # Gaussian kernel SD in seconds
+sigma_sec = 0.04                    # Gaussian kernel 
 prominence_threshold_percentile = 90 # percentile on smoothed rate
-min_inter_burst_interval = 0.14      # seconds (distance between peaks)
+min_inter_burst_interval = 0.14     
 N_SURROGATES = 100                   # Poisson repetitions per subject
 PRINT_DEBUG = True
 
@@ -27,7 +27,7 @@ min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 # =========================
 path_decay_acg  = '../Clustering_3D.xlsx'
 path_all_meta   = '../data/all_neuron_brain_regions_cleaned.xlsx'
-path_trials     = '../graph_data/graph_encoding1.xlsx'
+path_trials     = '../graph_data/graph_encoding1.xlsx' ### CHANGE TO graph_maintenance.xlsx TO GET MAINTENANCE BURSTS
 
 # =========================
 # Load data
