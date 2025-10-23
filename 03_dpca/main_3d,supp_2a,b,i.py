@@ -240,7 +240,7 @@ ax[0].set_ylabel("explained variance  (%)")
 ax[1].boxplot(explvar_maint[:, :5])
 ax[1].set_title("Maintenance")
 
-plt.suptitle(f"Variance explained across {n_iter} splits")
+plt.suptitle(f"Variance explained across 100 splits")
 plt.tight_layout()
 plt.savefig("./enc_maintenance_training_var.eps", format='eps', bbox_inches='tight', dpi=300)
 plt.show()
