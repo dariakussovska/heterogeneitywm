@@ -11,8 +11,8 @@ acg_narrow = data['acg']['narrow'][0,0]
 time_axis = np.linspace(-50, 50, 201)
 
 # Plot only neurons 10-20 (11 neurons total)
-start_neuron = 20
-end_neuron = 40
+start_neuron = 19
+end_neuron = 38
 neurons_to_plot = range(start_neuron, end_neuron + 1)
 num_neurons_to_plot = len(neurons_to_plot)
 
