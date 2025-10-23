@@ -213,9 +213,12 @@ def run_dpca_distance_resampling_E_vs_D(
         print(f"Figure saved to {savefig_path}")
     plt.show()
 
-    return measure_dict, kw_p, dunn_df, explvar_enc, explvar_maint
+    explvar_enc_arr = np.vstack(explvar_enc) #New addition
+    explvar_maint_arr  = np.vstack(explvar_maint)  #New addition
 
-measure_dict, kw_p, dunn_df, explE, explD = run_dpca_distance_resampling_E_vs_D(
+    return measure_dict, kw_p, dunn_df, explvar_enc_arr, explvar_maint_arr
+
+measure_dict, kw_p, dunn_df, explvar_enc, explvar_maint = run_dpca_distance_resampling_E_vs_D(
                 trialE,
                 trialD,
                 n_iter        = 100,              
@@ -226,19 +229,18 @@ measure_dict, kw_p, dunn_df, explE, explD = run_dpca_distance_resampling_E_vs_D(
         )
 
 
-n_iter, n_dpcs = explE.shape
 labels = [f"dPC{i+1}" for i in range(n_dpcs)]
 
 fig, ax = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
 
 # Encoding
-ax[0].boxplot(explE * 100, labels=labels, patch_artist=True,
+ax[0].boxplot(explvar_enc * 100, labels=labels, patch_artist=True,
               medianprops={"color": "k"})
 ax[0].set_title("Encoding")
 ax[0].set_ylabel("explained variance  (%)")
 
 # Maintenance
-ax[1].boxplot(explD * 100, labels=labels, patch_artist=True,
+ax[1].boxplot(explvar_maint * 100, labels=labels, patch_artist=True,
               medianprops={"color": "k"})
 ax[1].set_title("Maintenance")
 
