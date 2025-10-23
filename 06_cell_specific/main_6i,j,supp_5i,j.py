@@ -13,6 +13,7 @@ subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', '
 print(subject_trials)
 
 y_matrix = subject_trials
+df_clustering = pd.read_excel('../Clustering_3D.xlsx')
 df_delay_filtered = pd.read_excel('../graph_data/graph_delay.xlsx')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
 
