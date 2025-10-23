@@ -134,7 +134,7 @@ def subject_metadata_for_category(category, subject_id):
 def choose_neurons(category, df_subject_metadata):
     """Return Neuron_ID_3 list for this subject & category, using the new per-subject split for ACG/Decay."""
     if category in ("Lowest_ACG", "Highest_ACG"):
-        low_ids, high_ids = _split_low_high_for_subject(df_subject_metadata, feature="ACG_Norm")
+        low_ids, high_ids = _split_low_high_for_subject(df_subject_metadata, feature="acg_norm")
         return low_ids if category == "Lowest_ACG" else high_ids
 
     elif category in ("Lowest_decay", "Highest_decay"):
@@ -162,7 +162,7 @@ def subjects_for_category(category):
     - Other categories keep your previous logic (thresholds unchanged unless noted).
     """
     if category in ("Lowest_ACG", "Highest_ACG"):
-        eligible = df_metadata_decay_acg.dropna(subset=["ACG_Norm"])
+        eligible = df_metadata_decay_acg.dropna(subset=["acg_norm"])
         counts = eligible.groupby("subject_id")["Neuron_ID_3"].count()
         return counts[counts >= PER_SUBJ].index.tolist()
 
