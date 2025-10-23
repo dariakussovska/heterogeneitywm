@@ -12,7 +12,7 @@ probe_data_full = pd.read_excel('../graph_data/graph_probe.xlsx')
 
 from ast import literal_eval
 
-# === SET NEURON OF INTEREST ===
+# === SET NEURON OF INTEREST === FOR FIG 5I SET SUBJECT_ID to 12 and NEURON_ID to 12
 subject_id = 4
 neuron_id = 52
 
