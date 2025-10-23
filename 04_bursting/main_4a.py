@@ -33,7 +33,7 @@ neuron_spike_counts = {}  # (neuron_id, trial_idx) -> spikes count
 for trial_idx, trial_id in enumerate(sorted(keep_trials)):
     df_trial = df_subject[df_subject['trial_id'] == trial_id]
     for neuron_idx, neuron_id in enumerate(sorted(df_trial['Neuron_ID'].unique())):
-        ser = df_trial[df_trial['Neuron_ID'] == neuron_id]['Standardized_Spikes_New'].dropna()
+        ser = df_trial[df_trial['Neuron_ID'] == neuron_id]['Standardized_Spikes'].dropna()
         spike_list = []
         for s in ser:
             if s != '[]':
