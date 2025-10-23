@@ -29,40 +29,7 @@ neurons_in_desired_locations = df_neuron_locations[
     df_neuron_locations['Location'].isin(desired_locations)
 ]['Neuron_ID_3'].unique()
 
-# 3) Prepare an Optional Hard-Coded List 
-
-#significant_neurons_manual = [401, 403, 4052, 509, 708, 7015, 8065, 1307, 14013, 14016, 16015, 16028, 16030]
-
-# 4) Filter Options – Uncomment Exactly ONE
-
-# Option A: Keep all valid Neuron_ID_3 (no location, no significance)
-#df_delay_filtered = df_delay_filtered[df_delay_filtered['Neuron_ID_3'].notna()]
-
-# Option B: Keep Neuron_ID_3 where Significance == 'Y' (ignore location)
-#df_delay_filtered = df_delay_filtered[
-#     df_delay_filtered['Neuron_ID_3'].notna() &
-#     (df_delay_filtered['Significance'] == 'Y')
-# ]
-
-# Option C: Keep only neurons found in desired locations (ignore significance)
-#df_delay_filtered = df_delay_filtered[
-#     (df_delay_filtered['Significance'] == 'Y') & df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations)
- #]
-
-# Option D: Keep only neurons found in desired locations AND Significance == 'Y'
-#df_delay_filtered = df_delay_filtered[
-#     df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations) &
-#     (df_delay_filtered['Significance'] == 'Y')
-#]
-    
-# --- Option E: Keep a manually specified list of neuron IDs (ignore location, significance)
-df_delay_filtered = df_delay_filtered[
-    df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations)
- ]
-#
-
-# 5) Build the Design Matrix
-# We'll gather the final list of neurons from the filtered df_delay_filtered
+# Design matrix
 final_neurons = df_delay_filtered['Neuron_ID_3'].unique()
 final_neurons = sorted(final_neurons)
 
@@ -141,11 +108,6 @@ rng = np.random.default_rng(SEED)
 
 n_iterations = 1000      # bootstrap null iterations
 alpha_neuron = 0.05      # per-neuron significance threshold (via null quantile)
-
-# Inputs
-# counts_matrix: [n_trials x n_neurons] or [n_trials x n_neurons x timebins]
-# subject_trials: DataFrame with 'RT_Median' and (optional) 'subject_id'
-# region_labels: array-like [n_neurons], region string per neuron
 
 neural_data = counts_matrix
 X_raw = subject_trials['num_images_presented'].to_numpy().astype(float)
