@@ -106,7 +106,7 @@ def run_grid_search():
                     for neuron_id in sorted(df_trial['Neuron_ID_3'].unique()):
                         spikes_series = df_trial.loc[
                             df_trial['Neuron_ID_3'] == neuron_id, 
-                            'Standardized_Spikes_New'
+                            'Standardized_Spikes'
                         ].dropna()
                         for s in first_nonnull_series(spikes_series):
                             arr = parse_spike_entry(s)
