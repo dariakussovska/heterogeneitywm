@@ -628,7 +628,7 @@ if extra2 > 0:
     ax.set_ylim(cur_ymin, cur_ymax + extra2)
 
 # Save & show
-plt.savefig(f"{out_dir}/04_bursting/main_4cd_6ab.eps",
+plt.savefig(f"{out_dir}main_4cd_6ab.eps",
             format='eps', dpi=300, bbox_inches='tight')
 plt.show()
 
