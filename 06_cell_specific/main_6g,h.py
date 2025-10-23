@@ -83,7 +83,7 @@ import numpy as np
 # Load your metadata and spikes
 df_meta = pd.read_excel('../Clustering_3D.xlsx')
 df_encoding = pd.read_excel('../graph_data/graph_encoding1.xlsx')
-df_delay    = pd.read_excel('../graph_data/graph_dela.xlsx')
+df_delay    = pd.read_excel('../graph_data/graph_delay.xlsx')
 
 # Filter metadata to significant neurons
 df_meta = df_meta[df_meta['Signi'] == 'Y']
