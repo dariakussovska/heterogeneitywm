@@ -4,7 +4,7 @@ from scipy.io import loadmat
 
 mat_file_path = '../data/cell_analysis/acg.mat'  
 data = loadmat(mat_file_path)
-
+num_neurons = 902
 acg_narrow = data['acg']['narrow'][0,0]  
 
 plots_per_row = 5  
@@ -22,15 +22,8 @@ mean_values = np.zeros(num_neurons)
 for neuron_index in range(num_neurons):
     # extract the ACG for the selected neuron (column)
     neuron_acg = acg_narrow[:, neuron_index]  # get the column corresponding to the selected neuron
-
-    # calculate mean ACG value for the selected neuron
-    mean_values[neuron_index] = np.mean(neuron_acg)
-
-    # determine the label based on mean value
-    label = 'Pyramidal' if mean_values[neuron_index] <= 5 else 'Interneuron'
-
     axes[neuron_index].plot(time_axis, neuron_acg, linewidth=1.5)
-    axes[neuron_index].set_title(f'Neuron {neuron_index + 1} ({label})', fontsize=8)
+    axes[neuron_index].set_title(f'Neuron {neuron_index + 1})', fontsize=8)
     axes[neuron_index].set_xlabel('Time (ms)', fontsize=6)
     axes[neuron_index].set_ylabel('ACG', fontsize=6)
     axes[neuron_index].set_xlim([-50, 50])  # Set x-axis limits
