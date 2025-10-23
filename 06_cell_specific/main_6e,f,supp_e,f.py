@@ -26,10 +26,10 @@ neurons_in_desired_locations = df_neuron_locations[
 ]['Neuron_ID_3'].unique()
 
 # UNCOMMENT TO GET FIG.6F and FIG.SE
-#df_delay_filtered = df_delay_filtered[
-#     df_delay_filtered['Neuron_ID_3'].isin(neurons_in_desired_locations) &
-#     (df_delay_filtered['Significance'] == 'Y')
-#]
+#neurons_in_desired_locations = df_neuron_locations[
+#    (df_neuron_locations['Cell_Type_New'].isin(desired_locations)) & 
+#    (df_neuron_locations['Signi'] == 'Y')
+#]['Neuron_ID_3'].unique()
 
 
 # 5) Build the Design Matrix
