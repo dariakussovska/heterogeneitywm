@@ -1,7 +1,6 @@
-function acg_metrics = calc_ACG_metrics(spikes, sr)
+function acg_metrics = calc_ACG_metrics(spikes)
     % Inputs:
     %   spikes - structure containing 'times' (cell array of spike times) and 'total' (number of spikes)
-    %   sr - sampling rate = 32000
     
     % Ensure that spikes.times is a cell array
     if ~iscell(spikes.times)
@@ -16,24 +15,24 @@ function acg_metrics = calc_ACG_metrics(spikes, sr)
     BurstIndex_Doublets = nan(1, numcells);
 
     % Define bins for ACG calculation
-    bins_wide = 1001;  % Total 1001 bins for wide ACG (1s, 1ms bins)
-    bins_narrow = 201;  % Total 201 bins for narrow ACG (100ms, 0.5ms bins)
+    bins_wide = 1001;   % Total 1001 bins for wide ACG (±500 ms, 1 ms bins)
+    bins_narrow = 201;  % Total 201 bins for narrow ACG (±50 ms, 0.5 ms bins)
 
     % Initialize matrices for storing ACGs
-    acg_wide = zeros(bins_wide, numcells);  % 1001 bins
-    acg_narrow = zeros(bins_narrow, numcells);  % 201 bins
+    acg_wide = zeros(bins_wide, numcells);     % 1001 bins
+    acg_narrow = zeros(bins_narrow, numcells); % 201 bins
 
-    disp('Calculating narrow ACGs (100ms, 0.5ms bins) and wide ACGs (1s, 1ms bins)');
+    disp('Calculating narrow ACGs (±50 ms, 0.5 ms bins) and wide ACGs (±500 ms, 1 ms bins)');
     tic
     for i = 1:numcells
         spike_times = spikes.times{i};  % Access spike times for this neuron
 
         if length(spike_times) > 1
-            % Calculate narrow ACG (100ms, 0.5ms bins)
-            acg_narrow(:, i) = autocorrelogram(spike_times, sr, 0.0005, 0.1, bins_narrow);
+            % Calculate narrow ACG (±50 ms, 0.5 ms bins)
+            acg_narrow(:, i) = autocorrelogram(spike_times, 0.0005, 0.05, bins_narrow);
 
-            % Calculate wide ACG (1s, 1ms bins)
-            acg_wide(:, i) = autocorrelogram(spike_times, sr, 0.001, 1, bins_wide);
+            % Calculate wide ACG (±500 ms, 1 ms bins)
+            acg_wide(:, i) = autocorrelogram(spike_times, 0.001, 0.5, bins_wide);
 
             % Metrics from narrow ACG (BurstIndex_Doublets)
             BurstIndex_Doublets(i) = max(acg_narrow(106:116, i)) / mean(acg_narrow(116:123, i));
@@ -63,7 +62,7 @@ function acg_metrics = calc_ACG_metrics(spikes, sr)
     acg_metrics.burstIndex_Doublets = BurstIndex_Doublets;
 end
 
-function acg = autocorrelogram(spike_times, Fs, bin_size, duration, expected_num_bins)
+function acg = autocorrelogram(spike_times, bin_size, duration, expected_num_bins)
     % Initialize ACG
     acg = zeros(expected_num_bins, 1);  % Initialize the ACG with correct size
     
