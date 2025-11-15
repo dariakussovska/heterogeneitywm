@@ -33,6 +33,7 @@ pip install -e .
 % nano setup.py
 % Change sklearn to scikit-learn
 ```
+Installing this repo and running each analysis step takes approximately 15-20 minutes on a standard desktop computer (16 CPU cores, 16-32 GB RAM), once the above dataset is downloaded.
 
 # Data extraction and organization
 
