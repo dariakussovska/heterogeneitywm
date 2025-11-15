@@ -48,7 +48,7 @@ python 02_trial_info.py
 
 For ease of use, some of the dependent files are given here, under the folder "data". new_trial_info.xlsx and trial_info_final.xlsx are files which make sure that stimulus ids are balanced based on load, and on number of image identities, respectively. all_neuron_brain_regions_cleaned.xlsx is a file where each neuron id has its correspodning brain region in a cleaned and organized way (because the extraction from the NWB file was not as straightforward). 
 
-Under cell_analysis, there are matlab structs and functions to run the cell classification method from scratch, suing the software Cell Explorer. 
+Under cell_analysis, there are matlab structs and functions to run the cell classification method from scratch, using the software Cell Explorer. 
 
 Under electrodes_plotting, there is a function to plot all the electrode coordinates from the Kyzar et al, 2024 paper in MNI space. 
 
