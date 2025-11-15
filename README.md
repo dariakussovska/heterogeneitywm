@@ -90,3 +90,20 @@ This step is needed to create the matrices used in dimensionality reduction (dPC
 python 08_dpca_matrices.py
 ```
 Now that we've ran all of the initial files for data extraction, standardization, and concept cell definition we can proceed with the main analyses used in each of our figures. Each main figure and the panels associated with it have a folder (ex. 01_task, 02_psth_decoding). They include all scripts, needed to recreate the main figures in the manuscript. Note that some figures just require running the same code twice, but with a different set of neurons. If that is the case, then this will be specified as a comment in the specific code. Run each .py file to get the corresponding panel from a main figure.  
+
+# Usage and citation 
+
+If you use this repo for you research, please cite our work: 
+
+```
+@article{Kussovska_2025,
+  author       = {D. Kussovska, R. Kim, N. Rungratsameetaweemana},
+  title        = {Neural heterogeneity shapes the temporal structure of human working memory},
+  journal      = {bioRxiv},
+  year         = {2025},
+  doi          = {10.1101/2025.10.31.684900},
+  url          = {https://doi.org/10.1101/2025.10.31.684900},
+  note         = {Preprint},
+  publisher    = {Cold Spring Harbor Laboratory},
+}
+```
