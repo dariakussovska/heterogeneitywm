@@ -1,30 +1,45 @@
-# =========================
-# Region-based bursting analysis (Left/Right collapsed)
-# Uses the SAME burst parameters + detection logic you already have,
-# but groups neurons by brain region instead of cell-type categories.
-# =========================
-
-import pandas as pd
 import numpy as np
-import ast
-
+import pandas as pd
+import scipy.signal as signal
 import matplotlib.pyplot as plt
-import seaborn as sns
-
-from scipy import signal
 from scipy.signal.windows import gaussian
 from scipy.stats import wilcoxon
 from statsmodels.stats.multitest import multipletests
+import seaborn as sns
+import ast
+import warnings
+warnings.filterwarnings('ignore')
 
 # =========================
-# 1) Filter correct trials only
+# Load data
 # =========================
-#df_fix   = df_fix[df_fix['response_accuracy'] == 1].copy()
-#df_enc1  = df_enc1[df_enc1['response_accuracy'] == 1].copy()
-#df_enc2  = df_enc2[df_enc2['response_accuracy'] == 1].copy()
-#df_enc3  = df_enc3[df_enc3['response_accuracy'] == 1].copy()
-#df_delay = df_delay[df_delay['response_accuracy'] == 1].copy()
-#df_probe = df_probe[df_probe['response_accuracy'] == 1].copy()
+df_metadata  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Significant_All.xlsx')
+df_metadata2 = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/merged_significant_neurons_with_brain_regions.xlsx')
+
+df_fix   = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Fixation.xlsx')   # <-- NEW
+df_enc1  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_encoding1.xlsx')
+df_enc2  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_encoding2.xlsx')
+df_enc3  = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_encoding3.xlsx')
+df_delay = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_delay.xlsx')
+df_probe = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/graph_probe.xlsx')
+# =========================
+# Parameters
+# =========================
+bin_size = 0.03             # s
+sigma = 0.05                   # Gaussian kernel SD (s)
+prominence_threshold_percentile = 90
+duration = {
+    'Fixation': 1,        # <-- set to your actual fixation duration (seconds)
+    'Encoding 1': 1,
+    'Encoding 2': 1,
+    'Encoding 3': 1,
+    'Delay': 3,
+   # 'Probe': 1
+}
+
+# Per-subject low/high split knobs for ACG/Decay
+PER_SUBJ = 10    # require >= 10 eligible neurons per subject
+OVERLAP  = 2    # set to 2 if you want ~2 neurons overlapping low & high
 
 encoding_map = {
     1: ('Encoding 1', df_enc1),
@@ -463,9 +478,7 @@ with pd.ExcelWriter(out_stats_xlsx, engine='openpyxl') as writer:
     df_burst_export.to_excel(writer, sheet_name='raw_burst_counts', index=False)
 
 print("Saved region summary and p-values to:", out_stats_xlsx)
-# =========================
-# 8) Optional: export burst counts to Excel (raw values)
-# =========================
+
 rows = []
 for reg in regions:
     for period in periods:
