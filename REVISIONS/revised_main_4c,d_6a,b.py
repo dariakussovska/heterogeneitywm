@@ -26,9 +26,9 @@ min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 # =========================
 # Paths (edit as needed)
 # =========================
-path_decay_acg  = '/Users/darikussovska/Desktop/revision_clustering.xlsx'
-path_all_meta   = '/Users/darikussovska/Desktop/PROJECT/merged_significant_neurons_with_brain_regions.xlsx'
-path_trials     = '/Users/darikussovska/Desktop/PROJECT/graph_encoding1.xlsx' ### CHANGE TO graph_maintenance.xlsx TO GET MAINTENANCE BURSTS
+path_decay_acg  = '../Clustering_3D.xlsx'
+path_all_meta   = '../data/all_neuron_brain_regions_cleaned.xlsx'
+path_trials     = '../graph_data/graph_encoding1.xlsx' ### CHANGE TO graph_maintenance.xlsx TO GET MAINTENANCE BURSTS
 
 # =========================
 # Load data
