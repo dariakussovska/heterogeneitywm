@@ -13,6 +13,9 @@ from matplotlib.patches import Patch
 # =========================
 # LOAD DATA
 # =========================
+trial_info = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/new_trial_final.xlsx')
+subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
+y_matrix = subject_trials
 
 df_delay_filtered = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/graph_dela.xlsx')
 df_fixation = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Fixation.xlsx')
@@ -658,14 +661,3 @@ with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
     real_vs_shuffle_df.to_excel(writer, sheet_name='real_vs_shuffled_stats', index=False)
     py_vs_in_df.to_excel(writer, sheet_name='PY_vs_IN_stats', index=False)
     temporal_window_df.to_excel(writer, sheet_name='temporal_window_stats', index=False)
-
-print(f"\nSaved paired sign-flip decoding statistics to:\n{excel_path}")
-
-print("\n=== Real vs shuffled decoding stats ===")
-print(real_vs_shuffle_df.to_string(index=False, float_format=lambda x: f"{x:.5f}"))
-
-print("\n=== PY vs IN decoding stats ===")
-print(py_vs_in_df.to_string(index=False, float_format=lambda x: f"{x:.5f}"))
-
-print("\n=== Temporal-window decoding stats ===")
-print(temporal_window_df.to_string(index=False, float_format=lambda x: f"{x:.5f}"))
