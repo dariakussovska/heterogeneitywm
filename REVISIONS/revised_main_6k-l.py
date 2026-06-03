@@ -6,7 +6,6 @@ from sklearn.model_selection import StratifiedKFold
 import ast
 import os
 from tqdm import tqdm
-from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 from matplotlib.patches import Patch
 
