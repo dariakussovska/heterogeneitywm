@@ -10,9 +10,6 @@ from statsmodels.stats.multitest import multipletests
 import warnings
 warnings.filterwarnings("ignore")
 
-# =========================================================
-# SETTINGS
-# =========================================================
 random_seed = 42
 rng = np.random.default_rng(random_seed)
 
@@ -32,7 +29,7 @@ long_rt_min = 0.80
 long_rt_max = 1.20
 
 # Save directory
-save_dir = "/Users/darikussovska/Desktop/"
+save_dir = "./"
 os.makedirs(save_dir, exist_ok=True)
 
 # =========================================================
@@ -48,9 +45,8 @@ def build_local_gaussian_kernel(bin_size=0.07, sigma=0.04):
 
 kernel = build_local_gaussian_kernel(bin_size=bin_size, sigma=sigma)
 
-# =========================================================
 # POISSON SPIKE GENERATOR
-# =========================================================
+
 def simulate_poisson_spikes(rate_hz, duration_s, rng):
     n_spikes = rng.poisson(rate_hz * duration_s)
     if n_spikes == 0:
@@ -74,9 +70,8 @@ def simulate_trials(n_trials, n_neurons, rate_hz, rt_min, rt_max, rng):
 
     return trials
 
-# =========================================================
 # FIXED 1 s SLOT BURST PIPELINE
-# =========================================================
+
 def compute_bursts_fixed_1s_slots(trials,
                                   forced_trial_duration=1.0,
                                   bin_size=0.07,
@@ -178,9 +173,6 @@ for sim in range(n_simulations):
 
 df_results = pd.DataFrame(results)
 
-# =========================================================
-# SAVE RESULTS
-# =========================================================
 excel_path = os.path.join(save_dir, "poisson_probe_rt_fixed_1s_results.xlsx")
 df_results.to_excel(excel_path, index=False)
 print(f"Saved results to: {excel_path}")
@@ -250,9 +242,6 @@ stats_path = os.path.join(save_dir, "poisson_probe_rt_fixed_1s_stats_fdr.xlsx")
 stats_df.to_excel(stats_path, index=False)
 print(f"Saved FDR-corrected stats to: {stats_path}")
 
-# =========================================================
-# SUMMARY TABLE
-# =========================================================
 summary = (
     df_results
     .groupby("condition")[["burst_count", "threshold", "total_duration"]]
@@ -266,9 +255,6 @@ summary_path = os.path.join(save_dir, "poisson_probe_rt_fixed_1s_summary.xlsx")
 summary.to_excel(summary_path)
 print(f"Saved summary to: {summary_path}")
 
-# =========================================================
-# PLOTS: SAVE AS EPS
-# =========================================================
 for metric in ["burst_count", "threshold"]:
     plt.figure(figsize=(7, 5))
     sns.boxplot(data=df_results, x="condition", y=metric, showfliers=False)
@@ -281,9 +267,8 @@ for metric in ["burst_count", "threshold"]:
     plt.savefig(fig_path, format="eps", bbox_inches="tight")
     plt.show()
 
-# =========================================================
 # EXAMPLE SINGLE SIMULATION TRACE
-# =========================================================
+
 example_short_trials = simulate_trials(
     n_trials=n_trials_per_group,
     n_neurons=n_neurons,
