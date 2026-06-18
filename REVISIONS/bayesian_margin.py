@@ -3,23 +3,15 @@ import numpy as np
 import ast
 from scipy.special import logsumexp
 
-# =========================
-# USER PATHS
-# =========================
+TRIAL_INFO_PATH = "../trial_info.xlsx"
+CONCEPT_CELL_PATH = "../data/all_neuron_brain_regions_cleaned.xlsx"
 
-TRIAL_INFO_PATH = "/Users/darikussovska/Desktop/PROJECT/trial_info.xlsx"
-CONCEPT_CELL_PATH = "/Users/darikussovska/Desktop/PROJECT/merged_significant_neurons_with_brain_regions.xlsx"
+ENC1_PATH = "../graph_data/graph_encoding1.xlsx"
+ENC2_PATH = "../graph_data/graph_encoding2.xlsx"
+ENC3_PATH = "../graph_data/graph_encoding3.xlsx"
+DELAY_PATH = "../graph_data/graph_delay.xlsx"
 
-ENC1_PATH = "/Users/darikussovska/Desktop/PROJECT/encoding1.xlsx"
-ENC2_PATH = "/Users/darikussovska/Desktop/PROJECT/encoding2.xlsx"
-ENC3_PATH = "/Users/darikussovska/Desktop/PROJECT/encoding3.xlsx"
-DELAY_PATH = "/Users/darikussovska/Desktop/PROJECT/maintenance.xlsx"
-
-OUTPUT_PATH = "/Users/darikussovska/Desktop/PROJECT/trial_level_bayesian_decoder_margins.xlsx"
-
-# =========================
-# CONFIG
-# =========================
+OUTPUT_PATH = "./trial_level_bayesian_decoder_margins.xlsx"
 
 BIN_SIZE = 0.25
 STEP_SIZE = 0.10
@@ -30,15 +22,8 @@ SUBJECT_COL = "subject_id"
 TRIAL_COL = "trial_id"
 NEURON_COL = "Neuron_ID"
 SIGNI_COL = "Signi"
-
-# Change these if your files use different spike columns
-ENC_SPIKE_COL = "Standardized_Spikes_New"
-DELAY_SPIKE_COL = "Standardized_Spikes_in_Delay"
-
-
-# =========================
-# BASIC UTILITIES
-# =========================
+ENC_SPIKE_COL = "Standardized_Spikes"
+DELAY_SPIKE_COL = "Standardized_Spikes"
 
 def parse_spikes(x):
     if isinstance(x, (list, np.ndarray)):
@@ -95,11 +80,6 @@ def posterior_poisson_nb(x, log_lambda, lambdas, log_prior):
     log_post = ll + log_prior
     log_post -= logsumexp(log_post)
     return np.exp(log_post)
-
-
-# =========================
-# BUILD SUBJECT DESIGN MATRIX
-# =========================
 
 def build_subject_design_matrix(
     subject_id,
@@ -176,11 +156,6 @@ def get_spikes(df, subject_id, trial_id, neuron_id, spike_col):
         spikes.extend(parse_spikes(val))
 
     return np.asarray(spikes, dtype=float)
-
-
-# =========================
-# DECODER
-# =========================
 
 def build_binned_counts_matrix(design_matrix, total_duration, bin_size, step_size):
     bins = create_time_bins(total_duration, bin_size, step_size)
@@ -263,10 +238,7 @@ def encoding_trained_delay_posteriors_loocv(
 
     return bins_delay, post_delay, classes_all
 
-
-# =========================
 # TRIAL-LEVEL MARGIN
-# =========================
 
 def compute_trial_margin(post_trial, classes, presented_items):
     presented_items = [x for x in presented_items if not pd.isna(x)]
@@ -284,11 +256,6 @@ def compute_trial_margin(post_trial, classes, presented_items):
     margin = presented_prob - nonpresented_max
 
     return margin, presented_prob, nonpresented_max
-
-
-# =========================
-# MAIN SCRIPT
-# =========================
 
 trial_info = pd.read_excel(TRIAL_INFO_PATH)
 concept_df = pd.read_excel(CONCEPT_CELL_PATH)
