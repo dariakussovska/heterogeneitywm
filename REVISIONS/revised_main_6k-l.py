@@ -12,13 +12,13 @@ from matplotlib.patches import Patch
 # =========================
 # LOAD DATA
 # =========================
-trial_info = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/new_trial_final.xlsx')
+trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 y_matrix = subject_trials
 
-df_delay_filtered = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/graph_dela.xlsx')
-df_fixation = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Fixation.xlsx')
-df_clustering = pd.read_excel('/Users/darikussovska/Desktop/revision_clustering.xlsx')
+df_delay_filtered = pd.read_excel('../clean_data/graph_dela.xlsx')
+df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
+df_clustering = pd.read_excel('../revision_clustering_waveform_labels.xlsx')
 
 # =========================
 # SETTINGS
@@ -132,10 +132,6 @@ print(f"Matched bootstrap sample size: {sample_size}")
 master_neurons = np.array(sorted(np.union1d(py_neurons, in_neurons)))
 neuron_to_col = {nid: idx for idx, nid in enumerate(master_neurons)}
 
-# =========================
-# BUILD DESIGN MATRIX ONCE
-# =========================
-
 trial_count = y_matrix.shape[0]
 neuron_count = len(master_neurons)
 
@@ -146,7 +142,7 @@ design_matrix[:] = None
 delay_lookup = {}
 for _, row in df_delay_filtered.iterrows():
     key = (row['trial_id_final'], row['Neuron_ID_3'])
-    delay_lookup[key] = parse_spike_times(row['Standardized_Spikes_in_Delay'])
+    delay_lookup[key] = parse_spike_times(row['Standardized_Spikes'])
 
 for trial_idx, row in y_matrix.iterrows():
     trial_id = row['trial_id_final']
@@ -154,10 +150,6 @@ for trial_idx, row in y_matrix.iterrows():
         col_idx = neuron_to_col[neuron_id]
         spikes = delay_lookup.get((trial_id, neuron_id), [])
         design_matrix[trial_idx, col_idx] = np.array(spikes, dtype=float)
-
-# =========================
-# FIXATION NORMALIZATION
-# =========================
 
 df_fixation_filtered = df_fixation[df_fixation['Neuron_ID_3'].isin(master_neurons)].copy()
 
@@ -172,10 +164,6 @@ fixation_stds = (
     .std()
     .to_dict()
 )
-
-# =========================
-# LABELS
-# =========================
 
 y_labels = []
 for _, row in y_matrix.iterrows():
@@ -202,10 +190,6 @@ load_trials = {
     2: np.where(y_matrix['num_images_presented'].values == 2)[0],
     3: np.where(y_matrix['num_images_presented'].values == 3)[0],
 }
-
-# =========================
-# BUILD MATRIX FOR A GIVEN BOOTSTRAP SAMPLE
-# =========================
 
 def build_matrix_subset(trials, sampled_neurons, bin_size, end_time):
     """
@@ -356,7 +340,7 @@ for load in [1, 2, 3]:
 
 from statsmodels.stats.multitest import multipletests
 
-folder_path = '/Users/darikussovska/Desktop/PROJECT/Figures'
+folder_path = './'
 os.makedirs(folder_path, exist_ok=True)
 
 n_perm_stats = 1000
@@ -449,7 +433,7 @@ def apply_fdr(df, p_col='p_raw', alpha=0.05):
 
 
 # =========================
-# 1. REAL VS SHUFFLED STATS
+# REAL VS SHUFFLED STATS
 # =========================
 
 real_vs_shuffle_rows = []
@@ -497,7 +481,7 @@ real_vs_shuffle_df = apply_fdr(real_vs_shuffle_df, p_col='p_raw', alpha=0.05)
 
 
 # =========================
-# 2. PY VS IN STATS PER WINDOW
+# PY VS IN STATS PER WINDOW
 # =========================
 
 py_vs_in_rows = []
@@ -543,7 +527,7 @@ py_vs_in_df = apply_fdr(py_vs_in_df, p_col='p_raw', alpha=0.05)
 
 
 # =========================
-# 3. TEMPORAL-WINDOW COMPARISONS
+# TEMPORAL-WINDOW COMPARISONS
 # =========================
 
 temporal_rows = []
@@ -589,11 +573,6 @@ for load in [1, 2, 3]:
 temporal_window_df = pd.DataFrame(temporal_rows)
 temporal_window_df = apply_fdr(temporal_window_df, p_col='p_raw', alpha=0.05)
 
-
-# =========================
-# 4. LONG-FORM RAW VALUES
-# =========================
-
 long_rows = []
 
 for load in [1, 2, 3]:
@@ -623,11 +602,6 @@ for load in [1, 2, 3]:
 
 df_long = pd.DataFrame(long_rows)
 
-
-# =========================
-# 5. AVERAGE DECODING ACCURACY TABLES
-# =========================
-
 average_accuracy_df = (
     df_long
     .groupby(['Load', 'Bin_ms', 'Cell_Type', 'Condition'], as_index=False)
@@ -642,11 +616,6 @@ average_accuracy_df = (
 real_average_py_in_df = average_accuracy_df[
     average_accuracy_df['Condition'] == 'Real'
 ].copy()
-
-
-# =========================
-# 6. SAVE EVERYTHING
-# =========================
 
 excel_path = os.path.join(
     folder_path,
