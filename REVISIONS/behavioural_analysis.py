@@ -23,6 +23,8 @@ from typing import Dict, List, Optional, Tuple
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from scipy import stats
+import warnings
+warnings.filterwarnings("ignore")
 
 
 # --- Expected trial table schema --------------------------------------------
