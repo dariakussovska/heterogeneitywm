@@ -4,12 +4,8 @@ from ast import literal_eval
 import matplotlib.pyplot as plt
 import os
 
-# ---------------------------------------------------
-# Parameters
-# ---------------------------------------------------
-
-input_path = "/Users/darikussovska/Desktop/PROJECT/new_clean_data/cleaned_Encoding1.xlsx"
-region_path = "/Users/darikussovska/Desktop/merged_significant_neurons_with_brain_regions.xlsx"
+input_path = "../clean_data/cleaned_Encoding1.xlsx"
+region_path = "../data/all_neuron_brain_regions_cleaned.xlsx"
 
 START_TIME = 0.2
 END_TIME = 1.0
@@ -20,19 +16,12 @@ ALPHA = 0.05
 RANDOM_SEED = 42
 rng = np.random.default_rng(RANDOM_SEED)
 
-# ---------------------------------------------------
-# Load data
-# ---------------------------------------------------
-
 df = pd.read_excel(input_path)
 regions = pd.read_excel(region_path)
 
 df.columns = df.columns.astype(str).str.strip()
 regions.columns = regions.columns.astype(str).str.strip()
 
-# ---------------------------------------------------
-# Detect region column
-# ---------------------------------------------------
 
 possible_region_cols = [
     "Location"
@@ -52,10 +41,6 @@ if region_col is None:
 
 print(f"Using brain-region column: {region_col}")
 
-# ---------------------------------------------------
-# Standardize neuron ID columns
-# ---------------------------------------------------
-
 if "Neuron_ID_3" not in regions.columns:
     raise KeyError(
         f"'Neuron_ID_3' not found in region file. Available columns:\n{regions.columns.tolist()}"
@@ -73,9 +58,6 @@ if "Neuron_ID_3" not in df.columns:
 if "Neuron_ID" not in df.columns:
     df["Neuron_ID"] = df["Neuron_ID_3"]
 
-# ---------------------------------------------------
-# Merge brain regions
-# ---------------------------------------------------
 
 region_keep = (
     regions[["subject_id", "Neuron_ID_3", region_col]]
@@ -94,10 +76,6 @@ df = df.dropna(subset=["Location"]).copy()
 print("Region counts before analysis:")
 print(df[["subject_id", "Neuron_ID_3", "Location"]].drop_duplicates()["Location"].value_counts())
 
-# ---------------------------------------------------
-# Keep top 5 regions by neuron count
-# ---------------------------------------------------
-
 top_regions = (
     df[["subject_id", "Neuron_ID_3", "Location"]]
     .drop_duplicates()["Location"]
@@ -111,10 +89,6 @@ print("\nTop 5 regions:")
 print(top_regions)
 
 df = df[df["Location"].isin(top_regions)].copy()
-
-# ---------------------------------------------------
-# Firing rate
-# ---------------------------------------------------
 
 def safe_parse_spikes(spikes):
     if pd.isna(spikes):
@@ -156,10 +130,6 @@ def compute_firing_rate(df, start_time=0.2, end_time=1.0):
 
 
 df = compute_firing_rate(df, START_TIME, END_TIME)
-
-# ---------------------------------------------------
-# Top two categories
-# ---------------------------------------------------
 
 def extract_top_two_categories(df, label_col="stimulus_index"):
 
@@ -223,9 +193,7 @@ def extract_top_two_categories(df, label_col="stimulus_index"):
 
     return pd.DataFrame(results)
 
-# ---------------------------------------------------
-# Bootstrap significance test — no FDR
-# ---------------------------------------------------
+# Bootstrap significance test 
 
 def resampling(arr1, arr2, iteration=1000):
     min_len = min(len(arr1), len(arr2))
@@ -280,10 +248,6 @@ def run_significance_test(df_top_2, iteration=1000):
 
     return df_top_2
 
-# ---------------------------------------------------
-# Real data, by region
-# ---------------------------------------------------
-
 df_top_2_real = extract_top_two_categories(df, label_col="stimulus_index")
 df_final_real = run_significance_test(df_top_2_real, iteration=BOOTSTRAP_ITER)
 
@@ -300,9 +264,7 @@ real_region_counts = (
 print("\nReal significant neurons by region:")
 print(real_region_counts)
 
-# ---------------------------------------------------
 # Shuffle labels within each neuron
-# ---------------------------------------------------
 
 def shuffle_labels_within_each_neuron(df, label_col="stimulus_index"):
 
@@ -319,9 +281,7 @@ def shuffle_labels_within_each_neuron(df, label_col="stimulus_index"):
 
     return df_shuff
 
-# ---------------------------------------------------
 # Region-wise shuffled null
-# ---------------------------------------------------
 
 shuffle_rows = []
 
@@ -360,9 +320,6 @@ for shuffle_i in range(N_SHUFFLES):
 
 df_shuffle_region_counts = pd.concat(shuffle_rows, ignore_index=True)
 
-# ---------------------------------------------------
-# Summary
-# ---------------------------------------------------
 
 summary_rows = []
 
@@ -399,24 +356,18 @@ summary_by_region = pd.DataFrame(summary_rows)
 print("\nRegion-wise shuffle null summary:")
 print(summary_by_region)
 
-# ---------------------------------------------------
-# Save outputs
-# ---------------------------------------------------
-
-with pd.ExcelWriter("/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Shuffled_Label_Null_by_Region_1000.xlsx", engine="openpyxl") as writer:
+with pd.ExcelWriter("./Neuron_Check_Shuffled_Label_Null_by_Region_1000.xlsx", engine="openpyxl") as writer:
     summary_by_region.to_excel(writer, sheet_name="summary_by_region", index=False)
     df_shuffle_region_counts.to_excel(writer, sheet_name="shuffle_counts_by_region", index=False)
     df_final_real.to_excel(writer, sheet_name="real_neurons_by_region", index=False)
     real_region_counts.to_excel(writer, sheet_name="real_region_counts", index=False)
 
 df_final_real.to_excel(
-    "/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Significant_All_REAL_by_Region_1000.xlsx",
+    "./Neuron_Check_Significant_All_REAL_by_Region_1000.xlsx",
     index=False
 )
 
-# ---------------------------------------------------
 # Plot 5 region distributions
-# ---------------------------------------------------
 
 fig, axes = plt.subplots(
     nrows=1,
@@ -467,9 +418,7 @@ plt.suptitle(
 )
 
 plt.tight_layout()
-
-plt.savefig("/Users/darikussovska/Desktop/PROJECT/shuffled_label_null_distribution_by_region_000.png", dpi=300)
-plt.savefig("/Users/darikussovska/Desktop/PROJECT/shuffled_label_null_distribution_by_region_000.eps", format="eps", dpi=300)
+plt.savefig("./shuffled_label_null_distribution_by_region_000.eps", format="eps", dpi=300)
 plt.show()
 
 print("\nSaved region-wise shuffle-null outputs.")
