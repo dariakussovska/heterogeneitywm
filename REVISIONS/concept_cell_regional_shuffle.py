@@ -339,12 +339,12 @@ for region in top_regions:
 
     summary_rows.append({
         "Location": region,
-        "real_significant_no_FDR": real_count,
-        "mean_significant_under_shuffle_no_FDR": shuff_counts.mean(),
-        "std_significant_under_shuffle_no_FDR": shuff_counts.std(),
-        "median_significant_under_shuffle_no_FDR": shuff_counts.median(),
-        "min_significant_under_shuffle_no_FDR": shuff_counts.min(),
-        "max_significant_under_shuffle_no_FDR": shuff_counts.max(),
+        "real_significant": real_count,
+        "mean_significant_under_shuffle": shuff_counts.mean(),
+        "std_significant_under_shuffle": shuff_counts.std(),
+        "median_significant_under_shuffle": shuff_counts.median(),
+        "min_significant_under_shuffle": shuff_counts.min(),
+        "max_significant_under_shuffle": shuff_counts.max(),
         "empirical_p_real_ge_shuffle": (
             (np.sum(shuff_counts >= real_count) + 1) / (N_SHUFFLES + 1)
             if len(shuff_counts) > 0 else np.nan
@@ -363,7 +363,7 @@ with pd.ExcelWriter("./Neuron_Check_Shuffled_Label_Null_by_Region_1000.xlsx", en
     real_region_counts.to_excel(writer, sheet_name="real_region_counts", index=False)
 
 df_final_real.to_excel(
-    "./Neuron_Check_Significant_All_REAL_by_Region_1000.xlsx",
+    "./Neuron_Check_Significant_All_by_Region.xlsx",
     index=False
 )
 
@@ -388,7 +388,7 @@ for ax, region in zip(axes, top_regions):
 
     real_count = summary_by_region.loc[
         summary_by_region["Location"] == region,
-        "real_significant_no_FDR"
+        "real_significant"
     ].iloc[0]
 
     ax.hist(
@@ -418,7 +418,7 @@ plt.suptitle(
 )
 
 plt.tight_layout()
-plt.savefig("./shuffled_label_null_distribution_by_region_000.eps", format="eps", dpi=300)
+plt.savefig("./shuffled_label_null_distribution_by_region.eps", format="eps", dpi=300)
 plt.show()
 
 print("\nSaved region-wise shuffle-null outputs.")
