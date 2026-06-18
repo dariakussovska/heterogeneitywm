@@ -4,11 +4,7 @@ from ast import literal_eval
 import os
 import matplotlib.pyplot as plt
 
-# ---------------------------------------------------
-# Parameters
-# ---------------------------------------------------
-
-input_path = "/Users/darikussovska/Desktop/PROJECT/new_clean_data/cleaned_Encoding1.xlsx"
+input_path = "../clean_data/cleaned_Encoding1.xlsx"
 
 START_TIME = 0.2
 END_TIME = 1.0
@@ -19,16 +15,8 @@ ALPHA = 0.05
 RANDOM_SEED = 42
 rng = np.random.default_rng(RANDOM_SEED)
 
-# ---------------------------------------------------
-# Load data
-# ---------------------------------------------------
-
 df = pd.read_excel(input_path)
 df.columns = df.columns.astype(str).str.strip()
-
-# ---------------------------------------------------
-# Firing rate
-# ---------------------------------------------------
 
 def safe_parse_spikes(spikes):
     if pd.isna(spikes):
@@ -69,9 +57,6 @@ def compute_firing_rate(df, start_time=0.2, end_time=1.0):
 
 df = compute_firing_rate(df, START_TIME, END_TIME)
 
-# ---------------------------------------------------
-# Top two categories
-# ---------------------------------------------------
 
 def extract_top_two_categories(df, label_col="stimulus_index"):
 
@@ -128,9 +113,6 @@ def extract_top_two_categories(df, label_col="stimulus_index"):
 
     return pd.DataFrame(results)
 
-# ---------------------------------------------------
-# Bootstrap significance test — unchanged logic
-# ---------------------------------------------------
 
 def resampling(arr1, arr2, iteration=1000):
     min_len = min(len(arr1), len(arr2))
@@ -184,26 +166,18 @@ def run_significance_test(df_top_2, iteration=1000):
 
     return df_top_2
 
-# ---------------------------------------------------
-# Real data result
-# ---------------------------------------------------
-
 df_top_2_real = extract_top_two_categories(df, label_col="stimulus_index")
 df_final_real = run_significance_test(df_top_2_real, iteration=BOOTSTRAP_ITER)
 
 n_real_significant = int((df_final_real["Signi"] == "Y").sum())
 
 df_final_real.to_excel(
-    "./Neuron_Check_Significant_All_REAL_no_FDR.xlsx",
+    "./Neuron_Check_Significant_All_NEW.xlsx",
     index=False
 )
 
 print("REAL DATA")
-print(f"Significant neurons without FDR: {n_real_significant}")
-
-# ---------------------------------------------------
-# Shuffle labels within each neuron
-# ---------------------------------------------------
+print(f"Significant neurons: {n_real_significant}")
 
 def shuffle_labels_within_each_neuron(df, label_col="stimulus_index"):
 
@@ -220,10 +194,6 @@ def shuffle_labels_within_each_neuron(df, label_col="stimulus_index"):
     df_shuff["stimulus_index_shuffled"] = shuffled_labels
 
     return df_shuff
-
-# ---------------------------------------------------
-# Run shuffled null 100 times
-# ---------------------------------------------------
 
 shuffle_rows = []
 
@@ -250,33 +220,29 @@ for shuffle_i in range(N_SHUFFLES):
 
     shuffle_rows.append({
         "shuffle_i": shuffle_i + 1,
-        "n_significant_no_FDR": n_significant,
+        "n_significant": n_significant,
         "n_neurons_tested": len(df_final_shuff)
     })
 
 df_shuffle_counts = pd.DataFrame(shuffle_rows)
 
-# ---------------------------------------------------
-# Summary
-# ---------------------------------------------------
-
 summary = pd.DataFrame([{
     "n_shuffles": N_SHUFFLES,
     "bootstrap_iterations_per_neuron": BOOTSTRAP_ITER,
     "alpha_uncorrected": ALPHA,
-    "real_significant_no_FDR": n_real_significant,
-    "mean_significant_under_shuffle_no_FDR": df_shuffle_counts["n_significant_no_FDR"].mean(),
-    "std_significant_under_shuffle_no_FDR": df_shuffle_counts["n_significant_no_FDR"].std(),
-    "median_significant_under_shuffle_no_FDR": df_shuffle_counts["n_significant_no_FDR"].median(),
-    "min_significant_under_shuffle_no_FDR": df_shuffle_counts["n_significant_no_FDR"].min(),
-    "max_significant_under_shuffle_no_FDR": df_shuffle_counts["n_significant_no_FDR"].max(),
+    "real_significant": n_real_significant,
+    "mean_significant_under_shuffle": df_shuffle_counts["n_significant"].mean(),
+    "std_significant_under_shuffle": df_shuffle_counts["n_significant"].std(),
+    "median_significant_under_shuffle": df_shuffle_counts["n_significant"].median(),
+    "min_significant_under_shuffle": df_shuffle_counts["n_significant"].min(),
+    "max_significant_under_shuffle": df_shuffle_counts["n_significant"].max(),
     "empirical_p_real_ge_shuffle": (
-        (np.sum(df_shuffle_counts["n_significant_no_FDR"] >= n_real_significant) + 1)
+        (np.sum(df_shuffle_counts["n_significant"] >= n_real_significant) + 1)
         / (N_SHUFFLES + 1)
     )
 }])
 
-with pd.ExcelWriter("/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Shuffled_Label_Null_no_FDR_1000.xlsx", engine="openpyxl") as writer:
+with pd.ExcelWriter("./Neuron_Check_Shuffled_Label_Null_1000.xlsx", engine="openpyxl") as writer:
     summary.to_excel(writer, sheet_name="summary", index=False)
     df_shuffle_counts.to_excel(writer, sheet_name="shuffle_counts", index=False)
     df_final_real.to_excel(writer, sheet_name="real_neurons", index=False)
@@ -284,14 +250,10 @@ with pd.ExcelWriter("/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Shuffled_
 print("\nSHUFFLE NULL SUMMARY")
 print(summary.T)
 
-# ---------------------------------------------------
-# Plot
-# ---------------------------------------------------
-
 plt.figure(figsize=(7, 5))
 
 plt.hist(
-    df_shuffle_counts["n_significant_no_FDR"],
+    df_shuffle_counts["n_significant"],
     bins=15,
     alpha=0.8,
     edgecolor="black"
@@ -310,7 +272,5 @@ plt.ylabel("Shuffle count")
 plt.title("Null distribution without FDR")
 plt.legend(frameon=False)
 plt.tight_layout()
-
-plt.savefig("/Users/darikussovska/Desktop/PROJECT/shuffled_label_null_distribution_no_FDR.png", dpi=300)
-plt.savefig("/Users/darikussovska/Desktop/PROJECT/shuffled_label_null_distribution_no_FDR_1000.eps", format="eps", dpi=300)
+plt.savefig("./shuffled_label_null_distribution.eps", format="eps", dpi=300)
 plt.show()
