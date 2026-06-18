@@ -422,20 +422,7 @@ for reg in regions:
 df_region_summary = pd.DataFrame(summary_rows)
 df_region_stats = pd.DataFrame(stats_rows)
 
-print("\n==============================")
-print("REGION SUMMARY: MEAN / MEDIAN BURST COUNTS")
-print("==============================")
-print(df_region_summary.to_string(index=False))
-
-print("\n==============================")
-print("REGION PAIRWISE WILCOXON TESTS")
-print("==============================")
-print(df_region_stats.to_string(index=False))
-
-
-# =========================
-# 9) Export summary + stats to Excel
-# =========================
+# Export summary + stats to Excel
 
 out_stats_xlsx = "./Region_Burst_Summary_and_Pvalues.xlsx"
 
