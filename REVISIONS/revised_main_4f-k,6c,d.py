@@ -34,7 +34,7 @@ plot_prefix = "./"
 # =========================
 # Load data
 # =========================
-df_metadata = pd.read_excel("./revision_clustering.xlsx")
+df_metadata = pd.read_excel("./revision_clustering_no_waveform_labels.xlsx")
 df_metadata2 = pd.read_excel("../Neuron_Check_Significant_All.xlsx")
 
 df_fixation = pd.read_excel("../clean_data/cleaned_Fixation.xlsx")
