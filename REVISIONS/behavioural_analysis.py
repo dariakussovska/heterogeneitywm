@@ -1,3 +1,5 @@
+pip install --upgrade scipy statsmodels
+
 """
 Trial-level behavioral link analyses for response to R1.1
 
