@@ -24,11 +24,11 @@ print(subject_trials)
 
 y_matrix = subject_trials
 
-#neuron_ids = df_enc1[df_enc1['Significance'] == 'Y']['Neuron_ID_3'].unique()
+neuron_ids = df_clustering[df_clustering['Signi'] == 'Y']['Neuron_ID_3'].unique()
 # Exclude subject_ids 6, 7, 8, 9, 16, 19
-exclude_subjects = []
-neuron_ids = df_clustering[(df_clustering['Signi'] == 'Y') & 
-                   (~df_enc1['subject_id'].isin(exclude_subjects))]['Neuron_ID_3'].unique()
+#exclude_subjects = []
+#neuron_ids = df_clustering[(df_clustering['Signi'] == 'Y') & 
+#                   (~df_enc1['subject_id'].isin(exclude_subjects))]['Neuron_ID_3'].unique()
 #neuron_ids = df_enc1[df_enc1['subject_id'] == 14]['Neuron_ID_3'].unique()
 #filtered_clustering = df_clustering[df_clustering['Cell_Type_New'].isin(['IN'])]
 #neuron_ids = sorted(
