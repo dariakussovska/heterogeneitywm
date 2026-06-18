@@ -18,14 +18,8 @@ prominence_threshold_percentile = 90 # percentile on smoothed rate
 min_inter_burst_interval = 0.14     
 N_SURROGATES = 100                   # Poisson repetitions per subject
 PRINT_DEBUG = True
-
-# Derived
 min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
-# =========================
 
-# =========================
-# Paths (edit as needed)
-# =========================
 path_decay_acg  = '../Clustering_3D.xlsx'
 path_all_meta   = '../data/all_neuron_brain_regions_cleaned.xlsx'
 path_trials     = '../graph_data/graph_encoding1.xlsx' ### CHANGE TO graph_maintenance.xlsx TO GET MAINTENANCE BURSTS
@@ -330,7 +324,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import wilcoxon, mannwhitneyu, friedmanchisquare
 from statsmodels.stats.multitest import multipletests
 
-out_dir = "/Users/darikussovska/Desktop/"
+out_dir = "./"
 os.makedirs(out_dir, exist_ok=True)
 
 def symbol_from_p(p):
