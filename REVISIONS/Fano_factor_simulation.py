@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-trial_info = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/new_trial_final.xlsx')
+trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][[
     'trial_id_final', 'num_images_presented',
     'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3',
@@ -18,9 +18,9 @@ from sklearn.model_selection import StratifiedKFold
 import ast
 import os
 
-df_delay_filtered = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/graph_dela.xlsx')
-df_fixation       = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Fixation.xlsx')
-df_clustering     = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Significant_All.xlsx')
+df_delay_filtered = pd.read_excel('../clean_data/cleaned_Delay.xlsx')
+df_fixation       = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
+df_clustering     = pd.read_excel('../Neuron_Check_Significant_All.xlsx')
 
 y_matrix = y_matrix.reset_index(drop=True)
 
@@ -33,10 +33,9 @@ n_repeats     = 10
 n_sims        = 100
 random_state  = 42
 
-folder_path = '/Users/darikussovska/Desktop/PROJECT/Figures'
+folder_path = './'
 os.makedirs(folder_path, exist_ok=True)
 
-# ── Helpers ─────────────────────────────────────────────────────────────────
 def parse_spike_times(spike_str):
     if pd.isna(spike_str):
         return []
@@ -46,7 +45,7 @@ def parse_spike_times(spike_str):
     except Exception:
         return []
 
-# ── Filter significant neurons present in delay + fixation ──────────────────
+# Filter significant neurons present in delay + fixation 
 candidate_neurons = df_clustering[df_clustering['Signi'] == 'Y']['Neuron_ID_3'].dropna().unique()
 delay_neurons     = df_delay_filtered['Neuron_ID_3'].dropna().unique()
 fix_neurons       = df_fixation['Neuron_ID_3'].dropna().unique()
@@ -59,7 +58,7 @@ trial_count   = y_matrix.shape[0]
 neuron_count  = len(final_neurons)
 neuron_to_col = {nid: idx for idx, nid in enumerate(final_neurons)}
 
-# ── Build design matrix (spike times per trial x neuron) ────────────────────
+# Build design matrix (spike times per trial x neuron)
 design_matrix = np.empty((trial_count, neuron_count), dtype=object)
 
 delay_lookup = {}
@@ -75,12 +74,12 @@ for trial_idx, row in y_matrix.iterrows():
             (trial_id, neuron_id), np.array([], dtype=float)
         )
 
-# ── Fixation normalization ───────────────────────────────────────────────────
+# Fixation normalization
 df_fix_filt  = df_fixation[df_fixation['Neuron_ID_3'].isin(final_neurons)].copy()
 fixation_means = df_fix_filt.groupby('Neuron_ID_3')['Spikes_rate_Fixation'].mean().to_dict()
 fixation_stds  = df_fix_filt.groupby('Neuron_ID_3')['Spikes_rate_Fixation'].std().to_dict()
 
-# ── Trial labels ─────────────────────────────────────────────────────────────
+# Trial labels
 y_labels = []
 for _, row in y_matrix.iterrows():
     load = row['num_images_presented']
@@ -273,7 +272,7 @@ print("\nDone.")
 
 bin_vals = np.array(bin_sizes)
 
-# ── Compute slopes ────────────────────────────────────────────────────────────
+# Compute slopes 
 real_slopes = {}
 for load in ['Load1', 'Load2', 'Load3']:
     y = np.array([real_curve[b][load] for b in bin_sizes])
@@ -288,7 +287,7 @@ for load in ['Load1', 'Load2', 'Load3']:
     ]
     null_slopes[load] = np.array(slopes)
 
-# ── Permutation statistics ────────────────────────────────────────────────────
+# Permutation statistics 
 p_values_slope = {}
 z_scores       = {}
 print("=" * 60)
@@ -305,7 +304,6 @@ for load in ['Load1', 'Load2', 'Load3']:
     print(f"{load:<8} {rs:>12.4f} {nd.mean():>12.4f} {nd.std():>10.4f} {p:>12.5f} {z:>8.2f}")
 print("=" * 60)
 
-# ── Figure: 3 subpanels (one per load) ────────────────────────────────────────
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 
 load_colors = {'Load1': '#2c7bb6', 'Load2': '#5aae61', 'Load3': '#d7191c'}
