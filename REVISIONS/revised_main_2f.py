@@ -12,18 +12,14 @@ from itertools import combinations
 # =========================
 # LOAD DATA
 # =========================
-trial_info = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/new_trial_final.xlsx')
+trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
 y_matrix = subject_trials
 
-df_delay_filtered = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/graph_dela.xlsx')
-df_fixation = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Fixation.xlsx')
-df_clustering = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Significant_All.xlsx')
-
-# =========================
-# SETTINGS
-# =========================
+df_delay_filtered = pd.read_excel('../clean_data/graph_dela.xlsx')
+df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
+df_clustering = pd.read_excel('../Neuron_Check_Significant_All.xlsx')
 
 bin_sizes = [0.25, 0.5, 0.75, 1.0]
 step_size = 0.025
@@ -35,12 +31,8 @@ n_permutations_null = 1000  # real vs shuffled
 n_permutations_pair = 10000 # paired sign-flip test for bin-vs-bin
 random_state = 42
 
-folder_path = '/Users/darikussovska/Desktop/PROJECT/Figures'
+folder_path = './'
 os.makedirs(folder_path, exist_ok=True)
-
-# =========================
-# HELPERS
-# =========================
 
 def parse_spike_times(spike_str):
     if pd.isna(spike_str):
@@ -187,10 +179,6 @@ final_neurons = np.array(sorted(final_neurons))
 trial_count = y_matrix.shape[0]
 neuron_count = len(final_neurons)
 
-# =========================
-# BUILD DESIGN MATRIX ONCE
-# =========================
-
 design_matrix = np.empty((trial_count, neuron_count), dtype=object)
 design_matrix[:] = None
 
@@ -208,10 +196,6 @@ for trial_idx, row in y_matrix.iterrows():
         spikes = delay_lookup.get((trial_id, neuron_id), np.array([], dtype=float))
         design_matrix[trial_idx, col_idx] = spikes
 
-# =========================
-# FIXATION NORMALIZATION
-# =========================
-
 df_fixation_filtered = df_fixation[df_fixation['Neuron_ID_3'].isin(final_neurons)].copy()
 
 fixation_means = (
@@ -225,10 +209,6 @@ fixation_stds = (
     .std()
     .to_dict()
 )
-
-# =========================
-# LABELS
-# =========================
 
 y_labels = []
 for _, row in y_matrix.iterrows():
@@ -255,10 +235,6 @@ load_trials = {
     3: np.where(y_matrix['num_images_presented'].values == 3)[0],
 }
 
-# =========================
-# BUILD FEATURE MATRIX
-# =========================
-
 def build_matrix(trials, bin_size, end_time):
     time_bins = create_time_bins(0, end_time, bin_size, step_size)
     n_trials = len(trials)
@@ -280,10 +256,6 @@ def build_matrix(trials, bin_size, end_time):
                 matrix[i, j, :] = (binned - mean_fix) / std_fix
 
     return matrix.reshape(n_trials, -1)
-
-# =========================
-# RUN DECODING
-# =========================
 
 regions = [f'{int(b * 1000)} ms' for b in bin_sizes]
 categories = ['Load1', 'Load2', 'Load3']
@@ -353,10 +325,6 @@ for bin_size in tqdm(bin_sizes, desc="Bin sizes"):
         'avg_shuffled_sem': avg_shuffled_sem
     })
 
-# =========================
-# STATS: REAL VS SHUFFLED
-# =========================
-
 p_values = np.zeros((len(bin_sizes), 3))
 
 for bin_idx, r in enumerate(results):
@@ -371,11 +339,6 @@ p_values_flat = p_values.flatten()
 rejected, pvals_fdr, _, _ = multipletests(p_values_flat, alpha=0.05, method='fdr_bh')
 pvals_fdr = pvals_fdr.reshape(p_values.shape)
 rejected = rejected.reshape(p_values.shape)
-
-# =========================
-# STATS: BETWEEN BIN WIDTHS
-# repeated-CV paired comparison
-# =========================
 
 bin_pairs = list(combinations(bin_sizes, 2))
 bin_compare_rows = []
@@ -482,7 +445,7 @@ plt.legend()
 plt.grid(axis='y', linestyle='--', alpha=0.6)
 plt.tight_layout()
 
-plot_save_path = os.path.join(folder_path, "decoding_timebins_repeatedcv_signflip.eps")
+plot_save_path = os.path.join(folder_path, "decoding_timebins_repeatedcv.eps")
 plt.savefig(plot_save_path, format='eps', dpi=300)
 plt.show()
 
