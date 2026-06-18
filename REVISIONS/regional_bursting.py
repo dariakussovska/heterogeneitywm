@@ -11,7 +11,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 df_metadata  = pd.read_excel('../Neuron_Check_Significant_All.xlsx')
-df_metadata2 = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
+df_metadata2 = pd.read_excel('./all_neuron_brain_regions_merged.xlsx')
 
 df_fix   = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')   
 df_enc1  = pd.read_excel('../graph_data/graph_encoding1.xlsx')
@@ -58,7 +58,7 @@ def collapse_lr(loc):
     return s
 
 df_metadata2 = df_metadata2.copy()
-df_metadata2['Region'] = df_metadata2['Location'].apply(collapse_lr)
+df_metadata2['Region'] = df_metadata2['Region'].apply(collapse_lr)
 
 # Optional: enforce only known regions to avoid typos sneaking in
 KNOWN_REGIONS = {'hippocampus', 'amygdala', 'dorsal_anterior_cingulate_cortex', 'pre_supplementary_motor_area'}
