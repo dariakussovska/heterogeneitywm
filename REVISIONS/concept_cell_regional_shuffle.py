@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 input_path = "../clean_data/cleaned_Encoding1.xlsx"
-region_path = "../data/all_neuron_brain_regions_cleaned.xlsx"
+region_path = "./all_neuron_brain_regions_merged.xlsx"
 
 START_TIME = 0.2
 END_TIME = 1.0
