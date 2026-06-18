@@ -28,20 +28,20 @@ PER_SUBJ = 10
 OVERLAP = 2
 
 # Output files
-stats_excel_path = "/Users/darikussovska/Desktop/burst_statistics_results.xlsx"
-plot_prefix = "/Users/darikussovska/Desktop"
+stats_excel_path = "./burst_statistics_results.xlsx"
+plot_prefix = "./"
 
 # =========================
 # Load data
 # =========================
-df_metadata = pd.read_excel("/Users/darikussovska/Desktop/revision_clustering_no_waveform_labels.xlsx")
-df_metadata2 = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/Neuron_Check_ANOVA_All.xlsx")
+df_metadata = pd.read_excel("./revision_clustering.xlsx")
+df_metadata2 = pd.read_excel("../Neuron_Check_Significant_All.xlsx")
 
-df_fixation = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/new_clean_data/cleaned_Fixation.xlsx")
-df_enc1 = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/graph_encoding1.xlsx")
-df_enc2 = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/graph_encoding2.xlsx")
-df_enc3 = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/graph_encoding3.xlsx")
-df_delay = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/graph_delay.xlsx")
+df_fixation = pd.read_excel("../clean_data/cleaned_Fixation.xlsx")
+df_enc1 = pd.read_excel("../graph_data/graph_encoding1.xlsx")
+df_enc2 = pd.read_excel("../graph_data/graph_encoding2.xlsx")
+df_enc3 = pd.read_excel("../graph_data/graph_encoding3.xlsx")
+df_delay = pd.read_excel("../graph_data/graph_delay.xlsx")
 #df_probe = pd.read_excel("/Users/darikussovska/Desktop/PROJECT/graph_probe.xlsx")
 
 encoding_map = {
@@ -511,7 +511,7 @@ for load in [1, 2, 3]:
         y=1.02
     )
     plt.tight_layout()
-    plt.savefig("/Users/darikussovska/Desktop/burst_plot_load_{}.eps".format(load),
+    plt.savefig("./normal_burst_plot_load_{}.eps".format(load),
             format="eps", dpi=300)
     plt.show()
 
