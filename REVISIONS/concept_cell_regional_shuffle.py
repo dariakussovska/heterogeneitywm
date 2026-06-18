@@ -24,7 +24,7 @@ regions.columns = regions.columns.astype(str).str.strip()
 
 
 possible_region_cols = [
-    "Location"
+    "Region"
 ]
 
 region_col = None
@@ -62,7 +62,7 @@ if "Neuron_ID" not in df.columns:
 region_keep = (
     regions[["subject_id", "Neuron_ID_3", region_col]]
     .drop_duplicates()
-    .rename(columns={region_col: "Location"})
+    .rename(columns={region_col: "Region"})
 )
 
 df = df.merge(
@@ -71,14 +71,14 @@ df = df.merge(
     how="left"
 )
 
-df = df.dropna(subset=["Location"]).copy()
+df = df.dropna(subset=["Region"]).copy()
 
 print("Region counts before analysis:")
-print(df[["subject_id", "Neuron_ID_3", "Location"]].drop_duplicates()["Location"].value_counts())
+print(df[["subject_id", "Neuron_ID_3", "Region"]].drop_duplicates()["Region"].value_counts())
 
 top_regions = (
-    df[["subject_id", "Neuron_ID_3", "Location"]]
-    .drop_duplicates()["Location"]
+    df[["subject_id", "Neuron_ID_3", "Region"]]
+    .drop_duplicates()["Region"]
     .value_counts()
     .head(5)
     .index
@@ -88,7 +88,7 @@ top_regions = (
 print("\nTop 5 regions:")
 print(top_regions)
 
-df = df[df["Location"].isin(top_regions)].copy()
+df = df[df["Region"].isin(top_regions)].copy()
 
 def safe_parse_spikes(spikes):
     if pd.isna(spikes):
@@ -146,7 +146,7 @@ def extract_top_two_categories(df, label_col="stimulus_index"):
             if df_neuron.empty:
                 continue
 
-            brain_region = df_neuron["Location"].iloc[0]
+            brain_region = df_neuron["Region"].iloc[0]
 
             category_rows = []
 
@@ -182,7 +182,7 @@ def extract_top_two_categories(df, label_col="stimulus_index"):
                 "subject_id": subj,
                 "Neuron_ID": neuron,
                 "Neuron_ID_3": df_neuron["Neuron_ID_3"].iloc[0],
-                "Location": brain_region,
+                "Region": brain_region,
                 "im_cat_1st": first["image"],
                 "mean_1st": first["mean_rate"],
                 "cat_1st": first["rates"],
@@ -253,7 +253,7 @@ df_final_real = run_significance_test(df_top_2_real, iteration=BOOTSTRAP_ITER)
 
 real_region_counts = (
     df_final_real
-    .groupby("Location")
+    .groupby("Region")
     .agg(
         n_neurons_tested=("Neuron_ID_3", "nunique"),
         n_significant_real=("Signi", lambda x: int((x == "Y").sum()))
@@ -306,7 +306,7 @@ for shuffle_i in range(N_SHUFFLES):
 
     region_counts = (
         df_final_shuff
-        .groupby("Location")
+        .groupby("Region")
         .agg(
             n_neurons_tested=("Neuron_ID_3", "nunique"),
             n_significant_shuffle=("Signi", lambda x: int((x == "Y").sum()))
@@ -326,19 +326,19 @@ summary_rows = []
 for region in top_regions:
 
     real_count = real_region_counts.loc[
-        real_region_counts["Location"] == region,
+        real_region_counts["Region"] == region,
         "n_significant_real"
     ]
 
     real_count = int(real_count.iloc[0]) if len(real_count) else 0
 
     shuff_counts = df_shuffle_region_counts.loc[
-        df_shuffle_region_counts["Location"] == region,
+        df_shuffle_region_counts["Region"] == region,
         "n_significant_shuffle"
     ]
 
     summary_rows.append({
-        "Location": region,
+        "Region": region,
         "real_significant": real_count,
         "mean_significant_under_shuffle": shuff_counts.mean(),
         "std_significant_under_shuffle": shuff_counts.std(),
@@ -382,12 +382,12 @@ if len(top_regions) == 1:
 for ax, region in zip(axes, top_regions):
 
     shuff_counts = df_shuffle_region_counts.loc[
-        df_shuffle_region_counts["Location"] == region,
+        df_shuffle_region_counts["Region"] == region,
         "n_significant_shuffle"
     ]
 
     real_count = summary_by_region.loc[
-        summary_by_region["Location"] == region,
+        summary_by_region["Region"] == region,
         "real_significant"
     ].iloc[0]
 
