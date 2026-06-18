@@ -429,7 +429,6 @@ out_stats_xlsx = "./Region_Burst_Summary_and_Pvalues.xlsx"
 with pd.ExcelWriter(out_stats_xlsx, engine='openpyxl') as writer:
     df_region_summary.to_excel(writer, sheet_name='summary_counts', index=False)
     df_region_stats.to_excel(writer, sheet_name='wilcoxon_pvalues', index=False)
-    df_burst_export.to_excel(writer, sheet_name='raw_burst_counts', index=False)
 
 print("Saved region summary and p-values to:", out_stats_xlsx)
 
