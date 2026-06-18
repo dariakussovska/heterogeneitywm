@@ -10,16 +10,13 @@ from scipy.stats import binom
 from scipy.ndimage import label, find_objects
 import ast
 
-# ===============================
-# 1. Load Spike Data from All Periods
-# ===============================
-df_enc1 = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Encoding1.xlsx')
-df_enc2 = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Encoding2.xlsx')
-df_enc3 = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Encoding3.xlsx')
-df_delay = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Delay.xlsx')
-df_probe = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Probe.xlsx')
-df_fixation = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/clean_data/cleaned_Fixation.xlsx')
-df_clustering = pd.read_excel('/Users/darikussovska/Desktop/PROJECT/Neuron_Check_Significant_MTL.xlsx')
+df_enc1 = pd.read_excel('../clean_data/cleaned_Encoding1.xlsx')
+df_enc2 = pd.read_excel('../clean_data/cleaned_Encoding2.xlsx')
+df_enc3 = pd.read_excel('../clean_data/cleaned_Encoding3.xlsx')
+df_delay = pd.read_excel('../clean_data/cleaned_Delay.xlsx')
+df_probe = pd.read_excel('../clean_data/cleaned_Probe.xlsx')
+df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
+df_clustering = pd.read_excel('./Neuron_Check_Significant_MTL.xlsx')
 
 trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
@@ -213,8 +210,8 @@ for idx, load in enumerate([1, 2, 3]):
 
 fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.75, label="Accuracy (%)")
 plt.suptitle("Cross-Temporal Decoding Accuracy by Load", fontsize=16)
-folder_path = "/Users/darikussovska/Desktop/PROJECT/Figures/Decoding_results"
+folder_path = "./"
 os.makedirs(folder_path, exist_ok=True)
-save_path = os.path.join(folder_path, "cross_temporal_decoding_py.eps")
+save_path = os.path.join(folder_path, "cross_temporal_decoding_MTL.eps")
 plt.savefig(save_path, format='eps', dpi=300)
 plt.show()
