@@ -629,3 +629,92 @@ with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
     real_vs_shuffle_df.to_excel(writer, sheet_name='real_vs_shuffled_stats', index=False)
     py_vs_in_df.to_excel(writer, sheet_name='PY_vs_IN_stats', index=False)
     temporal_window_df.to_excel(writer, sheet_name='temporal_window_stats', index=False)
+
+plot_folder = './'
+os.makedirs(plot_folder, exist_ok=True)
+
+def plot_celltype_decoding(cell_type, results, bin_sizes, save_folder):
+    """
+    One plot per cell type.
+    X-axis = bin size.
+    Lines = Load 1, Load 2, Load 3, combined shuffled.
+    """
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+
+    x = np.array([int(b * 1000) for b in bin_sizes])
+
+    # Real accuracy per load
+    for load in [1, 2, 3]:
+        means = []
+        errors = []
+
+        for bin_size in bin_sizes:
+            vals = results[load][bin_size][f'{cell_type}_real']
+            vals = vals[~np.isnan(vals)]
+
+            means.append(np.mean(vals))
+            errors.append(sem(vals))
+
+        ax.errorbar(
+            x,
+            means,
+            yerr=errors,
+            marker='o',
+            linewidth=2,
+            capsize=4,
+            label=f'Load {load}'
+        )
+
+    # Combined shuffled across Load 1, 2, 3
+    shuf_means = []
+    shuf_errors = []
+
+    for bin_size in bin_sizes:
+        combined_shuf = []
+
+        for load in [1, 2, 3]:
+            vals = results[load][bin_size][f'{cell_type}_shuf']
+            vals = vals[~np.isnan(vals)]
+            combined_shuf.extend(vals)
+
+        combined_shuf = np.array(combined_shuf)
+
+        shuf_means.append(np.mean(combined_shuf))
+        shuf_errors.append(sem(combined_shuf))
+
+    ax.errorbar(
+        x,
+        shuf_means,
+        yerr=shuf_errors,
+        marker='o',
+        linewidth=2,
+        linestyle='--',
+        capsize=4,
+        label='Shuffled combined'
+    )
+
+    ax.axhline(20, linestyle=':', linewidth=1.5, label='Chance level')
+
+    ax.set_xlabel('Bin size (ms)')
+    ax.set_ylabel('Decoding accuracy (%)')
+    ax.set_title(f'{cell_type} decoding accuracy')
+    ax.set_xticks(x)
+    ax.set_ylim(0, 100)
+    ax.legend(frameon=False)
+    ax.spines[['top', 'right']].set_visible(False)
+
+    plt.tight_layout()
+
+    save_path = os.path.join(
+        save_folder,
+        f'{cell_type}_decoding_accuracy_loads_shuffled_combined.eps'
+    )
+
+    plt.savefig(save_path, format='eps', dpi=300, bbox_inches='tight')
+    plt.show()
+
+    print(f'Saved: {save_path}')
+
+plot_celltype_decoding('PY', results, bin_sizes, plot_folder)
+plot_celltype_decoding('IN', results, bin_sizes, plot_folder)
