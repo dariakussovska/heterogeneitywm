@@ -15,7 +15,7 @@ from itertools import combinations
 trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
-y_matrix = subject_trials
+y_matrix = subject_trials.reset_index(drop=True)
 
 df_delay_filtered = pd.read_excel('../clean_data/graph_dela.xlsx')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
@@ -160,10 +160,6 @@ def paired_sign_flip_test(x, y, n_permutations=10000, seed=42):
 
     p = (np.sum(np.abs(null_vals) >= abs(observed)) + 1) / (n_permutations + 1)
     return p, observed, n
-
-# =========================
-# FILTER NEURONS
-# =========================
 
 filtered_clustering = df_clustering[
     (df_clustering['Signi'] == 'Y')
