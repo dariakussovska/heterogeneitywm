@@ -17,7 +17,7 @@ subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', '
 print(subject_trials)
 y_matrix = subject_trials.reset_index(drop=True)
 
-df_delay_filtered = pd.read_excel('../clean_data/graph_dela.xlsx')
+df_delay_filtered = pd.read_excel('../clean_data/graph_Delay.xlsx')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
 df_clustering = pd.read_excel('../Neuron_Check_Significant_All.xlsx')
 
