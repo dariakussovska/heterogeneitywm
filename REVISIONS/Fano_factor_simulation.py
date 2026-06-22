@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
-
+import matplotlib.pyplot as plt
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+import ast
+import os
 trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][[
     'trial_id_final', 'num_images_presented',
@@ -9,14 +13,6 @@ subject_trials = trial_info[trial_info['subject_id'] == 14][[
 ]]
 print(subject_trials)
 y_matrix = subject_trials
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.svm import SVC
-from sklearn.model_selection import StratifiedKFold
-import ast
-import os
 
 df_delay_filtered = pd.read_excel('../clean_data/cleaned_Delay.xlsx')
 df_fixation       = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
