@@ -403,7 +403,7 @@ for i in range(3):
     for j in range(len(regions)):
         p_fdr = pvals_fdr[j, i]
 
-        if p_fdr < 0.001:
+        if p_fdr < 0.005:
             stars = '***'
         elif p_fdr < 0.01:
             stars = '**'
