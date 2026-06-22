@@ -18,7 +18,7 @@ y_matrix = subject_trials.reset_index(drop=True)
 
 df_delay_filtered = pd.read_excel('../graph_data/graph_delay.xlsx')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
-df_clustering = pd.read_excel('../revision_clustering_waveform_labels.xlsx')
+df_clustering = pd.read_excel('./revision_clustering_waveform_labels.xlsx')
 
 # =========================
 # SETTINGS
