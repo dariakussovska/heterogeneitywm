@@ -310,7 +310,7 @@ for ax, load in zip(axes, ['Load1', 'Load2', 'Load3']):
     rs   = real_slopes[load]
     p    = p_values_slope[load]
     z    = z_scores[load]
-    stars = ('***' if p < 0.001 else '**' if p < 0.01 else '*' if p < 0.05 else 'ns')
+    stars = ('***' if p < 0.005 else '**' if p < 0.01 else '*' if p < 0.05 else 'ns')
 
     # Null distribution
     ax.hist(nd, bins=40, color='lightgray', edgecolor='gray', alpha=0.85, label='Fano-matched null')
@@ -408,7 +408,7 @@ for ax, load in zip(axes, ['Load1', 'Load2', 'Load3']):
     z = z_scores[load]
 
     stars = (
-        '***' if p < 0.001 else
+        '***' if p < 0.005 else
         '**'  if p < 0.01 else
         '*'   if p < 0.05 else
         'ns'
