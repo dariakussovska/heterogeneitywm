@@ -16,7 +16,7 @@ y_matrix = subject_trials
 
 df_delay_filtered = pd.read_excel('../clean_data/cleaned_Delay.xlsx')
 df_fixation       = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
-df_clustering     = pd.read_excel('../Neuron_Check_Significant_All.xlsx')
+df_clustering     = pd.read_excel('all_neuron_brain_regions_merged.xlsx')
 
 y_matrix = y_matrix.reset_index(drop=True)
 
@@ -60,7 +60,7 @@ design_matrix = np.empty((trial_count, neuron_count), dtype=object)
 delay_lookup = {}
 for _, row in df_delay_filtered.iterrows():
     key = (row['trial_id_final'], row['Neuron_ID_3'])
-    delay_lookup[key] = np.array(parse_spike_times(row['Standardized_Spikes_in_Delay']), dtype=float)
+    delay_lookup[key] = np.array(parse_spike_times(row['Standardized_Spikes']), dtype=float)
 
 for trial_idx, row in y_matrix.iterrows():
     trial_id = row['trial_id_final']
