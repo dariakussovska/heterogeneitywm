@@ -45,7 +45,7 @@ trialD_train   = gather(trialD, train_idx_by_stim)  # (n_train, n_neurons, n_sti
 trialD_test    = gather(trialD, test_idx_by_stim)
 
 # ------------------------------------------------------------------
-#  (3)  trial averages  + mean-centering over neurons
+#  trial averages  + mean-centering over neurons
 # ------------------------------------------------------------------
 def centre_over_neurons(x):
     m = np.mean(x.reshape(x.shape[0], -1), axis=1, keepdims=True)
