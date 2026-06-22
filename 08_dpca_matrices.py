@@ -235,9 +235,7 @@ print(trialE.shape)
 print(trialD.shape)
 
 import numpy as np
-
-# Define your directory path
-save_directory = "./"  # Replace with your desired path
+save_directory = "./"  
 
 # Save individual files
 np.save(f"{save_directory}trialE.npy", trialE)
