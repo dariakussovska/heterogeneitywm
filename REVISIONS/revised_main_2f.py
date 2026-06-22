@@ -161,8 +161,8 @@ def paired_sign_flip_test(x, y, n_permutations=10000, seed=42):
     p = (np.sum(np.abs(null_vals) >= abs(observed)) + 1) / (n_permutations + 1)
     return p, observed, n
 
-filtered_clustering = df_clustering[
-    (df_clustering['Signi'] == 'Y')
+filtered_clustering = df_delay_filtered[
+    (df_delay_filtered['Signi'] == 'Y')
 ].copy()
 
 candidate_neurons = filtered_clustering['Neuron_ID_3'].dropna().unique()
