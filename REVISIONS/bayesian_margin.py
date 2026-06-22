@@ -327,6 +327,16 @@ for subject_id in sorted(trial_info[SUBJECT_COL].dropna().unique()):
             step_size=STEP_SIZE,
         )
 
+        plot_example_posteriors(
+            bins_delay=bins_delay,
+            post_delay=post_delay,
+            classes=classes,
+            trial_table=trial_table,
+            load=load,
+            subject_id=subject_id,
+            n_trials=N_EXAMPLE_TRIALS,
+            save_dir=POSTERIOR_PLOT_DIR
+         )
         for i, row in trial_table.iterrows():
 
             if load == 1:
