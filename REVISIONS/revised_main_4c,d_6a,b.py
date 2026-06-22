@@ -20,7 +20,7 @@ N_SURROGATES = 100                   # Poisson repetitions per subject
 PRINT_DEBUG = True
 min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
 
-path_decay_acg  = '../Clustering_3D.xlsx'
+path_decay_acg  = './revision_clustering_no_waveform_labels.xlsx'
 path_all_meta   = '../data/all_neuron_brain_regions_cleaned.xlsx'
 path_trials     = '../graph_data/graph_encoding1.xlsx' ### CHANGE TO graph_maintenance.xlsx TO GET MAINTENANCE BURSTS
 
