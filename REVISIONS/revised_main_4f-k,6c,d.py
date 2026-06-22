@@ -35,7 +35,6 @@ plot_prefix = "./"
 # Load data
 # =========================
 df_metadata = pd.read_excel("./revision_clustering_no_waveform_labels.xlsx")
-
 df_fixation = pd.read_excel("../clean_data/cleaned_Fixation.xlsx")
 df_enc1 = pd.read_excel("../graph_data/graph_encoding1.xlsx")
 df_enc2 = pd.read_excel("../graph_data/graph_encoding2.xlsx")
