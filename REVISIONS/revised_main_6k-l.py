@@ -14,9 +14,9 @@ from matplotlib.patches import Patch
 # =========================
 trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
-y_matrix = subject_trials
+y_matrix = subject_trials.reset_index(drop=True)
 
-df_delay_filtered = pd.read_excel('../clean_data/graph_dela.xlsx')
+df_delay_filtered = pd.read_excel('../graph_data/graph_delay.xlsx')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
 df_clustering = pd.read_excel('../revision_clustering_waveform_labels.xlsx')
 
