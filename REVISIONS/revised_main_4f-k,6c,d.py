@@ -35,7 +35,6 @@ plot_prefix = "./"
 # Load data
 # =========================
 df_metadata = pd.read_excel("./revision_clustering_no_waveform_labels.xlsx")
-df_metadata2 = pd.read_excel("../Neuron_Check_Significant_All.xlsx")
 
 df_fixation = pd.read_excel("../clean_data/cleaned_Fixation.xlsx")
 df_enc1 = pd.read_excel("../graph_data/graph_encoding1.xlsx")
@@ -168,7 +167,7 @@ subject_ids_per_category = {}
 
 for category in categories:
     if category == "Concept_cells":
-        subject_counts = df_metadata2[df_metadata2["Signi"] == "Y"]["subject_id"].value_counts()
+        subject_counts = df_metadata[df_metadata["Signi"] == "Y"]["subject_id"].value_counts()
         threshold = 3
 
     elif category in ["Pyramidal", "Interneurons"]:
@@ -203,9 +202,9 @@ for group in categories:
         low_acg, high_acg = split_low_high(df_meta_r2, "Mean_ACG", per_subj=PER_SUBJ, overlap=OVERLAP)
         low_dec, high_dec = split_low_high(df_meta_r2, "Decay", per_subj=PER_SUBJ, overlap=OVERLAP)
 
-        concept_ids = df_metadata2[
-            (df_metadata2["subject_id"] == subject_id) &
-            (df_metadata2["Signi"] == "Y")
+        concept_ids = df_metadata[
+            (df_metadata["subject_id"] == subject_id) &
+            (df_metadata["Signi"] == "Y")
         ]["Neuron_ID_3"].tolist()
 
         neuron_groups = {
