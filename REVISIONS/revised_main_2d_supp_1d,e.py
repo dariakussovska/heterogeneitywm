@@ -24,6 +24,9 @@ print(subject_trials)
 
 y_matrix = subject_trials
 
+# Reset the index right after creating y_matrix
+y_matrix = subject_trials.reset_index(drop=True)
+
 neuron_ids = df_clustering[df_clustering['Signi'] == 'Y']['Neuron_ID_3'].unique()
 # Exclude subject_ids 6, 7, 8, 9, 16, 19
 #exclude_subjects = []
