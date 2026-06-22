@@ -181,7 +181,7 @@ design_matrix[:] = None
 delay_lookup = {}
 for _, row in df_delay_filtered.iterrows():
     key = (row['trial_id_final'], row['Neuron_ID_3'])
-    delay_lookup[key] = np.array(parse_spike_times(row['Standardized_Spikes_in_Delay']), dtype=float)
+    delay_lookup[key] = np.array(parse_spike_times(row['Standardized_Spikes']), dtype=float)
 
 neuron_to_col = {nid: idx for idx, nid in enumerate(final_neurons)}
 
