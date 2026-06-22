@@ -327,16 +327,6 @@ for subject_id in sorted(trial_info[SUBJECT_COL].dropna().unique()):
             step_size=STEP_SIZE,
         )
 
-        plot_example_posteriors(
-            bins_delay=bins_delay,
-            post_delay=post_delay,
-            classes=classes,
-            trial_table=trial_table,
-            load=load,
-            subject_id=subject_id,
-            n_trials=N_EXAMPLE_TRIALS,
-            save_dir=POSTERIOR_PLOT_DIR
-         )
         for i, row in trial_table.iterrows():
 
             if load == 1:
@@ -383,88 +373,3 @@ results_df.to_excel(OUTPUT_PATH, index=False)
 
 print(f"\nSaved trial-level decoder margins to:\n{OUTPUT_PATH}")
 print(f"Valid subjects used: {valid_subjects}")
-
-# =========================
-# PLOT EXAMPLE POSTERIORS
-# =========================
-
-import matplotlib.pyplot as plt
-import os
-
-POSTERIOR_PLOT_DIR = "./posterior_example_plots"
-os.makedirs(POSTERIOR_PLOT_DIR, exist_ok=True)
-
-N_EXAMPLE_TRIALS = 3  # change if you want more/less
-
-
-def plot_example_posteriors(
-    bins_delay,
-    post_delay,
-    classes,
-    trial_table,
-    load,
-    subject_id,
-    n_trials=3,
-    save_dir="./posterior_example_plots"
-):
-    """
-    Plots posterior probability across delay time for each stimulus identity.
-    One figure per example trial.
-    """
-
-    n_trials = min(n_trials, len(trial_table))
-
-    # pick evenly spaced example trials, not just the first few
-    example_idxs = np.linspace(0, len(trial_table) - 1, n_trials, dtype=int)
-
-    for i in example_idxs:
-        row = trial_table.iloc[i]
-        trial_id = row[TRIAL_COL]
-
-        plt.figure(figsize=(8, 5))
-
-        for c_i, stim_id in enumerate(classes):
-            plt.plot(
-                bins_delay,
-                post_delay[i, :, c_i],
-                marker="o",
-                linewidth=2,
-                label=f"Stim {stim_id}"
-            )
-
-        # mark presented stimuli
-        if load == 1:
-            presented = [row["stimulus_index_enc1"]]
-        elif load == 2:
-            presented = [
-                row["stimulus_index_enc1"],
-                row["stimulus_index_enc2"],
-            ]
-        else:
-            presented = [
-                row["stimulus_index_enc1"],
-                row["stimulus_index_enc2"],
-                row["stimulus_index_enc3"],
-            ]
-
-        presented = [p for p in presented if not pd.isna(p)]
-
-        plt.title(
-            f"Subject {subject_id} | Load {load} | Trial {trial_id}\n"
-            f"Presented: {presented}"
-        )
-        plt.xlabel("Delay time (s)")
-        plt.ylabel("Posterior probability")
-        plt.ylim(0, 1)
-        plt.legend(title="Decoder class", bbox_to_anchor=(1.05, 1), loc="upper left")
-        plt.tight_layout()
-
-        outpath = os.path.join(
-            save_dir,
-            f"subject_{subject_id}_load_{load}_trial_{trial_id}_posterior.png"
-        )
-
-        plt.savefig(outpath, dpi=300)
-        plt.show()
-
-        print(f"Saved posterior plot: {outpath}")
