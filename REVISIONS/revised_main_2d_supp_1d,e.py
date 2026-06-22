@@ -22,9 +22,6 @@ trial_info = pd.read_excel('../data/new_trial_final.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 print(subject_trials)
 
-y_matrix = subject_trials
-
-# Reset the index right after creating y_matrix
 y_matrix = subject_trials.reset_index(drop=True)
 
 neuron_ids = df_clustering[df_clustering['Signi'] == 'Y']['Neuron_ID_3'].unique()
@@ -145,7 +142,6 @@ colors = [
     (138/255, 31/255, 34/255)
 ]
 custom_cmap = LinearSegmentedColormap.from_list("custom_red_blue", colors)
-print(X.shape)
 
 from scipy.stats import binom
 from statsmodels.stats.multitest import fdrcorrection
