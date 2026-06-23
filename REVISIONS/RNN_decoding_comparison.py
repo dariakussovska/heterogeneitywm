@@ -9,10 +9,6 @@ import random
 import warnings
 warnings.filterwarnings('ignore')
 
-# =============================================
-# Helper functions
-# =============================================
-
 def create_time_bins(duration, bin_size, step_size):
     return np.arange(0, duration - bin_size + step_size, step_size)
 
@@ -639,15 +635,12 @@ stat_diff, p_diff = mannwhitneyu(real_diff, rnn_model_means_diff_rescaled, alter
 
 print(f"\nPresented duration:")
 print(f"  Mann-Whitney U = {stat_pres:.1f}, p = {p_pres:.6f}")
-print(f"  {'✓ SIGNIFICANT difference' if p_pres < 0.05 else '✗ NOT significant'}")
 
 print(f"\nNon-presented duration:")
 print(f"  Mann-Whitney U = {stat_non:.1f}, p = {p_non:.6f}")
-print(f"  {'✓ SIGNIFICANT difference' if p_non < 0.05 else '✗ NOT significant'}")
 
 print(f"\nDifference (presented - non-presented):")
 print(f"  Mann-Whitney U = {stat_diff:.1f}, p = {p_diff:.6f}")
-print(f"  {'✓ SIGNIFICANT difference' if p_diff < 0.05 else '✗ NOT significant'}")
 
 # Effect size
 def cohen_d(x, y):
@@ -682,17 +675,8 @@ data_diff = pd.DataFrame({
     'Metric': 'Difference (Presented - Non-presented)'
 })
 
-# Combine all data
 all_data = pd.concat([data_pres, data_non, data_diff], ignore_index=True)
-
-# =============================================
-# STEP 6: Create seaborn boxplots with swarmplots
-# =============================================
-
-# Set up the figure
 fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-
-# Define colors
 colors = {'Real Data': '#3498db', 'RNN Models': '#e74c3c'}
 
 # Plot each metric
@@ -738,7 +722,7 @@ for idx, metric in enumerate(['Presented Duration', 'Non-presented Duration', 'D
                 color='black', linewidth=1.5)
         
         # Add p-value text
-        if p_val < 0.001:
+        if p_val < 0.005:
             p_text = '***'
         elif p_val < 0.01:
             p_text = '**'
@@ -759,11 +743,6 @@ print("\n Plots saved as:")
 print("   - real_vs_rnn_model_level.eps")
 
 plt.show()
-
-
-# =============================================
-# STEP 8: Save results
-# =============================================
 
 comparison_results = {
     'real_data': {
@@ -804,16 +783,6 @@ comparison_results = {
 
 with open('real_vs_rnn_comparison.pkl', 'wb') as f:
     pickle.dump(comparison_results, f)
-
-print("\n Results saved to 'real_vs_rnn_comparison.pkl'")
-
-# =============================================
-# STEP 9: Summary
-# =============================================
-
-print("\n" + "="*60)
-print("SUMMARY")
-print("="*60)
 
 print(f"\nTime scaling: {rnn_delay_duration}s → {real_delay_duration}s (factor {time_scale:.2f})")
 
