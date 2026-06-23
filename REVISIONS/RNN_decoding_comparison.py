@@ -304,10 +304,8 @@ def load_and_prepare_model(model_path, use_inhibitory=True):
     print(f"  Loading {os.path.basename(model_path)}...")
     
     try:
-        # Try v7.3 first
         mat_data = load_model_v73(model_path)
     except:
-        # Fall back to scipy
         mat_data = loadmat(model_path)
     
     # Find spike data
@@ -506,8 +504,6 @@ if len(all_model_results) > 0:
     if not np.all(all_pres_durs == all_non_durs):
         stat_wilcox_all, p_val_wilcox_all = wilcoxon(all_pres_durs, all_non_durs)
         print(f"  Wilcoxon (all trials): statistic={stat_wilcox_all:.1f}, p={p_val_wilcox_all:.4e}")
-    
-    # Intermediate diagnostic plots removed. The final publication-style real-vs-RNN plot is kept below.
 
     # Print summary table
     print("\n" + "="*80)
@@ -544,14 +540,12 @@ if len(all_model_results) > 0:
 else:
     print("\n No models were successfully processed!")
 
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import mannwhitneyu
 import pickle
 import pandas as pd
 
-# Set seaborn style for publication-ready plots
 sns.set_style("whitegrid")
 sns.set_context("paper", font_scale=1.5)
 
