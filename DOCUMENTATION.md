@@ -2,7 +2,7 @@
 
 ## DATA EXTRACTION
 
-1) Install the dataset (from https://www.nature.com/articles/s41597-024-02943-8) and put it in a folder on your local computer. Here, we are using the folder heterogeneity_wm, and the dataset files are in the folder 000469. 
+1) Install the dataset (from https://www.nature.com/articles/s41597-024-02943-8) and put it in a folder on your local computer. Directions are given in the README.md file. Here, we are using the folder heterogeneity_wm, and the dataset files are in the folder 000469. 
 2) Run the scripts 01_data_extraction.py and 02_trial_info.py. 
 
 - These scripts are aimed to make the extraction of necessary data for the analysis easier and more convenient.
