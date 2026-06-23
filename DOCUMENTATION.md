@@ -119,7 +119,7 @@ all_neuron_brain_regions_cleaned.xlsx. Given as a cleaned version of all the neu
 
 Neuron_Check_Significant_All.xlsx. An excel file containing the statistical analysis conducted of every neuron, using its individual spikes in all encoding 1 period trials. Contains p values, confidence intervals, top two image categories from which the statistical analysis is conducted and determines significance (Y if significant and N if non-significant – aka non concept cell). 
 
-merged_significant_braing_regions_
+merged_significant_neurons_with_brain_regions.xlsx.: an Excel file with all cells, including notation for the concept cells and their location in the brain. 
 
 **Figures:** 
 
