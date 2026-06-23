@@ -57,7 +57,6 @@ y_matrix = trial_info[
     "stimulus_index_enc1",
     "stimulus_index_enc2",
     "stimulus_index_enc3",
-    "response_accuracy",
 ]].reset_index(drop=True)
 
 # Pooled concept cells, excluding subjects with less than 135 trials 
