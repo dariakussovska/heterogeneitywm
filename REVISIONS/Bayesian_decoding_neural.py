@@ -12,7 +12,7 @@ from scipy.stats import ttest_1samp, wilcoxon
 # =========================
 PROJECT_DIR = "../"
 CLEAN_DIR = os.path.join(PROJECT_DIR, "clean_data")
-OUTPUT_DIR = os.path.join(PROJECT_DIR, "Bayesian_decoder_outputs_minimal")
+OUTPUT_DIR = os.path.join(PROJECT_DIR, "Bayesian_decoding")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 TRIAL_INFO_PATH = os.path.join(PROJECT_DIR, "trial_info.xlsx")
