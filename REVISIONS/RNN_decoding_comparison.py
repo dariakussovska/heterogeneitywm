@@ -1,3 +1,5 @@
+### CAN RUN THIS ONLY AFTER RUNNING BAYESIAN_DECODING_NEURAL.PY CODE
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import wilcoxon, mannwhitneyu, ttest_rel
