@@ -249,7 +249,7 @@ Here, we are performing a bursting analysis in all cells and across subjects to 
 
 ## CELL-TYPE CLASSIFICATION
 
-Here, we are extracting waveforms and spike times and using Cell Explorer functions to find properties of the waveforms and attempt to label the neurons by Interneurons and Pyramidal cells.
+Here, we are extracting waveforms and spike times and using Cell Explorer functions to find properties of the waveforms and attempt to label the neurons as Interneurons and Pyramidal cells.
 
 - We have provided an intial matrix with spike times and total number of neurons under data >> cell_analysis >> spikes_struct.m. We have also provided the functions needed to calculate ACGs (raw and normalized), calculate mean ACG, fit the ACG (CellExplorer function) to get parameters such as decay time constant, ACG tau rise, and others. 
 
