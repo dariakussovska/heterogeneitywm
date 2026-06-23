@@ -10,3 +10,9 @@ After downloading, place the `.mat` files in the following folder:
 
 ```text
 REVISIONS/RNN_models/
+```
+Without this, you won't be able to run the 
+```text
+RNN_decoding_comparison.py
+```
+ file. 
