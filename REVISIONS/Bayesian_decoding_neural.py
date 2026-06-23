@@ -7,9 +7,6 @@ import matplotlib.pyplot as plt
 from scipy.special import logsumexp
 from scipy.stats import ttest_1samp, wilcoxon
 
-# =========================
-# PATHS
-# =========================
 PROJECT_DIR = "../"
 CLEAN_DIR = os.path.join(PROJECT_DIR, "clean_data")
 OUTPUT_DIR = os.path.join(PROJECT_DIR, "Bayesian_decoding")
@@ -735,7 +732,7 @@ for load in [1, 2, 3]:
 
     duration_results[load] = out
 
-    pkl_path = os.path.join(OUTPUT_DIR, f"bayesian_presented_item_duration_load{load}.pkl")
+    pkl_path = os.path.join(OUTPUT_DIR, f"real_data_results_load{load}.pkl")
     with open(pkl_path, "wb") as f:
         pickle.dump(out, f)
 
