@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore")
 
 BASE = "../"
-OUT = BASE + ../
+OUT = BASE + "HMM_figures"
 DESKTOP = "../"
 os.makedirs(OUT, exist_ok=True)
 
