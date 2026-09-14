@@ -276,7 +276,7 @@ def load_cfi_file(cat):
     return cfi_datasets[cat]
 
 
-trial_info = pd.read_excel(BASE + "trial_info.xlsx")[["subject_id", "trial_id", "num_images_presented"]]
+trial_info = pd.read_excel("trial_info.xlsx")[["subject_id", "trial_id", "num_images_presented"]]
 
 
 def zwithin(df, col, out):
