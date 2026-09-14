@@ -60,7 +60,7 @@ Detailed explanation of each of these and how to run them is found under "Docume
 After data extraction, you need just two more steps before you have all necessary files to run all analyses and get all figures. First, standardize the spikes. Run the code standardization.py 
 
 ```
-python 01_standardization.py
+python 03_standardization.py
 ```
 
 In order to standardize the spikes in two different ways: for PSTH graphs (standardizing by start of each corresponding period); and for cross-temporal decoding (standardizing the spikes from the encoding period). This outputs two folders with standardized spikes column, as well as adds new neuron identities (subject id + 0 + neuron id) for ease of use. 
@@ -81,7 +81,7 @@ python 06_add_category.py
 This step needed to recreate all figures with ease is to perform the cell-classification analysis. For preprocessing and how we get the cell metrics needed to classify neurons into pyramidal cells and interneurons, you can read the corresponding section in the DOCUMENTATION.md file. This analysis is done in Matlab with the help of the software CellExplorer, and functions required for it are listed in the "data" folder. However, here, we have provided the outputs of the CellExplorer function under data >> Cell_analysis.xlsx. With the code 07_cell_types.py, we will just run the spectral clustering on those metrics and assign neurons as pyramidal (PY) or interneurons (IN) for subsequent analysis.
 
 ```
-python 07_cell_types.py
+python 07_spectral_clustering.py
 ```
 # Dimensionality reduction matrices
 
