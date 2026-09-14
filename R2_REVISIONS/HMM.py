@@ -18,9 +18,9 @@ DESKTOP = "../"
 os.makedirs(OUT, exist_ok=True)
 
 BIN_WIDTH = 0.03            # 30 ms, matches burst-detection bin size used elsewhere in this project
-ENC_DURATION = 1.0          # s, natural encoding window
-MAINT_DURATION = 2.8        # s, full recorded delay period
-TEST_FRACTION = 0.30        # single held-out split, used only for the "final parameter estimate" fits
+ENC_DURATION = 1.0         
+MAINT_DURATION = 2.8        
+TEST_FRACTION = 0.30        
 SEED = 0
 
 K_FOLDS = 5                 # cross-validated model-comparison fold count
