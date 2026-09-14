@@ -228,7 +228,7 @@ def subjects_for_category(category):
 for _cat in ALL_CATEGORIES:
     print(f"{_cat}: {len(subjects_for_category(_cat))} eligible subjects for CFI")
 
-trial_info_rt_acc = pd.read_excel(BASE + "trial_info.xlsx")[
+trial_info_rt_acc = pd.read_excel("../" + "trial_info.xlsx")[
     ["subject_id", "trial_id", "RT", "response_accuracy"]].drop_duplicates()
 trial_info_rt_acc["subject_id"] = trial_info_rt_acc["subject_id"].astype(int)
 trial_info_rt_acc["trial_id"] = trial_info_rt_acc["trial_id"].astype(int)
