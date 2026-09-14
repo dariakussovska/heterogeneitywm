@@ -172,14 +172,21 @@ def parse_spike_entry_raw(val):
 
 
 def build_spike_cache(df, neuron_ids):
+    # Use Standardized_Spikes (already relative to each trial's own period start, and already
+    # windowed to that period at raw-extraction time in 01_data_extraction.py's
+    # calculate_spike_rate: `start_time <= spike < stop_time`) instead of re-deriving from raw
+    # "Spikes"/"start_time"/"stop_time" columns. Those raw column names are encoding-period-specific
+    # ("Spikes", "start_time", "stop_time") -- the delay period's raw columns are named
+    # "Spikes_in_Delay"/"Delay_Start"/"Delay_End" by 01_data_extraction.py's process_delay_periods,
+    # and 03_standardization.py's create_graph_data() never renames them to match. Reading
+    # Standardized_Spikes directly works uniformly for both graph_encoding1.xlsx and
+    # graph_delay.xlsx without depending on either period's raw column-naming convention.
     df = df[df["Neuron_ID_3"].isin(neuron_ids)]
     cache = {}
     for neuron_id, ndf in df.groupby("Neuron_ID_3"):
         trial_map = {}
         for trial_id, g in ndf.groupby("trial_id"):
-            spikes = parse_spike_entry_raw(g["Spikes"].iloc[0])
-            start, stop = float(g["start_time"].iloc[0]), float(g["stop_time"].iloc[0])
-            trial_map[int(trial_id)] = spikes[(spikes >= start) & (spikes <= stop)] - start
+            trial_map[int(trial_id)] = parse_spike_entry_raw(g["Standardized_Spikes"].iloc[0])
         cache[int(neuron_id)] = trial_map
     return cache
 
