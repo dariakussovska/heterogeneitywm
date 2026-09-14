@@ -191,7 +191,7 @@ delay_df = pd.read_excel(GRAPH_DATA + "graph_delay.xlsx")
 delay_df["subject_id"] = delay_df["subject_id"].astype(int)
 delay_df["trial_id"] = delay_df["trial_id"].astype(int)
 
-sig_df = pd.read_excel(BASE + "merged_significant_neurons_with_brain_regions.xlsx")
+sig_df = pd.read_excel(BASE + "REVISIONS/all_neuron_brain_regions_merged.xlsx")
 concept_ids = set(sig_df.loc[sig_df["Signi"] == "Y", "Neuron_ID_3"])
 print(f"{len(concept_ids)} concept cells (Signi == 'Y')")
 
