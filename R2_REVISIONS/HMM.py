@@ -182,10 +182,6 @@ print(f"fit lam={f2b['lam'].round(2)} (true=5.0 for both -- should be close toge
 print(f"held-out delta-LL/bin (2state - 1state) = {delta_null:.5f}  (expect ~0, small in magnitude)")
 assert abs(delta_null) < 0.01, "negative control FAILED: 2-state spuriously beating 1-state by a lot on pure noise"
 
-# graph_encoding1.xlsx/graph_delay.xlsx are produced by 03_standardization.py's
-# create_graph_data() into "graph_data/", not into the repo root -- BASE ("../") is still
-# used below for merged_significant_neurons_with_brain_regions.xlsx, which is one of the
-# repo's "provided extracted data" files and does live at repo root.
 GRAPH_DATA = BASE + "graph_data/"
 enc_df = pd.read_excel(GRAPH_DATA + "graph_encoding1.xlsx")
 enc_df["subject_id"] = enc_df["subject_id"].astype(int)
@@ -199,9 +195,6 @@ sig_df = pd.read_excel(BASE + "merged_significant_neurons_with_brain_regions.xls
 concept_ids = set(sig_df.loc[sig_df["Signi"] == "Y", "Neuron_ID_3"])
 print(f"{len(concept_ids)} concept cells (Signi == 'Y')")
 
-# R2-filtered IN/PY labels: use the .xlsx already committed under REVISIONS/ (same
-# Neuron_ID_3/Cell_Type_New schema, 170 IN + 123 PY) rather than a CSV on the Desktop that
-# isn't part of this repo.
 r2_labels = pd.read_excel(BASE + "REVISIONS/revision_clustering_no_waveform_labels.xlsx")
 r2_labels["Cell_Type_New"] = r2_labels["Cell_Type_New"].fillna("").astype(str).str.strip()
 labelled_IN_ids = set(r2_labels.loc[r2_labels.Cell_Type_New == "IN", "Neuron_ID_3"].astype(int))
