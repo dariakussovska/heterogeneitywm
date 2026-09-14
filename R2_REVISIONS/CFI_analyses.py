@@ -47,7 +47,7 @@ for _df in (enc_df, delay_df):
     _df["subject_id"] = _df["subject_id"].astype(int)
     _df["trial_id"] = _df["trial_id"].astype(int)
 
-r2_labels = pd.read_excel(DESKTOP + "revision_clustering_no_waveform_labels.xlsx", sep="\t")
+r2_labels = pd.read_excel(DESKTOP + "revision_clustering_no_waveform_labels.xlsx")
 full_labels = pd.read_excel(DESKTOP + "revision_clustering_waveform_labels.xlsx")
 
 
