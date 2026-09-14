@@ -18,9 +18,9 @@ from IPython.display import display
 warnings.simplefilter("ignore", ConvergenceWarning)
 warnings.simplefilter("ignore", UserWarning)
 
-BASE = "../"
-DESKTOP = "../"
-OUT = BASE + "CFI_Figures"
+BASE = "../graph_data/"
+DESKTOP = "../REVISIONS/"
+OUT = "CFI_Figures"
 os.makedirs(OUT, exist_ok=True)
 
 BIN_SIZE = 0.03
@@ -47,8 +47,8 @@ for _df in (enc_df, delay_df):
     _df["subject_id"] = _df["subject_id"].astype(int)
     _df["trial_id"] = _df["trial_id"].astype(int)
 
-r2_labels = pd.read_csv(DESKTOP + "cell_clustering_no_waveform_labels.csv", sep="\t")
-full_labels = pd.read_csv(BASE + "cell_types.csv")
+r2_labels = pd.read_excel(DESKTOP + "revision_clustering_no_waveform_labels.xlsx", sep="\t")
+full_labels = pd.read_excel(DESKTOP + "revision_clustering_waveform_labels.xlsx")
 
 
 def neurons_for(category):
