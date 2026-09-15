@@ -6,7 +6,7 @@ pandas==3.0.5
 # Modeling / stats
 scikit-learn==1.9.0
 statsmodels==0.14
-scikit-posthocs=0.16.1
+scikit-posthocs==0.16.1
 
 # Dimensionality reduction
 umap-learn==0.5.12
