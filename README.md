@@ -23,16 +23,6 @@ dandi download DANDI:000469/0.240123.1806
 ```
 Detailed description of the dataset is included in the original paper by Kyzar et al., 2024. 
 
-If you don't have dCPA installed, you can do it like this:
-```
-git clone https://github.com/machenslab/dPCA.git
-cd dPCA
-cd python
-pip install -e .
-% If it gives you a mistake with the sklearn, you can do the following:
-% nano setup.py
-% Change sklearn to scikit-learn
-```
 Installing this repo and running each analysis step takes approximately 15-20 minutes on a standard desktop computer (16 CPU cores, 16-32 GB RAM), once the above dataset is downloaded.
 
 # Data extraction and organization
