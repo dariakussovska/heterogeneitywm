@@ -734,7 +734,7 @@ plt.suptitle(f'Model-Level Comparison: Real Data vs RNN Models\n(Rescaled from {
 plt.tight_layout()
 
 # Save as EPS 
-plt.savefig('/home/daria/Desktop/real_vs_rnn_model_level.eps', format='eps', dpi=300, bbox_inches='tight')
+plt.savefig('./Bayesian_decoding/real_vs_rnn_model_level.eps', format='eps', dpi=300, bbox_inches='tight')
 print("\n Plots saved as:")
 print("   - real_vs_rnn_model_level.eps")
 
