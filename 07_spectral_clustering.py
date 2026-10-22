@@ -33,18 +33,9 @@ df_filtered["UMAP_1"] = embedding[:, 0]
 df_filtered["UMAP_2"] = embedding[:, 1]
 df_filtered["UMAP_3"] = embedding[:, 2]
 
-# Assign cell types based on Spectral clustering
-def map_spectral_to_type(spectral_label):
-    if pd.isna(spectral_label):
-        return None
-    if int(spectral_label) == 0:
-        return "PY"
-    elif int(spectral_label) == 1:
-        return "IN"
-    else:
-        return None
-
-df_filtered["Cell_Type_New"] = df_filtered["Spectral"].apply(map_spectral_to_type)
+# The cluster with the higher median firing rate = putative interneurons (IN), the other = putative pyramidal (PY)
+in_cluster = df_filtered.groupby("Spectral")["firing_rate"].median().idxmax()
+df_filtered["Cell_Type_New"] = np.where(df_filtered["Spectral"] == in_cluster, "IN", "PY")
 
 # Count results
 count_py = len(df_filtered[df_filtered["Cell_Type_New"] == "PY"])
