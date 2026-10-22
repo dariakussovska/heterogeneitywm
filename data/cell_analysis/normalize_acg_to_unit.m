@@ -23,3 +23,4 @@ function [acg_unit] = normalize_acg_to_unit(acg)
     % Force zero-lag bin to 0 (prevents tiny numerical bumps)
     acg_unit(zeroBin, :) = 0;
 end
+
