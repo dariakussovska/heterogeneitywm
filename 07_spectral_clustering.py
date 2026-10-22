@@ -13,14 +13,14 @@ warnings.filterwarnings("ignore")
 # Load and preprocess data
 df = pd.read_excel("./data/cell_analysis/Cell_metrics.xlsx")
 
-df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "acg_norm", "tau_rise"]).copy()
+df_filtered = df[(df["R2"] >= 0.3)].dropna(subset=["firing_rate", "mean_acg", "tau_rise"]).copy()
 
 hex_palette = {  
     "Spectral": ['#3254A2', '#941A37']
 }
 
 # Feature matrix
-X = df_filtered[["firing_rate", "acg_norm", "tau_rise"]].values
+X = df_filtered[["firing_rate", "mean_acg", "tau_rise"]].values
 X_scaled = StandardScaler().fit_transform(X)
 
 # Spectral clustering
@@ -37,9 +37,9 @@ df_filtered["UMAP_3"] = embedding[:, 2]
 def map_spectral_to_type(spectral_label):
     if pd.isna(spectral_label):
         return None
-    if int(spectral_label) == 1:
+    if int(spectral_label) == 0:
         return "PY"
-    elif int(spectral_label) == 0:
+    elif int(spectral_label) == 1:
         return "IN"
     else:
         return None
