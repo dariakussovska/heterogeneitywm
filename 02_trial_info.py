@@ -40,10 +40,10 @@ def calculate_metrics(units_data):
         return len(spike_times) / (spike_times[-1] - spike_times[0])
 
     def calculate_cv2(spike_times):
-        if len(spike_times) < 2:
+        if len(spike_times) < 3:
             return np.nan
         isi = np.diff(spike_times)
-        return np.std(isi) / np.mean(isi)
+        return np.mean(2 * np.abs(np.diff(isi)) / (isi[1:] + isi[:-1]))
 
     metrics = pd.DataFrame({
         'ISI_3ms': units_data['spike_times'].apply(calculate_isi),
