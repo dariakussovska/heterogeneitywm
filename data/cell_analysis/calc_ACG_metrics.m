@@ -1,5 +1,6 @@
-function acg_metrics = calc_ACG_metrics(spikes,sr,varargin)
-% Two autocorrelograms are calculated:  narrow (100ms, 0.5ms bins) and wide (1s, 1ms bins) using the CCG function (for speed)
+function acg_metrics = calc_ACG_metrics(spikes,varargin)
+% Two autocorrelograms are calculated:  narrow (100ms, 0.5ms bins) and wide (1s, 1ms bins) using compute_acg.m
+% spikes.times: 1 x N cell of spike times in SECONDS; spikes.total: spike count per unit.
 %
 % Further three metrics are derived from these:
 %
@@ -19,6 +20,8 @@ function acg_metrics = calc_ACG_metrics(spikes,sr,varargin)
 % By Peter Petersen
 % petersen.peter@gmail.com
 % Last edited: 06-10-2020
+% Modified for heterogeneitywm: ACGs from compute_acg.m (pairs binned by round(dt/binSize) in seconds) instead of
+% CCG/CCGHeart with 'Fs',1, which gave a 0-sample bin size for spike times in seconds. No sampling rate or mex needed.
 p = inputParser;
 addParameter(p,'showFigures',true,@islogical);
 parse(p,varargin{:})
@@ -38,8 +41,8 @@ acg_narrow = zeros(bins_narrow*2+1,numel(spikes.times));
 disp('Calculating narrow ACGs (100ms, 0.5ms bins) and wide ACGs (1s, 1ms bins)')
 tic
 for i = cell_indexes
-    acg_wide(:,i) = CCG(spikes.times{i},ones(size(spikes.times{i})),'binSize',0.001,'duration',1,'norm','rate','Fs',1);
-    acg_narrow(:,i) = CCG(spikes.times{i},ones(size(spikes.times{i})),'binSize',0.0005,'duration',0.100,'norm','rate','Fs',1);
+    acg_wide(:,i) = compute_acg(spikes.times{i},0.001,1);
+    acg_narrow(:,i) = compute_acg(spikes.times{i},0.0005,0.100);
     % Metrics from narrow
     BurstIndex_Doublets(i) = max(acg_narrow(bins_narrow+1+5:bins_narrow+1+16,i))/mean(acg_narrow(bins_narrow+1+16:bins_narrow+1+23,i));
     % Metrics from wide
@@ -62,3 +65,4 @@ acg_metrics.acg_narrow = acg_narrow;
 acg_metrics.thetaModulationIndex = ThetaModulationIndex;
 acg_metrics.burstIndex_Royer2012 = BurstIndex_Royer2012;
 acg_metrics.burstIndex_Doublets = BurstIndex_Doublets;
+
