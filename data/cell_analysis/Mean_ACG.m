@@ -1,5 +1,5 @@
 % Extract the ACG matrix 
-acg_values = spikes.acg.wide;  
+acg_values = spikes.acg_wide;  
 
 % Compute the mean ACG for each neuron (column-wise mean)
 mean_acg_values = mean(acg_values, 1, 'omitnan'); 
