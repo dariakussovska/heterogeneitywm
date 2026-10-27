@@ -23,17 +23,13 @@ duration = {
    # "Probe": 1
 }
 
-# Per-subject low/high split knobs for ACG/Decay
+# Per-subject low/high split for neurons with different ACGs 
 PER_SUBJ = 10
 OVERLAP = 2
 
-# Output files
 stats_excel_path = "./burst_statistics_results.xlsx"
 plot_prefix = "./"
 
-# =========================
-# Load data
-# =========================
 df_metadata = pd.read_excel("./revision_clustering_no_waveform_labels.xlsx")
 df_metadata2 = pd.read_exceel("./all_neurons_brain_regions_merged.xlsx")
 df_fixation = pd.read_excel("../clean_data/cleaned_Fixation.xlsx")
@@ -77,9 +73,6 @@ burst_counts = {
     for cat in categories
 }
 
-# =========================
-# Helper functions
-# =========================
 def parse_spike_list(x, trial_dur):
     """Safely parse a stringified list of spikes; clip to [0, trial_dur]."""
     if pd.isna(x):
@@ -106,8 +99,7 @@ def parse_spike_list(x, trial_dur):
 
 def split_low_high(df_subj, feature, per_subj=PER_SUBJ, overlap=OVERLAP):
     """
-    Deterministically split one subject's neurons into low/high sets by `feature`.
-    Requires at least `per_subj` rows after dropping NaNs in feature.
+    Split one subject's neurons into low/high sets by ACG feature.
     """
     if df_subj.empty or feature not in df_subj.columns:
         return [], []
@@ -160,9 +152,8 @@ def add_hash(ax, text, x1, x2, base_y, height=0.6, text_pad=0.1, lw=1.5, color="
     )
 
 
-# =========================
-# Determine eligible subjects per category
-# =========================
+# Thresholds per category 
+
 subject_ids_per_category = {}
 
 for category in categories:
@@ -191,9 +182,8 @@ for category in categories:
 
     subject_ids_per_category[category] = subject_counts[subject_counts >= threshold].index.tolist()
 
-# =========================
-# Compute burst counts
-# =========================
+# Burst counts 
+
 for group in categories:
     for subject_id in subject_ids_per_category[group]:
         df_meta = df_metadata[df_metadata["subject_id"] == subject_id].copy()
@@ -333,9 +323,8 @@ for load in [1, 2, 3]:
 
 df_plot_all = pd.DataFrame(plot_data)
 
-# =========================
-# Summary table
-# =========================
+# Stats and summary tables 
+
 summary_rows = []
 for load in [1, 2, 3]:
     for group in categories:
@@ -516,9 +505,8 @@ for load in [1, 2, 3]:
 
 df_stats = pd.DataFrame(stats_results)
 
-# =========================
-# Save all results to Excel
-# =========================
+# Saving results to excel
+
 with pd.ExcelWriter(stats_excel_path, engine="openpyxl") as writer:
     df_plot_all.to_excel(writer, sheet_name="burst_counts_long", index=False)
     df_summary.to_excel(writer, sheet_name="summary_by_group_period", index=False)
