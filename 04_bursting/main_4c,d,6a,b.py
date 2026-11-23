@@ -9,23 +9,18 @@ from scipy.signal.windows import gaussian
 # =========================
 # Parameters
 # =========================
-bin_size = 0.07                    
-TRIAL_WIN = 1                       # seconds per trial window; CHANGE TO 2.8 FOR MAINTENANCE
+bin_size = 0.03        
+TRIAL_WIN = 1 # seconds per trial window; CHANGE TO 2.8 FOR MAINTENANCE
 GLOBAL_SEED = 5
-sigma_sec = 0.04                    # Gaussian kernel 
+sigma_sec = 0.05    
+sigma = 0.05 # Gaussian kernel 
 prominence_threshold_percentile = 90 # percentile on smoothed rate
 min_inter_burst_interval = 0.14     
 N_SURROGATES = 100                   # Poisson repetitions per subject
 PRINT_DEBUG = True
-
-# Derived
 min_bin_separation = int(np.ceil(min_inter_burst_interval / bin_size))
-# =========================
 
-# =========================
-# Paths (edit as needed)
-# =========================
-path_decay_acg  = '../Clustering_3D.xlsx'
+path_decay_acg  = '../REVISIONS/revision_clustering_no_waveform_labels.xlsx'
 path_all_meta   = '../data/all_neuron_brain_regions_cleaned.xlsx'
 path_trials     = '../graph_data/graph_encoding1.xlsx' ### CHANGE TO graph_maintenance.xlsx TO GET MAINTENANCE BURSTS
 
@@ -49,8 +44,8 @@ df_metadata_in_py     = df_metadata_decay_acg.copy()
 # =========================
 # New knobs for per-subject low/high splits
 # =========================
-PER_SUBJ = 10   # minimum number of eligible neurons per subject to include for ACG/Decay categories
-OVERLAP  = 1    
+PER_SUBJ = 10  # minimum number of eligible neurons per subject to include for ACG/Decay categories
+OVERLAP  = 2   
 
 categories = [
     "All_cells",
@@ -134,7 +129,7 @@ def subject_metadata_for_category(category, subject_id):
 def choose_neurons(category, df_subject_metadata):
     """Return Neuron_ID_3 list for this subject & category, using the new per-subject split for ACG/Decay."""
     if category in ("Lowest_ACG", "Highest_ACG"):
-        low_ids, high_ids = _split_low_high_for_subject(df_subject_metadata, feature="acg_norm")
+        low_ids, high_ids = _split_low_high_for_subject(df_subject_metadata, feature="Mean_ACG")
         return low_ids if category == "Lowest_ACG" else high_ids
 
     elif category in ("Lowest_decay", "Highest_decay"):
@@ -162,7 +157,7 @@ def subjects_for_category(category):
     - Other categories keep your previous logic (thresholds unchanged unless noted).
     """
     if category in ("Lowest_ACG", "Highest_ACG"):
-        eligible = df_metadata_decay_acg.dropna(subset=["acg_norm"])
+        eligible = df_metadata_decay_acg.dropna(subset=["Mean_ACG"])
         counts = eligible.groupby("subject_id")["Neuron_ID_3"].count()
         return counts[counts >= PER_SUBJ].index.tolist()
 
@@ -244,8 +239,8 @@ for category in categories:
         spike_counts, _ = np.histogram(all_spikes, bins=time_bins)
 
         # Smoothing kernel
-        kernel = gaussian(len(spike_counts), std=sigma_sec / bin_size)
-        kernel = kernel / np.sum(kernel)
+        kernel_width = int(5 * sigma / bin_size)
+        kernel = gaussian(kernel_width, std=sigma / bin_size)
 
         smoothed = np.convolve(spike_counts, kernel, mode='same')
         threshold = np.percentile(smoothed, prominence_threshold_percentile)
@@ -628,7 +623,7 @@ if extra2 > 0:
     ax.set_ylim(cur_ymin, cur_ymax + extra2)
 
 # Save & show
-plt.savefig(f"{out_dir}main_4cd_6ab.eps",
+plt.savefig(f"{out_dir}enc_4cd_6ab.eps",
             format='eps', dpi=300, bbox_inches='tight')
 plt.show()
 
