@@ -553,7 +553,7 @@ sns.set_context("paper", font_scale=1.5)
 # Load your real data results
 # =============================================
 
-with open('./Bayesian_decoding/real_data_results_load1.pkl', 'rb') as f:
+with open('../Bayesian_decoding/real_data_results_load1.pkl', 'rb') as f:
     real_results = pickle.load(f)
 
 print("="*60)
@@ -734,7 +734,7 @@ plt.suptitle(f'Model-Level Comparison: Real Data vs RNN Models\n(Rescaled from {
 plt.tight_layout()
 
 # Save as EPS 
-plt.savefig('./Bayesian_decoding/real_vs_rnn_model_level.eps', format='eps', dpi=300, bbox_inches='tight')
+plt.savefig('../Bayesian_decoding/real_vs_rnn_model_level.eps', format='eps', dpi=300, bbox_inches='tight')
 print("\n Plots saved as:")
 print("   - real_vs_rnn_model_level.eps")
 

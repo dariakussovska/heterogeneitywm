@@ -79,7 +79,7 @@ def analyze_subject(filepath, subject_id):
 
 def main():
     filepaths = [
-        f"/Users/darikussovska/Desktop/PROJECT/000469/sub-{i}/sub-{i}_ses-2_ecephys+image.nwb"
+        f"../000469/sub-{i}/sub-{i}_ses-2_ecephys+image.nwb"
         for i in range(1, 22)
     ]
 
@@ -102,7 +102,7 @@ def main():
 
 def main():
     filepaths = [
-        f"/Users/darikussovska/Desktop/PROJECT/000469/sub-{i}/sub-{i}_ses-2_ecephys+image.nwb"
+        f"../000469/sub-{i}/sub-{i}_ses-2_ecephys+image.nwb"
         for i in range(1, 22)
     ]
 
