@@ -1,5 +1,5 @@
 """
-Co-Firing Index (CFI): burst count -> CFI and CFI -> behaviour (Fig 6i,j; Supp Fig 10h-k).
+Co-Firing Index (CFI): burst count -> CFI and CFI -> behaviour (Fig 6g,h; Supp Fig 10h-k).
 
 CFI, per neuron pair and trial: coincidences within +-30 ms, expected count = mean over 50 circular trial shifts,
 CFI = log2((observed + c) / (expected + c)), c = 0.5 (0.1 and 1 for the sensitivity panel). Averaged over pairs per
@@ -11,7 +11,7 @@ Models (participant random intercept and random slope of the focal predictor):
   Burst -> CFI (Supp 10h): CFI_z ~ burst_count_z + firing_rate_z (mixed model). Bursts counted on each trial
       separately: spikes of the pairing's neurons pooled, 30 ms bins, Gaussian smoothing (sigma 50 ms, 8-bin kernel),
       peaks with prominence above the 50th percentile of that trial's trace, no minimum separation.
-  CFI -> RT (Fig 6i,j; Supp 10i,k): log RT ~ CFI_z + load_z + firing_rate_z (mixed model; correct trials).
+  CFI -> RT (Fig 6g,h; Supp 10i,k): log RT ~ CFI_z + load_z + firing_rate_z (mixed model; correct trials).
   CFI -> accuracy (Supp 10j): accuracy ~ CFI_z + load_z + firing_rate_z (GEE, binomial, logit; cluster = participant).
 Significance: focal predictor permuted across trials within participant (5000), two-sided,
 P = (1 + #|null| >= |observed|) / (1 + #valid permutations). BH correction: burst -> CFI over 6 tests (3 pairings x
@@ -19,7 +19,7 @@ encoding, maintenance); behaviour over 9 tests per outcome and constant (3 pairi
 
 Run from 06_cell_specific. The permutations take long (about 200,000 model fits); set N_JOBS to run models in parallel.
 Outputs: cfi_<pairing>[_eps<c>].csv, firing_rates.csv, burst_counts.csv, burst_cfi_stats.csv,
-cfi_behaviour_stats.csv, Fig6ij_CFI_RT.eps, FigS10hk_CFI.eps
+cfi_behaviour_stats.csv, Fig6gh_CFI_RT.eps, FigS10hk_CFI.eps
 """
 import ast
 import os
@@ -246,7 +246,7 @@ def star(p):
 
 
 def bars(ax, S, epoch, title, ylabel=''):
-    """Fig 6i,j style: one bar per pairing, filled when BH-significant"""
+    """Fig 6g,h style: one bar per pairing, filled when BH-significant"""
     for i, cat in enumerate(['Labelled_PY', 'Labelled_IN', 'All_cells']):
         r = S[(S.category == cat) & (S.epoch == epoch)].iloc[0]
         ax.bar(i, r.coef, 0.7, color=COLORS[cat], edgecolor='k', lw=0.8, label=NAMES[cat])
@@ -277,12 +277,12 @@ def figures():
     S = pd.read_csv(OUT + 'cfi_behaviour_stats.csv')
     rt = S[(S.outcome == 'rt') & (S.eps == 0.5)]
 
-    # Fig 6i,j: CFI -> RT, encoding and maintenance
+    # Fig 6g,h: CFI -> RT, encoding and maintenance
     fig, axs = plt.subplots(1, 2, figsize=(6, 3.5), sharey=True)
     bars(axs[0], rt, 'encoding', 'CFI vs RT', r'$\beta$ coefficient (log RT)')
     bars(axs[1], rt, 'maintenance', 'CFI vs RT')
     axs[0].legend(frameon=False, loc='lower left')
-    fig.tight_layout(); fig.savefig(OUT + 'Fig6ij_CFI_RT.eps', format='eps'); plt.close(fig)
+    fig.tight_layout(); fig.savefig(OUT + 'Fig6gh_CFI_RT.eps', format='eps'); plt.close(fig)
 
     # Supp 10h-k: burst -> CFI; CFI -> RT and accuracy (fixation, encoding, maintenance); constant sensitivity (RT)
     fig, axs = plt.subplots(1, 4, figsize=(20, 4))

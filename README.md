@@ -23,11 +23,11 @@ dandi download DANDI:000469/0.240123.1806
 ```
 Detailed description of the dataset is included in the original paper by Kyzar et al., 2024. 
 
-Installing this repo and running each analysis step takes approximately 15-20 minutes on a standard desktop computer (16 CPU cores, 16-32 GB RAM), once the above dataset is downloaded.
+Installing this repo and running most analysis steps takes approximately 15-20 minutes on a standard desktop computer (16 CPU cores, 16-32 GB RAM), once the above dataset is downloaded. The permutation-based analyses take longer: the CFI models (06_cell_specific/main_6g,h,supp10h,i,j,k.py) and the PY/IN decoding null (06_cell_specific/supp_10l,m.py) need many hours on one core, and the HMM fits (05_cell_analysis/supp_11.py) about an hour. These scripts have an N_JOBS setting to run in parallel.
 
 # Data extraction and organization
 
-To extact data for main analysis, you can use the code 1_data_extraction.py by going into the heterogeneity_wm folder on your terminal and running
+To extract data for main analysis, you can use the code 01_data_extraction.py by going into the heterogeneity_wm folder on your terminal and running
 
 ```
 python 01_data_extraction.py
@@ -80,7 +80,7 @@ This step is needed to create the matrices used in dimensionality reduction (dPC
 ```
 python 08_dpca_matrices.py
 ```
-Now that we've ran all of the initial files for data extraction, standardization, and concept cell definition we can proceed with the main analyses used in each of our figures. Each main figure and the panels associated with it have a folder (ex. 01_task, 02_psth_decoding). They include all scripts, needed to recreate the main figures in the manuscript. Note that some figures just require running the same code twice, but with a different set of neurons. If that is the case, then this will be specified as a comment in the specific code. Run each .py file to get the corresponding panel from a main figure.  
+Now that we've ran all of the initial files for data extraction, standardization, and concept cell definition we can proceed with the main analyses used in each of our figures. Each main figure and the panels associated with it have a folder (ex. 01_task, 02_psth_decoding). They include all scripts, needed to recreate the main figures in the manuscript. Note that some figures just require running the same code twice, but with a different set of neurons. If that is the case, then this will be specified as a comment in the specific code. Run each .py file to get the corresponding panel from a main figure. Scripts named supp_* produce supplementary figure panels (e.g. 04_bursting/supp_10e.py for Fig. S10e). The cell-type label files and the scripts for additional supplementary analyses are in Supplementary_Figures. See DOCUMENTATION.md for a description of each script.  
 
 # Usage and citation 
 
