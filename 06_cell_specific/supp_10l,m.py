@@ -1,40 +1,33 @@
-import numpy as np
-import pandas as pd 
-import matplotlib.pyplot as plt
 import os
+os.environ['OMP_NUM_THREADS'] = '1'          
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 from sklearn.svm import SVC
-from matplotlib.colors import LinearSegmentedColormap
-from scipy.stats import binom
-from scipy.ndimage import label, find_objects
+from sklearn.model_selection import StratifiedKFold
+from statsmodels.stats.multitest import multipletests
+from multiprocessing import Pool
 import ast
 
 trial_info = pd.read_excel('../data/new_trial_final.xlsx')
-df_clustering = pd.read_excel('../Clustering_3D.xlsx')
+df_clustering = pd.read_excel('../REVISIONS/revision_clustering_waveform_labels.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
-print(subject_trials)
+y_matrix = subject_trials.reset_index(drop=True)
 
-y_matrix = subject_trials
-
-# 1. Load Spike Data from All Periods
-# ===============================
-df_enc1 = pd.read_excel('../clean_data/cleaned_Encoding1.xlsx')
-df_enc2 = pd.read_excel('../clean_data/cleaned_Encoding2.xlsx')
-df_enc3 = pd.read_excel('../clean_data/cleaned_Encoding3.xlsx')
-df_delay = pd.read_excel('../clean_data/cleaned_Delay.xlsx')
-df_probe = pd.read_excel('../clean_data/cleaned_Probe.xlsx')
+# 1. Load Spike Data (maintenance) and fixation rates
+df_delay = pd.read_excel('../graph_data/graph_delay.xlsx')
+df_delay = df_delay.merge(trial_info[['subject_id', 'trial_id', 'trial_id_final']], on=['subject_id', 'trial_id'], how='inner')
 df_fixation = pd.read_excel('../clean_data/cleaned_Fixation.xlsx')
 
-y_matrix = y_matrix.reset_index(drop=True)
-#neuron_ids = df_enc1[df_enc1['Significance'] == 'Y']['Neuron_ID_3'].unique()
-filtered_clustering = df_clustering[df_clustering['Cell_Type_New'].isin(['PY'])]
-neuron_ids = sorted(
-    filtered_clustering[
-        (filtered_clustering['Signi'] == "Y")# &
-     #   (df_delay['subject_id'] == 14)
-    ]['Neuron_ID_3'].unique())
-trial_count = y_matrix.shape[0]
-neuron_count = len(neuron_ids)
-design_matrix = np.empty((trial_count, neuron_count), dtype=object)
+concept = df_clustering[(df_clustering['Signi'] == 'Y') & df_clustering['Cell_Type_New'].isin(['PY', 'IN'])]
+available = np.intersect1d(df_delay['Neuron_ID_3'].unique(), df_fixation['Neuron_ID_3'].unique())
+neuron_ids = {t: np.intersect1d(concept.loc[concept['Cell_Type_New'] == t, 'Neuron_ID_3'].unique(), available) for t in ['PY', 'IN']}
+sample_size = min(len(neuron_ids['PY']), len(neuron_ids['IN']))      # 11
+print({t: len(v) for t, v in neuron_ids.items()}, 'sample size', sample_size)
 
 def parse_spike_times(spike_str):
     try:
@@ -42,158 +35,151 @@ def parse_spike_times(spike_str):
     except:
         return []
 
-for trial_idx, row in y_matrix.iterrows():
-    trial_id = row['trial_id_final']
-    num_images = row['num_images_presented']
-    for neuron_idx, neuron in enumerate(neuron_ids):
-        all_spikes = []
-        for df, col in [
-            (df_enc1, 'Standardized_Spikes'),
-            (df_enc2, 'Standardized_Spikes'),
-            (df_enc3, 'Standardized_Spikes'),
-            (df_delay, 'Standardized_Spikes'),
-            (df_probe, 'Standardized_Spikes')
-        ]:
-            if (df is df_enc2 and num_images < 2) or (df is df_enc3 and num_images < 3):
-                continue
-            match = df[(df['trial_id_final'] == trial_id) & (df['Neuron_ID_3'] == neuron)]
-            if not match.empty:
-                all_spikes.extend(parse_spike_times(match[col].values[0]))
-        design_matrix[trial_idx, neuron_idx] = np.array(all_spikes)
+spikes = {(row.trial_id_final, row.Neuron_ID_3): np.array(parse_spike_times(row.Standardized_Spikes), dtype=float)
+          for row in df_delay.itertuples()}
 
-bin_size = 0.25
-step_size = 0.1
-load_durations = {1: 5, 2: 6, 3: 7}
+fixation = df_fixation[df_fixation['Neuron_ID_3'].isin(np.union1d(neuron_ids['PY'], neuron_ids['IN']))]
+fixation_means = fixation.groupby('Neuron_ID_3')['Spikes_rate_Fixation'].mean().to_dict()
+fixation_stds = fixation.groupby('Neuron_ID_3')['Spikes_rate_Fixation'].std().to_dict()
 
-fixation_means = df_fixation.groupby('Neuron_ID_3')['Spikes_rate_Fixation'].mean().to_dict()
-fixation_stds = df_fixation.groupby('Neuron_ID_3')['Spikes_rate_Fixation'].std().to_dict()
+# label = last image shown
+y_all = np.array([row[f"stimulus_index_enc{int(row['num_images_presented'])}"] for _, row in y_matrix.iterrows()])
+load_trials = {load: np.where(y_matrix['num_images_presented'].values == load)[0] for load in [1, 2, 3]}
 
-def create_time_bins(duration):
+bin_sizes = [0.25, 0.5, 0.75, 1.0]
+step_size = 0.025
+duration = 2.5
+n_bootstrap = 100
+n_perm = 1000
+N_JOBS = int(os.environ.get('N_JOBS', 1))
+
+def create_time_bins(bin_size):
     return np.arange(0, duration - bin_size + step_size, step_size)
 
 def count_spikes(spikes, bins, size):
     return np.array([np.sum((spikes >= t) & (spikes < t + size)) for t in bins])
 
-def build_binned_matrix(duration):
-    bins = create_time_bins(duration)
-    binned_matrix = np.zeros((trial_count, neuron_count, len(bins)))
-    for i in range(trial_count):
-        for j in range(neuron_count):
-            spikes = design_matrix[i, j]
-            binned = count_spikes(spikes, bins, bin_size)
-            mean = fixation_means.get(neuron_ids[j], 0)
-            std = fixation_stds.get(neuron_ids[j], 1)
+def build_binned_matrix(load, bin_size, cell_type):
+    """trials x neurons x bins, z-scored with each neuron's fixation rate"""
+    bins = create_time_bins(bin_size)
+    trials = load_trials[load]
+    ids = neuron_ids[cell_type]
+    binned_matrix = np.zeros((len(trials), len(ids), len(bins)))
+    for i, t in enumerate(trials):
+        for j, neuron in enumerate(ids):
+            binned = count_spikes(spikes.get((y_matrix.loc[t, 'trial_id_final'], neuron), np.array([])), bins, bin_size)
+            mean = fixation_means.get(neuron, 0)
+            std = fixation_stds.get(neuron, 1)
             binned_matrix[i, j, :] = (binned - mean) / std if std > 0 else binned
     return binned_matrix
 
-def cross_temporal_decoding(X, y):
-    n_bins = X.shape[2]
-    acc_matrix = np.zeros((n_bins, n_bins))
-    for train_bin in range(n_bins):
-        for test_bin in range(n_bins):
-            correct = 0
-            for i in range(len(X)):
-                X_train = np.delete(X, i, axis=0)[:, :, train_bin]
-                y_train = np.delete(y, i)
-                X_test = X[i, :, test_bin].reshape(1, -1)
-                y_test = y[i]
-                clf = SVC(kernel='linear')
-                clf.fit(X_train, y_train)
-                pred = clf.predict(X_test)
-                correct += (pred[0] == y_test)
-            acc_matrix[train_bin, test_bin] = correct / len(X)
-    return acc_matrix
+def decode(X, y, seed):
+    """mean accuracy (%) over 10 repeats of stratified 3-fold CV"""
+    accs = []
+    for rep in range(10):
+        for train, test in StratifiedKFold(3, shuffle=True, random_state=seed + rep).split(X, y):
+            clf = SVC(kernel='linear', random_state=seed + rep)
+            clf.fit(X[train], y[train])
+            accs.append(np.mean(clf.predict(X[test]) == y[test]) * 100)
+    return np.mean(accs)
 
-def add_epoch_lines(ax, enc_bins, delay_bins, total_bins):
-    ax.axvline(enc_bins, color='k', linewidth=1)
-    ax.axvline(enc_bins + delay_bins, color='k', linewidth=1)
-    ax.axhline(enc_bins, color='k', linewidth=1)
-    ax.axhline(enc_bins + delay_bins, color='k', linewidth=1)
-    ax.text(-2, enc_bins / 2, "Enc", va='center', ha='right', fontsize=10)
-    ax.text(-2, enc_bins + delay_bins / 2, "Delay", va='center', ha='right', fontsize=10)
-    ax.text(-2, enc_bins + delay_bins + (total_bins - enc_bins - delay_bins) / 2, "Probe", va='center', ha='right', fontsize=10)
-    ax.text(enc_bins / 2, total_bins + 1, "Encoding", ha='center', va='bottom', fontsize=10)
-    ax.text(enc_bins + delay_bins / 2, total_bins + 1, "Delay", ha='center', va='bottom', fontsize=10)
-    ax.text(enc_bins + delay_bins + (total_bins - enc_bins - delay_bins) / 2, total_bins + 1, "Probe", ha='center', va='bottom', fontsize=10)
+def draw(X, columns):
+    """features of one bootstrap draw (neurons x bins flattened)"""
+    return X[:, columns, :].reshape(X.shape[0], -1)
 
-colors = [
-    (44/255, 63/255, 122/255),
-    (120/255, 150/255, 200/255),
-    (227/255, 215/255, 207/255),
-    (255/255, 160/255, 160/255),
-    (200/255, 70/255, 70/255),
-    (138/255, 31/255, 34/255)
-]
-custom_cmap = LinearSegmentedColormap.from_list("custom_red_blue", colors)
+matrices = {(load, b, t): build_binned_matrix(load, b, t) for load in [1, 2, 3] for b in bin_sizes for t in ['PY', 'IN']}
 
-from scipy.stats import binom
-from statsmodels.stats.multitest import fdrcorrection
-from skimage import measure
-import os
+# 2. Null of means for one cell type x load x bin and one permutation
+def null_mean(task):
+    load, b_ms, cell_type, p = task
+    X = matrices[(load, b_ms / 1000, cell_type)]
+    rng_p = np.random.default_rng([load, b_ms, 0 if cell_type == 'PY' else 1, p + 1])
+    y_perm = rng_p.permutation(y_all[load_trials[load]])
+    accs = [decode(draw(X, rng_p.integers(0, X.shape[1], sample_size)), y_perm, 10000 * (p + 2) + d) for d in range(n_bootstrap)]
+    return load, b_ms, cell_type, p, np.mean(accs)
 
-fig, axes = plt.subplots(1, 3, figsize=(18, 5), constrained_layout=True)
+if __name__ == '__main__':
+    folder_path = './'
+    os.makedirs(folder_path, exist_ok=True)
 
-chance_level = 1 / len(np.unique(y_matrix['stimulus_index_enc1']))
-alpha = 0.05
+    # 3. Real decoding: 100 bootstrap draws (and one shuffled-label decode per draw)
+    rng = np.random.default_rng(42)
+    # the published run first went through an earlier loop on the same generator; repeat its draws (no fitting)
+    # so the accuracies are identical to the published ones
+    for load in [1, 2, 3]:
+        for b in bin_sizes:
+            for _ in range(n_bootstrap):
+                rng.choice(neuron_ids['PY'], sample_size); rng.choice(neuron_ids['IN'], sample_size)
+            for _ in range(n_bootstrap):
+                rng.permutation(y_all[load_trials[load]]); rng.choice(neuron_ids['PY'], sample_size); rng.choice(neuron_ids['IN'], sample_size)
 
-for idx, load in enumerate([1, 2, 3]):
-    duration = load_durations[load]
-    bins = create_time_bins(duration)
-    n_bins = len(bins)
+    rows = []
+    for load in [1, 2, 3]:
+        y = y_all[load_trials[load]]
+        for b in bin_sizes:
+            for i in range(n_bootstrap):
+                X_py = draw(matrices[(load, b, 'PY')], np.searchsorted(neuron_ids['PY'], rng.choice(neuron_ids['PY'], sample_size)))
+                X_in = draw(matrices[(load, b, 'IN')], np.searchsorted(neuron_ids['IN'], rng.choice(neuron_ids['IN'], sample_size)))
+                real_py, real_in = decode(X_py, y, 42 + i), decode(X_in, y, 142 + i)
+                y_shuf = rng.permutation(y)
+                shuf_py, shuf_in = decode(X_py, y_shuf, 242 + i), decode(X_in, y_shuf, 342 + i)
+                for cell_type, condition, acc in [('PY', 'Real', real_py), ('IN', 'Real', real_in), ('PY', 'Shuffled', shuf_py), ('IN', 'Shuffled', shuf_in)]:
+                    rows.append(dict(load=load, bin_ms=int(b * 1000), cell_type=cell_type, condition=condition, draw=i, accuracy=acc))
+            print(f'Load {load}, {int(b * 1000)} ms done')
+    draws = pd.DataFrame(rows)
+    draws.to_csv(folder_path + 'decoding_draws.csv', index=False)
 
-    enc_dur = load + 0.2
-    delay_dur = 2.8
-    probe_dur = 1.2
+    # 4. Null of means (resumes from null_values.csv)
+    null_file = folder_path + 'null_values.csv'
+    if not os.path.exists(null_file):
+        open(null_file, 'w').write('load,bin_ms,cell_type,perm,value\n')
+    done = set(map(tuple, pd.read_csv(null_file)[['load', 'bin_ms', 'cell_type', 'perm']].values.tolist()))
+    tasks = [(load, int(b * 1000), t, p) for load in [1, 2, 3] for b in bin_sizes for t in ['PY', 'IN'] for p in range(n_perm)]
+    tasks = [task for task in tasks if task not in done]
+    with Pool(N_JOBS) as pool:
+        for result in pool.imap_unordered(null_mean, tasks, chunksize=10):
+            with open(null_file, 'a') as f:
+                f.write(','.join(map(str, result)) + '\n')
+    null = pd.read_csv(null_file)
 
-    enc_bins = len(create_time_bins(enc_dur))
-    delay_bins = len(create_time_bins(delay_dur))
-    probe_bins = n_bins - enc_bins - delay_bins
+    # 5. Statistics: P = (1 + #null >= real) / (1 + n_perm), BH across bins within cell type x load
+    stats = []
+    for (load, b_ms, cell_type), g in draws[draws.condition == 'Real'].groupby(['load', 'bin_ms', 'cell_type']):
+        real = g.accuracy.mean()
+        v = null[(null.load == load) & (null.bin_ms == b_ms) & (null.cell_type == cell_type)].value.values
+        stats.append(dict(load=load, cell_type=cell_type, bin_ms=b_ms, accuracy=real, sem=g.accuracy.sem(), null_mean=v.mean(),
+                          n_null=len(v), p=(1 + np.sum(v >= real)) / (1 + len(v))))
+    stats = pd.DataFrame(stats)
+    stats['p_BH'] = stats.groupby(['cell_type', 'load']).p.transform(lambda p: multipletests(p, method='fdr_bh')[1])
+    stats = stats.sort_values(['cell_type', 'load', 'bin_ms'])
+    stats.to_csv(folder_path + 'decoding_stats.csv', index=False)
+    print(stats.round(4).to_string(index=False))
 
-    trials = y_matrix[y_matrix['num_images_presented'] == load].index.values
-    if load == 1:
-        y = y_matrix.loc[trials, 'stimulus_index_enc1'].values
-    elif load == 2:
-        y = y_matrix.loc[trials, 'stimulus_index_enc2'].values
-    elif load == 3:
-        y = y_matrix.loc[trials, 'stimulus_index_enc3'].values
+    # 6. Plots: accuracy vs bin width per load (mean +- SEM over draws), shuffled labels, chance
+    def star(p):
+        return '***' if p < 0.005 else '**' if p < 0.01 else '*' if p < 0.05 else ''
 
-    N = len(y)
-    X_all = build_binned_matrix(duration)
-    X = X_all[trials, :, :]
-
-    acc_matrix = cross_temporal_decoding(X, y)
-
-    p_vals = 1 - binom.cdf((acc_matrix * N).astype(int), N, chance_level)
-    p_vals_flat = p_vals.flatten()
-    _, p_vals_fdr = fdrcorrection(p_vals_flat, alpha=alpha)
-    sig_mask = p_vals_fdr.reshape(acc_matrix.shape) < alpha
-
-    ax = axes[idx]
-    im = ax.imshow(
-       acc_matrix * 100,
-       cmap=custom_cmap, vmin=0, vmax=100,
-       interpolation='nearest',
-       aspect='equal'
-    )
-
-    ax.invert_yaxis()  
-
-    contours = measure.find_contours(sig_mask.astype(float), 0.5)
-    for contour in contours:
-        if len(contour) > 13: 
-            ax.plot(contour[:, 1], contour[:, 0], linewidth=1.5, color=(138/255, 31/255, 34/255))
-
-    add_epoch_lines(ax, enc_bins, delay_bins, n_bins)
-    ax.set_title(f"Load {load} Decoding", fontsize=14)
-    ax.set_xlabel("Test Time Bin")
-    ax.set_ylabel("Train Time Bin")
-    ax.set_xticks([])
-    ax.set_yticks([])
-
-fig.colorbar(im, ax=axes.ravel().tolist(), shrink=0.75, label="Accuracy (%)")
-plt.suptitle("Cross-Temporal Decoding Accuracy by Load", fontsize=16)
-folder_path = "./"
-os.makedirs(folder_path, exist_ok=True)
-save_path = os.path.join(folder_path, "main_6kl.eps")
-plt.savefig(save_path, format='eps', dpi=300)
-plt.show()
+    colors = {'PY': ['#8e1c2e', '#cf5d6d', '#e9a9b2'], 'IN': ['#17393b', '#4f8a8d', '#9cc4c5']}
+    x = [int(b * 1000) for b in bin_sizes]
+    for cell_type, panel in [('PY', 'l'), ('IN', 'm')]:
+        d = draws[draws.cell_type == cell_type]
+        fig, ax = plt.subplots(figsize=(4.8, 3.8))
+        shuf = d[d.condition == 'Shuffled'].groupby('bin_ms').accuracy
+        ax.errorbar(range(4), shuf.mean().loc[x], shuf.sem().loc[x], color='#6b6b6b', ls='--', marker='o', ms=4, capsize=2, label='Shuffled (all loads)')
+        ax.axhline(20, ls=':', color='0.4', lw=1, label='Chance (20%)')
+        for k, load in enumerate([1, 2, 3]):
+            real = d[(d.condition == 'Real') & (d.load == load)].groupby('bin_ms').accuracy
+            ax.errorbar(range(4), real.mean().loc[x], real.sem().loc[x], color=colors[cell_type][k], lw=2, marker='o', ms=5, capsize=2)
+            ax.text(3.09, real.mean().loc[x[-1]], f'Load {load}', va='center', fontsize=9)
+            ax.text(-0.46, 58 - 4 * k, f'L{load}', va='center', fontsize=9)
+            for j, b_ms in enumerate(x):
+                p = stats[(stats.cell_type == cell_type) & (stats.load == load) & (stats.bin_ms == b_ms)].p_BH.iloc[0]
+                ax.text(j, 58 - 4 * k, star(p), ha='center', va='center', fontsize=12)
+        ax.set_xticks(range(4)); ax.set_xticklabels(x); ax.set_xlim(-0.5, 3.6)
+        ax.set_ylim(0, 60); ax.set_xlabel('Bin size (ms)'); ax.set_ylabel('Decoding accuracy (%)')
+        ax.set_title(f'{cell_type} concept cells (n = {len(neuron_ids[cell_type])})')
+        ax.legend(frameon=False, loc='lower left', fontsize=8, ncol=2)
+        ax.spines[['top', 'right']].set_visible(False)
+        plt.tight_layout()
+        plt.savefig(folder_path + f'supp_10{panel}_{cell_type}_decoding.eps', format='eps', dpi=300)
+        plt.close()
