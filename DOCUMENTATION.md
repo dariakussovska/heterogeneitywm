@@ -311,17 +311,6 @@ IN PYTHON:
 
 **Outputs:** cfi_<pairing>[_eps<c>].csv, firing_rates.csv, burst_counts.csv, burst_cfi_stats.csv, cfi_behaviour_stats.csv, Fig6gh_CFI_RT.eps, FigS10hk_CFI.eps.
 
-## PY AND IN CONCEPT-CELL DECODING
-
-06_cell_specific >> supp_10l,m.py decodes the identity of the last image during maintenance (0-2.5 s) from PY (n = 47) and IN (n = 11) concept cells (waveform labels), separately for load 1, 2 and 3 trials, for bin widths of 250, 500, 750 and 1000 ms (25 ms step). Counts are z-scored with each neuron's fixation rate. 100 bootstrap draws of 11 neurons (with replacement) per cell type; linear SVC, stratified 3-fold cross-validation repeated 10 times.
-
-- Statistics: permutation test against a null of means. One null value = labels permuted once, then 100 new bootstrap draws decoded and averaged; 1000 null values per cell type x load x bin. P = (1 + #null ≥ real)/(1 + 1000), BH across the 4 bin widths within cell type x load.
-- The null is long (24,000 x 100 draws); set N_JOBS to run it in parallel. Null values are written to null_values.csv as they finish, so an interrupted run resumes.
-
-**Inputs:** new_trial_final.xlsx, graph_delay.xlsx, cleaned_Fixation.xlsx, Supplementary_Figures >> revision_clustering_waveform_labels.xlsx.
-
-**Outputs (in ./decoding):** decoding_draws.csv, null_values.csv, decoding_stats.csv, supp_10l_PY_decoding.eps, supp_10m_IN_decoding.eps.
-
 ## TWO-STATE (HMM) DYNAMICS
 
 05_cell_analysis >> supp_11.py fits one- and two-state Poisson hidden Markov models to every neuron (30 ms bins) and produces the panels of Fig. S11.
