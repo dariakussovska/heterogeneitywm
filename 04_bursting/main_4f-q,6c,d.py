@@ -61,8 +61,8 @@ WINDOWS = {'Fixation': ('fix', 0.0), 'Encoding': ('enc', 0.0),
            'M1': ('delay', M_STARTS[0]), 'M2': ('delay', M_STARTS[1]), 'M3': ('delay', M_STARTS[2])}
 periods = list(WINDOWS)
 
-df_metadata = pd.read_excel('../REVISIONS/revision_clustering_no_waveform_labels.xlsx')
-df_metadata2 = pd.read_excel('../REVISIONS/all_neuron_brain_regions_merged.xlsx')
+df_metadata = pd.read_excel('../Supplementary_Figures/revision_clustering_no_waveform_labels.xlsx')
+df_metadata2 = pd.read_excel('../Supplementary_Figures/all_neuron_brain_regions_merged.xlsx')
 
 if REGION:
     # ACG-labelled neurons only; vmPFC left out (only 2 participants with >= 5 such neurons)

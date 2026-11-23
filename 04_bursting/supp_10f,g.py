@@ -106,8 +106,8 @@ def star(p):
 
 
 if __name__ == '__main__':
-    wf = pd.read_excel('../REVISIONS/revision_clustering_waveform_labels.xlsx')
-    nw = pd.read_excel('../REVISIONS/revision_clustering_no_waveform_labels.xlsx')
+    wf = pd.read_excel('../Supplementary_Figures/revision_clustering_waveform_labels.xlsx')
+    nw = pd.read_excel('../Supplementary_Figures/revision_clustering_no_waveform_labels.xlsx')
     concept = set(wf[wf.Signi == 'Y'].Neuron_ID_3)
     C = pd.DataFrame([r for pop in ('PY', 'IN') for e in EPOCHS
                       for r in recruitment(pop, e, concept, set(nw[nw.Cell_Type_New == pop].Neuron_ID_3))])

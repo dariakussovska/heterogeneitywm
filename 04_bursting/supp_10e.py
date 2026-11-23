@@ -98,7 +98,7 @@ def star(p):
 
 
 if __name__ == '__main__':
-    labels = pd.read_excel('../REVISIONS/revision_clustering_no_waveform_labels.xlsx')
+    labels = pd.read_excel('../Supplementary_Figures/revision_clustering_no_waveform_labels.xlsx')
     d = pd.read_excel('../graph_data/graph_delay.xlsx', usecols=['subject_id', 'trial_id', 'Neuron_ID_3', 'num_images_presented', 'Standardized_Spikes'])
     d = d[d.num_images_presented == LOAD].drop_duplicates(['trial_id', 'Neuron_ID_3', 'subject_id'])
     d['sp'] = d.Standardized_Spikes.map(parse)

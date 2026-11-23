@@ -14,7 +14,7 @@ from multiprocessing import Pool
 import ast
 
 trial_info = pd.read_excel('../data/new_trial_final.xlsx')
-df_clustering = pd.read_excel('../REVISIONS/revision_clustering_waveform_labels.xlsx')
+df_clustering = pd.read_excel('../Supplementary_Figures/revision_clustering_waveform_labels.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 14][['trial_id_final', 'num_images_presented', 'stimulus_index_enc1', 'stimulus_index_enc2', 'stimulus_index_enc3', 'response_accuracy']]
 y_matrix = subject_trials.reset_index(drop=True)
 

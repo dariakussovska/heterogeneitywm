@@ -62,8 +62,8 @@ COLORS = {'Labelled_PY': '#b5283c', 'Labelled_IN': '#235356', 'All_cells': '#f2e
 EPOCHS = ['fixation', 'encoding', 'maintenance']
 FILES = {'fixation': '../clean_data/cleaned_Fixation.xlsx', 'encoding': '../graph_data/graph_encoding1.xlsx',
          'maintenance': '../graph_data/graph_delay.xlsx'}
-LABELS = '../REVISIONS/'
-TRIAL_INFO = '../R2_REVISIONS/trial_info.xlsx'
+LABELS = '../Supplementary_Figures/'
+TRIAL_INFO = '../data/trial_info.xlsx'
 OUT = './'
 kernel = gaussian(int(5 * sigma / bin_size), std=sigma / bin_size)   # 8 bins
 
