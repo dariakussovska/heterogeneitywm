@@ -136,6 +136,7 @@ Here, we are preparing the existing files for plotting the firing rates across c
 - First, we need to run the code 06_add_category.py to add the corresponding trial type ("Category" column) to say whether the trial was preferred or non-preferred for that particular neuron and subject id combination. 
 - Under the 02_psth_decoding >> main_2a,b, we choose a neuron to plot. We run the code to load the data and filter by the number of images presented (to show only load 1 trials). We count spikes and convert to firing rates in the corresponding time bins, and subsequently smooth the data. We calculate calculate z-scores (subtracting the mean firing rate in the baseline and dividing by the standard deviation), and the confidence intervals for plotting later. Finally, we plot the z-scores and confidence intervals for the encoding, delay and probe periods.
 - The script also includes the generation of a raster with the spike times of this particular neuron over the task epochs. 
+- 02_psth_decoding >> main_2c,5k,l,supp_1b,c.py plots the population PSTH of concept cells (Fig. 2c; Fig. S1b,c). Set CELL_TYPE=PY or CELL_TYPE=IN to use only the concept cells of one type (ACG labels, Supplementary_Figures >> revision_clustering_no_waveform_labels.xlsx) for Fig. 5k and 5l. Output: PSTH_concept_<all|PY|IN>.eps.
 
 **Inputs:**
 
@@ -152,7 +153,7 @@ Here, we are preparing the existing files for plotting the firing rates across c
 
 ## DECODING 
 
-Here, we are decoding stimulus identity from the maintenance period to see how information gets maintained. In addition, we are doing cross-temporal decoding to see how memoranda evolve through time, and we are doing within-subject decoding on brain regions. Decoding from pyramidal vs interneuron concept cells (Fig. S10l,m) is described in the PY AND IN CONCEPT-CELL DECODING section below.
+Here, we are decoding stimulus identity from the maintenance period to see how information gets maintained. In addition, we are doing cross-temporal decoding to see how memoranda evolve through time, and we are doing within-subject decoding on brain regions.
 
 - We construct the y matrix from individual subject trial labels in the new_trial_final.xlsx file as shown in the code. Data is binned and normalized by z-scoring with each neuron's activity during baseline (fixation). You can choose which neurons to include in the data.
 - The script 02_psth_decoding >> main_2d,supp_1d,e.py builds the design matrix across all task phases (encoding, delay, probe) and performs cross-temporal decoding (train on one time bin, test on another). Significant clusters are outlined after FDR correction. By varying the neurons that participate in the decoding analysis, as well as the loads, this code generates the .eps files that are used in Fig. 2d as well as Fig. S1d,e.
@@ -188,7 +189,7 @@ graph_delay.xlsx : an Excel file with standardized spikes from the Delay (relati
 
 Here, we fit the spike trains of individual neurons to a Poisson GLM model to see how they are modulated with task parameters such as load and reaction time.  
 
-- The script 01_task >> main_1e,f.py (Fig. 1e,f) loads trial data and task relevant features; 06_cell_specific >> main_6e,f,supp_e,f.py runs the same model by putative cell type (Fig. 6e,f; Fig. S5e,f). For this script we are using the trials, balanced by load, as this is our main point of interest.
+- The script 01_task >> main_1e,f.py (Fig. 1e,f) loads trial data and task relevant features; 06_cell_specific >> main_6e,f,supp_e,f.py runs the same model by putative cell type, using the waveform labels (all 902 units) (Fig. 6e,f; Fig. S5e,f). Set PREDICTOR=num_images_presented (load; Fig. 6e, S5e) or PREDICTOR=RT (Fig. 6f, S5f), CONCEPT_ONLY=1 to restrict to concept cells, and TAG to name the output (TAG.eps, TAG_summary.csv). For this script we are using the trials, balanced by load, as this is our main point of interest.
 - It prepares an X matrix with the relevant neurons that you want to use. There are options for concept cells vs all cells, as well as just PY or IN cells. You can also load the neuronal locations if you want to do a region-specific analysis (as done in our Fig. 1).
 - It defines region labels, combining left and right neurons from the same brain regions (neurons with amygdala_left and amygdala_right locations are put under the same underlying label -- amygdala). 
 - Lastly, the script identifes brain regions where the neural activity is significantly modulated by a task variable. See our methods and the description in the notebook for detailed explanation of the procedure and statistical analysis. This notebook allows the creation of the following figures in our paper: Fig. 1e,f ; Fig. 6e,f; Fig. S5 e;f.
@@ -199,7 +200,7 @@ Here, we fit the spike trains of individual neurons to a Poisson GLM model to se
 - new_trial_info.xlsx: trial identities, ensuring pooling across neurons for GLM encoder. 
 - graph_delay.xlsx : an Excel file with standardized spikes from the Delay (relative to start of the corresponding trial in the Delay) per subject, trial and neuron, with merged data for brain region, concept vs non-concept cell, preferred image identity of every neuron (relative to Encoding 1 period). This is used for decoding from the maintenance period only.
 - merged_significant_neurons_with_brain_regions.xlsx.: an Excel file with all cells, including notation for the concept cells and their location in the brain. Use this if you want to achieve the across brain-region analysis. 
-- Clustering_3D.xlsx: an Excel file with labels for putative cell-type classification (PY/IN). Use this if you want to achieve analysis across neuronal types. 
+- Supplementary_Figures >> revision_clustering_waveform_labels.xlsx: putative cell-type labels (PY/IN) for all units, with Signi for concept cells (used by main_6e,f,supp_e,f.py). 
 
 **Outputs (Figures):**
 
@@ -232,7 +233,7 @@ Here, we are performing a bursting analysis across participants to look for alte
 
 - 04_bursting >> main_4a.py: example population trace with detected bursts, real vs Poisson (Fig. 4a).
 - 04_bursting >> main_4c,d,6a,b.py: burst counts in the real data vs Poisson surrogates for each neuronal group, encoding (0-1 s) or maintenance (set TRIAL_WIN to 2.8 and load the delay data, as noted in the script); one-sided paired Wilcoxon (Fig. 4c,d; Fig. 6a,b). PY/IN groups use participants with at least 3 labelled cells of the type.
-- 04_bursting >> main_4e.py: ACG decay constant by putative cell type (Fig. 4e).
+- 04_bursting >> main_4e.py: ACG decay constant by putative cell type (ACG labels; units with R squared ≥ 0.3 and a fitted decay) (Fig. 4e).
 - 04_bursting >> main_4f-q,6c,d.py: bursting per epoch in equal 1 s windows (fixation, encoding, maintenance M1 0-1 s, M2 0.75-1.75 s, M3 1.5-2.5 s), split into an alignment component, log2((real + 1)/(trial shuffle + 1)), and a single-neuron component, log2((trial shuffle + 1)/(Poisson + 1)). One-sided paired Wilcoxon, FDR-BH across the 5 epochs within group x load (Fig. 4f-q; Fig. 6c,d; Fig. S6, S10a-d). PY/IN groups use participants with at least 5 labelled cells. With REGION = True, the same analysis by brain region (Fig. S7).
 - 04_bursting >> supp_10e.py: components of burst excess for PY and IN during maintenance (0-2.5 s, load 1), with Poisson, PSTH (rate-profile) and trial-shuffle surrogates; one-sided paired Wilcoxon (BH across the 4 component tests) and IN vs PY (two-sided, participants with both types) (Fig. S10e).
 - 04_bursting >> supp_10f,g.py: recruitment of concept-cell spikes (within ±50 ms of burst peaks) into bursts defined by non-concept PY or IN, on preferred vs nonpreferred trials, encoding (0-0.9 s) and maintenance (0-2.5 s), against a trial-shuffle expectation; Wilcoxon vs 0, BH across the 8 tests (Fig. S10f,g).
@@ -268,9 +269,9 @@ IN MATLAB:
 
 IN PYTHON: 
 - To visualise the autocorrelograms, we can use the script main_5a,b. This returns all autocorrelograms (one for each neuron).  
-- For our cell classification (07_spectral_clustering.py), we use data >> cell_analysis >> Cell_metrics.xlsx. We remove cells with an R squared value below 0.3 (less than 30% explained variance) and run spectral clustering on Mean ACG, firing_rate and Tau_rise. The cluster with the higher firing rate is labeled the interneuron cluster, and the other one the pyramidal cluster, in a new column “Cell_Type_New”. The labels are saved in Clustering_3D.xlsx, the number of IN/PY neurons is printed and the UMAP is plotted. 
+- For our cell classification (07_spectral_clustering.py), we use data >> cell_analysis >> Cell_metrics.xlsx. We remove cells with an R squared value below 0.3 (less than 30% explained variance) and run spectral clustering on Mean ACG, firing_rate and Tau_rise. The cluster with the higher firing rate is labeled the interneuron cluster, and the other one the pyramidal cluster, in a new column “Cell_Type_New”. The labels are saved in Clustering_3D.xlsx (same labels as Supplementary_Figures >> revision_clustering_no_waveform_labels.xlsx), the number of IN/PY neurons is printed and the UMAP is plotted. 
 - The label files used for the revised analyses are in Supplementary_Figures: revision_clustering_no_waveform_labels.xlsx (ACG-based labels only, R squared ≥ 0.3: 127 PY, 167 IN) and revision_clustering_waveform_labels.xlsx (all 902 units; units with R squared < 0.3 labelled by spike width: 621 PY, 281 IN). See data >> cell_analysis >> README.md.
-- The main_5d-h.py script runs descriptive statistics on the already classified cells and performs comparison across cell types (tau rise, firing rate, cv2, burst index, mean ACG); Mann–Whitney U, FDR-BY across metrics. 
+- The main_5d-h.py script runs descriptive statistics on the ACG-classified cells (revision_clustering_no_waveform_labels.xlsx) and compares cell types on firing rate, mean ACG (raw, as used for clustering), tau rise, spike width and CV2 (Fig. 5d-h); Mann–Whitney U, FDR-BY across metrics. Set ACG_DISPLAY=norm to plot the unit-normalized mean ACG instead. Outputs main_5dh.eps and main_5dh_stats_script.csv.
 - The supp_4a-e.py script repeats the clustering on the validation data (data >> cell_analysis >> validation_data.xlsx) and compares the resulting labels (Fig. S4a-e). 
 
 **Inputs:**
@@ -295,7 +296,7 @@ IN PYTHON:
 **Figures:** 
 
 - clustering.eps: an EPS file that contains the clustering output of the spectral clustering analysis 
-- Cell_Metrics.eps: an EPS file that contains box plots and significance testing between the mean ACG, ACG tau rise, firing rate, CV2, and burst index values between cells labeled as interneurons vs pyramidal cells. 
+- main_5dh.eps: box plots and significance testing of firing rate, mean ACG, ACG tau rise, spike width and CV2 between cells labeled as interneurons vs pyramidal cells. 
 
 ## CO-FIRING INDEX (CFI)
 

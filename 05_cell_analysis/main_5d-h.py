@@ -6,16 +6,22 @@ from scipy.stats import mannwhitneyu
 from statsmodels.stats.multitest import multipletests
 
 # Load data
-file_path = "../Clustering_3D.xlsx"
+file_path = "../Supplementary_Figures/revision_clustering_no_waveform_labels.xlsx"
 data = pd.read_excel(file_path)
 data.columns = data.columns.str.strip()
 
-metrics = ["firing_rate", "acg_norm","tau_rise", "Burst", "CV2"]
+import os
+# panel e: the clustering uses the raw mean ACG; ACG_DISPLAY=norm shows the unit-normalized mean ACG (acg_norm) instead,
+# for readability (cell labels unchanged; its own Mann-Whitney test is reported)
+ACG_DISPLAY = os.environ.get("ACG_DISPLAY", "raw")
+ACG_COL = "acg_norm" if ACG_DISPLAY == "norm" else "Mean_ACG"
+metrics = ["firing_rate", ACG_COL, "Tau_rise", "Spike-width", "CV2"]   # Fig. 5d-h (raw mean ACG for clustering, true CV2)
 labels = {
     "firing_rate": "Firing Rate",
-    "acg_norm": "ACG (Norm)",
-    "tau_rise": "τ Rise",
-    "Burst": "burst",
+    "Mean_ACG": "Mean ACG (Hz)",
+    "acg_norm": "Mean normalized ACG",
+    "Tau_rise": "τ Rise (ms)",
+    "Spike-width": "Spike width (ms)",
     "CV2": "CV2"
 }
 
@@ -157,11 +163,11 @@ handles = [
     plt.Line2D([0],[0], marker='s', color='w', label='IN',
                markerfacecolor=custom_palette["IN"], markersize=10)
 ]
-fig.legend(handles=handles, title="Neuron Type", loc="upper right", fontsize=11)
+fig.legend(handles=handles, title="Neuron Type", loc="lower right", bbox_to_anchor=(0.93, 0.18), fontsize=11)
 
 plt.tight_layout(rect=[0, 0, 0.98, 0.98])
 # Save if you want:
-plt.savefig("./main_5dh.eps",
+plt.savefig(f"./main_5dh{'_normACG' if ACG_DISPLAY == 'norm' else ''}.eps",
              format='eps', dpi=300)
 plt.show()
 
@@ -171,5 +177,9 @@ summary = pd.DataFrame({
     "p_FDR_BY": pvals_corr,
     "Reject@0.05_BY": rejected
 })
+n_in, n_py = len(data_in), len(data_py)
+summary["U_PY"] = [mannwhitneyu(data_py[m].dropna(), data_in[m].dropna()).statistic for m in metrics]
+summary["median_PY"] = [data_py[m].median() for m in metrics]; summary["median_IN"] = [data_in[m].median() for m in metrics]
+summary.to_csv(f"./main_5dh{'_normACG' if ACG_DISPLAY == 'norm' else ''}_stats_script.csv", index=False)
 print("\nMann–Whitney PY vs IN per metric (raw & FDR-BY):")
 print(summary)

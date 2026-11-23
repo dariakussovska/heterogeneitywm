@@ -10,10 +10,19 @@ enc2 = pd.read_excel('../graph_data/graph_encoding2.xlsx')
 enc3 = pd.read_excel('../graph_data/graph_encoding3.xlsx')
 delay = pd.read_excel('../graph_data/graph_delay.xlsx')
 probe = pd.read_excel('../graph_data/graph_probe.xlsx')
+if 'Probe_Category' not in probe.columns and 'Category_Probe' in probe.columns:   # current graph_probe.xlsx naming
+    probe = probe.rename(columns={'Category_Probe': 'Probe_Category'})
 
+import os
 classification_df = pd.read_excel('../data/all_neuron_brain_regions_cleaned.xlsx')
-classification_df = classification_df[
-    (classification_df["Signi"] == "Y")] # & (classification_df["Cell_Type_New"] == "IN")]  ### UNCOMMENT TO GET FIG 5L and UNCOMMENT AND CHANGE TO "PY" INSTEAD OF "IN" TO GET FIG5K
+# Fig. 5k/l: concept cells of one ACG-classified type (CELL_TYPE=PY -> 5k, IN -> 5l); unset -> all concept cells (Fig. 2c)
+CELL_TYPE = os.environ.get("CELL_TYPE")
+labels_df = pd.read_excel('../Supplementary_Figures/revision_clustering_no_waveform_labels.xlsx')[["Neuron_ID_3", "Cell_Type_New"]]
+classification_df = classification_df.merge(labels_df, on="Neuron_ID_3", how="left")
+classification_df = classification_df[classification_df["Signi"] == "Y"]
+if CELL_TYPE:
+    classification_df = classification_df[classification_df["Cell_Type_New"] == CELL_TYPE]
+print(f"concept cells used ({CELL_TYPE or 'all'}): {classification_df['Neuron_ID_3'].nunique()}")
 valid_neuron_ids = classification_df["Neuron_ID_3"].dropna().unique().tolist()
 
 # === Time Bins ===
@@ -403,7 +412,7 @@ ax.legend()
 axs[1, 3].axis('off')
 
 plt.tight_layout(rect=[0, 0, 1, 0.96])
-save_path = "./PSTH_concept.eps"
+save_path = f"./PSTH_concept_{CELL_TYPE or 'all'}.eps"
 plt.savefig(save_path, format='eps', dpi=300)
 print(f"Saved EPS figure with bootstrapped confidence intervals + FDR stars to: {save_path}")
 plt.show()

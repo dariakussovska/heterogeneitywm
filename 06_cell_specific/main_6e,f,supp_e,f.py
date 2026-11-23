@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import PoissonRegressor
 from tqdm import tqdm
 import ast
+import os
+# PREDICTOR=num_images_presented (load; Fig. 6e / S5e) or RT (Fig. 6f / S5f); CONCEPT_ONLY=1 restricts to concept cells
+PREDICTOR = os.environ.get('PREDICTOR', 'num_images_presented')
+CONCEPT_ONLY = os.environ.get('CONCEPT_ONLY', '0') == '1'
+TAG = os.environ.get('TAG', 'main_6ef')
 
 trial_info = pd.read_excel('../data/new_trial_info.xlsx')
 subject_trials = trial_info[trial_info['subject_id'] == 1][['new_trial_id', 'num_images_presented', 'stimulus_index', 'RT', 'response_accuracy']]
@@ -16,14 +21,16 @@ y_matrix = y_matrix.reset_index(drop=True)
 
 # 2) Load Neuron Locations Data (for location-based filtering)
 
-df_neuron_locations = pd.read_excel('../Clustering_3D.xlsx')
+df_neuron_locations = pd.read_excel('../Supplementary_Figures/revision_clustering_waveform_labels.xlsx')   # encoding models: waveform (all-unit) labels
 
 desired_locations = ['PY', 'IN']
 
 ### LIKE THIS IT PRODUCES FIG.6E and FIG.S5F
-neurons_in_desired_locations = df_neuron_locations[
-    df_neuron_locations['Cell_Type_New'].isin(desired_locations)
-]['Neuron_ID_3'].unique()
+_sel = df_neuron_locations['Cell_Type_New'].isin(desired_locations)
+if CONCEPT_ONLY:
+    _sel &= df_neuron_locations['Signi'] == 'Y'
+neurons_in_desired_locations = df_neuron_locations[_sel]['Neuron_ID_3'].unique()
+print(f"predictor={PREDICTOR} concept_only={CONCEPT_ONLY} neurons={len(neurons_in_desired_locations)}")
 
 # UNCOMMENT TO GET FIG.6F and FIG.SE
 #neurons_in_desired_locations = df_neuron_locations[
@@ -112,7 +119,7 @@ alpha_neuron = 0.05      # per-neuron significance threshold (via null quantile)
 # region_labels: array-like [n_neurons], region string per neuron
 
 neural_data = counts_matrix
-X_raw = subject_trials['num_images_presented'].to_numpy().astype(float) ###CHANGE TO RT FOR FIG S5F and 6F.
+X_raw = subject_trials[PREDICTOR].to_numpy().astype(float)
 cell_type_labels = np.asarray(region_labels)  
 
 if neural_data.ndim == 3:
@@ -243,5 +250,6 @@ if len(summary_df) > 0:
     ax.set_ylim(-5, ymax + headroom)
     ax.set_title("Observed % significant neurons (Brain Regions)")
     plt.tight_layout()
-    plt.savefig("./main_6ef.eps", format='eps', dpi=300)
+    plt.savefig(f"./{TAG}.eps", format='eps', dpi=300)
+    summary_df.to_csv(f"./{TAG}_summary.csv", index=False)
     plt.show()

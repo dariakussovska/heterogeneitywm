@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the dataset
-file_path = "../Clustering_3D.xlsx"
+file_path = "../Supplementary_Figures/revision_clustering_no_waveform_labels.xlsx"
 data = pd.read_excel(file_path)
 
 # Clean column names
@@ -12,7 +12,7 @@ data.columns = data.columns.str.strip()
 data_filtered = data[(data["R2"] >= 0.3)]
 
 # Drop rows where Decay is NaN
-data_filtered = data.dropna(subset=["Decay"])
+data_filtered = data_filtered.dropna(subset=["Decay"])   # was data.dropna(...), which discarded the R2 filter
 
 # Filter again to only keep neurons with defined Cell Type
 #data_filtered = data_filtered.dropna(subset=["Cell_Type_New"])
