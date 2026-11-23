@@ -1,8 +1,7 @@
 """
 Single-neuron two-state dynamics (Supp Fig 11a-m): one- vs two-state Poisson HMMs and the link between HMM high states
 and population bursts.
-
-HMM fits (as in the R2 HMM.py), all neurons with >= 20 trials, 30 ms bins:
+HMM fits, all neurons with >= 20 trials, 30 ms bins:
   encoding  : first image, 0-1 s (33 bins). Parameters from a 2-state fit to all trials; two-state preference = 5-fold
               held-out delta log-likelihood per bin (2-state - 1-state).
   maintenance: parameters from one fit to 1-2 s; preference = 5-fold held-out delta LL pooled over 5 resampled 1 s windows
@@ -18,10 +17,6 @@ P(high state) per 30 ms bin from the neuron's fit (encoding 0-1 s, maintenance 1
 Statistics: a, b: none (descriptive); c: Wilcoxon signed-rank vs 0; d-g: Wilcoxon signed-rank on delta LL; h-k:
 chi-square vs uniform; l, m: rate-matched pairs (each PY matched 1:1 to the IN with the nearest log rate, without
 replacement, |difference| <= 0.25), Fisher's exact test per class, BH across the 3 classes.
-The fits take about an hour on one core; set N_JOBS to fit neurons in parallel (results do not depend on it). Fits and
-burst links are saved and reused on later runs.
-Run from 05_cell_analysis. Outputs (./HMM): hmm_fits_encoding.csv, hmm_fits_maintenance.csv, hmm_burst_link_<epoch>.csv,
-S11_stats.csv, S11a ... S11m panels (.eps)
 """
 import os
 for v in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS'):
